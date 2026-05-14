@@ -103,11 +103,11 @@
 - [x] XLATE8 north-south traffic flow
 - [x] Interactive CLI for Zone Server management (`ipv8lab zone`)
 - [x] Multi-zone CLI commands (`ipv8lab multizone`)
-- [x] 707 tests total
+- [x] BGP8 path selection CLI (`ipv8lab bgp8`)
+- [x] 746 tests total
 
 ## Future
 
-- [ ] BGP8 path selection CLI (`ipv8lab bgp8`)
 - [ ] XLATE8 flow CLI (`ipv8lab xlate8`)
 - [ ] Performance dashboard with CF visualisation
 - [ ] PCAP export for Wireshark integration

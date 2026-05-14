@@ -7,6 +7,7 @@ import typer
 
 from ipv8lab.cli.addr import app as addr_app
 from ipv8lab.cli.bench_cli import app as bench_app
+from ipv8lab.cli.bgp8_cli import app as bgp8_app
 from ipv8lab.cli.capture_cli import app as capture_app
 from ipv8lab.cli.dashboard_cli import app as dashboard_app
 from ipv8lab.cli.packet_cli import app as packet_app
@@ -23,6 +24,7 @@ app = typer.Typer(
 
 app.add_typer(addr_app, name="addr", help="IPv8 address operations.")
 app.add_typer(bench_app, name="bench", help="Performance benchmarks.")
+app.add_typer(bgp8_app, name="bgp8", help="BGP8 path selection.")
 app.add_typer(packet_app, name="packet", help="IPv8 Lab packet operations.")
 app.add_typer(route_app, name="route", help="Routing simulation.")
 app.add_typer(udp_app, name="udp", help="UDP transport experiments.")
