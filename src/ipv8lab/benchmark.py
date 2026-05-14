@@ -36,7 +36,7 @@ class BenchmarkResult:
         return (self.total_seconds * 1_000_000) / self.iterations
 
 
-def _bench(name: str, func: Callable[[], None], iterations: int = 10_000) -> BenchmarkResult:
+def _bench(name: str, func: Callable[[], object], iterations: int = 10_000) -> BenchmarkResult:
     """Run a function N times and measure elapsed time."""
     start = time.perf_counter()
     for _ in range(iterations):
