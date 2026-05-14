@@ -82,3 +82,62 @@ class RouteTable:
                 )
             )
         return table
+
+
+@dataclass(slots=True)
+class TwoTierRouteTable:
+    """Two-tier routing table per Section 8.7.
+
+    Tier 1 (global): routes by r.r.r.r routing prefix → AS border router.
+    Tier 2 (local):  routes by n.n.n.n host address  → same as IPv4 routing.
+
+    When r.r.r.r = 0.0.0.0 (IPv4-compatible), Tier 1 is bypassed.
+    """
+
+    tier1: RouteTable = field(default_factory=RouteTable)
+    tier2: RouteTable = field(default_factory=RouteTable)
+
+    def find_route(self, address: str | IPv8Address) -> Route:
+        """Look up the best route using two-tier logic."""
+        if isinstance(address, str):
+            address = IPv8Address.parse(address)
+
+        # When r.r.r.r = 0.0.0.0, bypass Tier 1 — route on n.n.n.n only
+        if address.is_ipv4_compatible():
+            return self._tier2_lookup(address)
+
+        # Tier 1: route by ASN prefix
+        try:
+            return self.tier1.find_route(address)
+        except NoRouteFoundError:
+            pass
+
+        # Fallback to Tier 2
+        return self._tier2_lookup(address)
+
+    def _tier2_lookup(self, address: IPv8Address) -> Route:
+        """Tier 2 lookup by host part (n.n.n.n)."""
+        host_str = address.host_str
+
+        # Exact host match
+        for route in self.tier2.routes:
+            if route.destination_prefix == host_str:
+                return route
+
+        # Prefix match: compare by first octets (simple /8, /16, /24 matching)
+        host_parts = host_str.split(".")
+        for prefix_len in (3, 2, 1):
+            candidate = ".".join(host_parts[:prefix_len]) + ".0" * (4 - prefix_len)
+            for route in self.tier2.routes:
+                if route.destination_prefix == candidate:
+                    return route
+
+        # Fallback: default route
+        for route in self.tier2.routes:
+            if route.destination_prefix == "0.0.0.0":
+                return route
+
+        raise NoRouteFoundError(
+            f"No route found for {address.full_notation} "
+            f"(prefix={address.prefix_str}, host={host_str})"
+        )
