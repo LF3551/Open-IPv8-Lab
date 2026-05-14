@@ -111,3 +111,14 @@
 - [x] 874 tests total
 
 ## Future
+
+- [ ] IPv8 packet fragmentation and reassembly
+- [ ] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
+- [ ] NAT8 address translation gateway simulation
+- [ ] Flow monitoring and NetFlow8-style telemetry export
+- [ ] QoS / traffic shaping based on TOS field
+- [ ] Docker-based multi-node testbed
+- [ ] TUI dashboard (Rich Live / Textual)
+- [ ] Packet fuzzer for protocol security testing
+- [ ] mTLS / encryption layer for Zone Server auth
+- [ ] PyPI package publishing
