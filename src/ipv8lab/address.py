@@ -83,13 +83,74 @@ class IPv8Address:
         """ASN dot notation: ASN.n.n.n.n"""
         return f"{self.asn}.{self.host_str}"
 
+    # --- address class classification (Section 4) ----------------------------
+
     def is_ipv4_compatible(self) -> bool:
-        """True if routing prefix is 0.0.0.0."""
+        """True if routing prefix is 0.0.0.0 (Section 3.3)."""
         return self.routing_prefix == (0, 0, 0, 0)
 
     def is_internal_zone(self) -> bool:
-        """True if the first octet of the routing prefix is 127."""
+        """True if r.r.r.r is in 127.0.0.0/8 (Section 3.5)."""
         return self.routing_prefix[0] == 127
+
+    def is_interop_prefix(self) -> bool:
+        """True if r.r.r.r is 127.127.0.0 — inter-company interop DMZ (Section 3.6)."""
+        return self.routing_prefix == (127, 127, 0, 0)
+
+    def is_rine_prefix(self) -> bool:
+        """True if r.r.r.r is in 100.0.0.0/8 — RINE peering fabric (Section 3.9)."""
+        return self.routing_prefix[0] == 100
+
+    def is_interior_link(self) -> bool:
+        """True if n.n.n.n is in 222.0.0.0/8 — interior link convention (Section 3.10)."""
+        return self.host_part[0] == 222
+
+    def is_broadcast(self) -> bool:
+        """True if r.r.r.r is ff.ff.ff.ff (Section 12)."""
+        return self.routing_prefix == (255, 255, 255, 255)
+
+    def is_multicast(self) -> bool:
+        """True if r.r.r.r is in ff.ff.00.00/16 — cross-ASN multicast (Section 10.2)."""
+        return self.routing_prefix[0] == 255 and self.routing_prefix[1] == 255
+
+    def is_intra_asn_multicast(self) -> bool:
+        """True if IPv4-compat and n.n.n.n in 224.0.0.0/4 (Section 10.1)."""
+        return self.is_ipv4_compatible() and 224 <= self.host_part[0] <= 239
+
+    def is_unicast(self) -> bool:
+        """True if address is a regular ASN unicast address (Section 4)."""
+        return (
+            not self.is_ipv4_compatible()
+            and not self.is_internal_zone()
+            and not self.is_rine_prefix()
+            and not self.is_broadcast()
+            and not self.is_multicast()
+        )
+
+    def is_private_peering_asn(self) -> bool:
+        """True if ASN 65534 — private inter-company BGP8 peering (Section 3.8)."""
+        return self.asn == 65534
+
+    def is_documentation_asn(self) -> bool:
+        """True if ASN 65533 — documentation and testing (Section 3.8)."""
+        return self.asn == 65533
+
+    @property
+    def address_class(self) -> str:
+        """Return the address class name per Section 4."""
+        if self.is_broadcast():
+            return "broadcast"
+        if self.is_multicast():
+            return "cross-asn-multicast"
+        if self.is_intra_asn_multicast():
+            return "intra-asn-multicast"
+        if self.is_ipv4_compatible():
+            return "ipv4-compatible"
+        if self.is_internal_zone():
+            return "internal-zone"
+        if self.is_rine_prefix():
+            return "rine-peering"
+        return "asn-unicast"
 
     def to_int(self) -> int:
         """Pack the full 8-octet address into a 64-bit integer."""

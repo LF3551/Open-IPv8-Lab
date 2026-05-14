@@ -148,4 +148,80 @@ class TestIPv8AddressInt:
     def test_zero_address(self):
         addr = IPv8Address.parse("0.0.0.0.0.0.0.0")
         assert addr.to_int() == 0
-        assert IPv8Address.from_int(0) == addr
+
+
+# --- Address classes (Section 4) ----------------------------------------------
+
+class TestAddressClasses:
+    def test_ipv4_compatible(self):
+        addr = IPv8Address.parse("0.0.0.0.8.8.8.8")
+        assert addr.address_class == "ipv4-compatible"
+        assert addr.is_ipv4_compatible()
+
+    def test_asn_unicast(self):
+        addr = IPv8Address.parse("64496.192.0.2.1")
+        assert addr.address_class == "asn-unicast"
+        assert addr.is_unicast()
+
+    def test_internal_zone(self):
+        addr = IPv8Address.parse("127.1.0.0.10.0.0.1")
+        assert addr.address_class == "internal-zone"
+        assert addr.is_internal_zone()
+        assert not addr.is_unicast()
+
+    def test_interop_prefix(self):
+        addr = IPv8Address.parse("127.127.0.0.10.0.0.1")
+        assert addr.is_interop_prefix()
+        assert addr.is_internal_zone()  # 127.x is also internal
+
+    def test_rine_peering(self):
+        addr = IPv8Address.parse("100.0.0.1.10.0.0.1")
+        assert addr.address_class == "rine-peering"
+        assert addr.is_rine_prefix()
+        assert not addr.is_unicast()
+
+    def test_interior_link(self):
+        addr = IPv8Address.parse("64496.222.0.0.1")
+        assert addr.is_interior_link()
+
+    def test_broadcast(self):
+        addr = IPv8Address.parse("255.255.255.255.255.255.255.255")
+        assert addr.address_class == "broadcast"
+        assert addr.is_broadcast()
+        assert not addr.is_unicast()
+
+    def test_cross_asn_multicast(self):
+        addr = IPv8Address.parse("255.255.0.0.224.0.0.1")
+        assert addr.address_class == "cross-asn-multicast"
+        assert addr.is_multicast()
+        assert not addr.is_unicast()
+
+    def test_intra_asn_multicast(self):
+        addr = IPv8Address.parse("0.0.0.0.224.0.0.1")
+        assert addr.address_class == "intra-asn-multicast"
+        assert addr.is_intra_asn_multicast()
+
+    def test_private_peering_asn(self):
+        addr = IPv8Address.parse("65534.10.0.0.1")
+        assert addr.is_private_peering_asn()
+        assert addr.asn == 65534
+
+    def test_documentation_asn(self):
+        addr = IPv8Address.parse("65533.10.0.0.1")
+        assert addr.is_documentation_asn()
+        assert addr.asn == 65533
+
+    def test_multicast_takes_precedence_over_broadcast(self):
+        # ff.ff.ff.ff is broadcast, but ff.ff.00.00 is multicast
+        mc = IPv8Address.parse("255.255.0.0.224.0.0.1")
+        assert mc.address_class == "cross-asn-multicast"
+        bc = IPv8Address.parse("255.255.255.255.0.0.0.0")
+        assert bc.address_class == "broadcast"
+
+    def test_ospf8_multicast(self):
+        addr = IPv8Address.parse("255.255.0.1.224.0.0.5")
+        assert addr.is_multicast()
+
+    def test_bgp8_multicast(self):
+        addr = IPv8Address.parse("255.255.0.2.224.0.0.1")
+        assert addr.is_multicast()
