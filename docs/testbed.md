@@ -105,3 +105,71 @@ Stub modules for all companion specifications:
 - **Update8** — firmware updates from DNS-named sources only (draft-thain-update8-00)
 - **WiFi8** — access points with Zone Server integration (draft-thain-wifi8-00)
 - **SNMPv8** — MIB tree (draft-thain-ipv8-mib-00)
+
+## Integration scenarios (v0.10)
+
+### End-to-end integration
+
+Full device onboarding lifecycle in 7 steps:
+
+1. Zone Server pair setup (primary .254, secondary .253)
+2. DHCP8 device provisioning (single-response)
+3. OAuth8 authentication (JWT issue + validate)
+4. ACL8 authorisation (east-west enforcement)
+5. WHOIS8 egress validation (north-south)
+6. Packet routing (two-tier table)
+7. Ingress filter (ASN spoofing detection)
+
+### Multi-zone simulation
+
+Multiple internal zones (127.x.0.0) with full service stacks connected via IBGP8-style inter-zone routing:
+
+- Zone isolation via ACL8 default deny
+- Bidirectional Tier 1 routes between zones
+- Device provisioning and authentication per zone
+
+### BGP8 path selection with CF metric
+
+Per-prefix RIB with CF-based best path selection:
+
+- Lowest accumulated CF wins
+- AS-path length and origin ASN tie-breaks
+- CF anomaly detection (RTT vs physics floor)
+- AS-path loop rejection, /16 minimum prefix validation
+- Withdraw + automatic failover
+
+### XLATE8 north-south traffic flow (Section 1.4)
+
+DNS8 → XLATE8 state table → address translation:
+
+- **Egress**: internal 127.x → external ASN address rewrite
+- **Ingress**: reverse XLATE8 lookup → internal address rewrite
+- No DNS lookup = no XLATE8 entry = blocked
+- Full round-trip simulation
+
+### Zone Server CLI (`ipv8lab zone`)
+
+Interactive management of Zone Server pairs:
+
+```bash
+# Initialize a zone
+ipv8lab zone init --prefix 127.1.0.0
+
+# Show status
+ipv8lab zone status --json
+
+# Manage services
+ipv8lab zone service-add DHCP8 dhcp.127.1.0.0
+ipv8lab zone service-list
+
+# ACL8 rules
+ipv8lab zone acl-add "*" gateway --action permit
+ipv8lab zone acl-check dev-01 gateway
+
+# OAuth8 tokens
+ipv8lab zone oauth-issue device-42
+ipv8lab zone oauth-validate <token>
+
+# PVRST VLAN check
+ipv8lab zone vlan-check 100
+```

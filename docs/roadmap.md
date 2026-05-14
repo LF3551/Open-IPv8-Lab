@@ -101,4 +101,13 @@
 - [x] Multi-zone simulation with Zone Server pairs
 - [x] BGP8 path selection with CF metric
 - [x] XLATE8 north-south traffic flow
-- [x] Interactive CLI for Zone Server management
+- [x] Interactive CLI for Zone Server management (`ipv8lab zone`)
+- [x] 669 tests total
+
+## Future
+
+- [ ] Multi-zone CLI commands (`ipv8lab multizone`)
+- [ ] BGP8 path selection CLI (`ipv8lab bgp8`)
+- [ ] XLATE8 flow CLI (`ipv8lab xlate8`)
+- [ ] Performance dashboard with CF visualisation
+- [ ] PCAP export for Wireshark integration

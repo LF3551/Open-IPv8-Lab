@@ -24,6 +24,11 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 - Zone Server mock: OAuth8 JWT cache, ACL8 east-west access control (Sections 1.3, 1.4)
 - NetLog8 telemetry client: structured logging with SEC-ALERT and E3 traps (Section 18)
 - Companion spec modules: BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, Update8, WiFi8, SNMPv8
+- End-to-end integration scenario: DHCP8 → OAuth8 → ACL8 → routing in one lifecycle
+- Multi-zone simulation: Zone Server pairs with IBGP8-style inter-zone routing
+- BGP8 path selection with CF metric: per-prefix RIB, anomaly detection, failover
+- XLATE8 north-south traffic flow: DNS8 → XLATE8 → translation → ingress (Section 1.4)
+- Interactive CLI for Zone Server management (`ipv8lab zone`)
 - Mesh network simulation, packet capture/replay, web dashboard, benchmarks, plugin system
 
 ## What it does NOT do
@@ -37,6 +42,6 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 
 1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-00
 2. **Userspace only** — everything runs as a normal user process
-3. **Tested** — 497 tests covering all implemented sections
+3. **Tested** — 669 tests covering all implemented sections
 4. **Extensible** — plugin system for custom protocol experiments
 5. **Safe** — no system modifications, no privilege escalation

@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, and all companion spec modules.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, and interactive Zone Server CLI.
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -41,6 +41,11 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | 18 | NetLog8 telemetry (SEC-ALERT, E3 traps) | `netlog8.py` |
 | — | WHOIS8 mock resolver (ASN/route validation) | `whois8.py` |
 | — | Companion specs (BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, Update8, WiFi8, SNMPv8) | `companions.py` |
+| — | End-to-end integration (DHCP8 → OAuth8 → ACL8 → routing) | `integration.py` |
+| — | Multi-zone simulation (Zone Server pairs, IBGP8 inter-zone routing) | `multizone.py` |
+| 8.4 | BGP8 path selection with CF metric (anomaly detection, failover) | `bgp8_selection.py` |
+| 1.4 | XLATE8 north-south traffic flow (DNS8 → XLATE8 → translation) | `xlate8_flow.py` |
+| — | Interactive Zone Server CLI | `cli/zone_cli.py` |
 
 ## Goals
 
@@ -61,6 +66,11 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - Zone Server OAuth8 JWT cache and ACL8 access control (Sections 1.3, 1.4)
 - NetLog8 telemetry with SEC-ALERT and E3 traps (Section 18)
 - Companion spec modules: BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, Update8, WiFi8, SNMPv8
+- End-to-end integration scenario: DHCP8 → OAuth8 → ACL8 → routing lifecycle
+- Multi-zone simulation with Zone Server pairs and IBGP8-style inter-zone routing
+- BGP8 path selection with CF metric: per-prefix RIB, anomaly detection, failover
+- XLATE8 north-south traffic flow: DNS8 → XLATE8 → address translation (Section 1.4)
+- Interactive Zone Server CLI: `ipv8lab zone` (init, status, services, ACL8, OAuth8, VLAN)
 - Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
 
 ## Non-goals
@@ -98,6 +108,13 @@ ipv8lab packet parse packet.bin
 
 # Run routing simulation
 ipv8lab route simulate --config examples/two_asn_demo.yaml
+
+# Zone Server management
+ipv8lab zone init --prefix 127.1.0.0
+ipv8lab zone status
+ipv8lab zone acl-add "*" gateway --action permit
+ipv8lab zone oauth-issue device-42
+ipv8lab zone vlan-check 100
 ```
 
 ## Example output
@@ -119,7 +136,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-497 tests covering all implemented spec sections.
+669 tests covering all implemented spec sections.
 
 ## Project structure
 
@@ -145,6 +162,10 @@ src/ipv8lab/
 ├── zoneserver.py     # Zone Server: OAuth8 cache, ACL8 (Sections 1.3, 1.4)
 ├── netlog8.py        # NetLog8 telemetry client (Section 18)
 ├── companions.py     # Companion spec modules (7 companion drafts)
+├── integration.py    # End-to-end integration scenario
+├── multizone.py      # Multi-zone simulation with Zone Server pairs
+├── bgp8_selection.py # BGP8 path selection with CF metric
+├── xlate8_flow.py    # XLATE8 north-south traffic flow
 ├── errors.py         # Error hierarchy
 ├── node.py           # Node abstraction
 ├── simulator.py      # Mesh network simulator

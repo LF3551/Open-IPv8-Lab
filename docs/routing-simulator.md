@@ -51,3 +51,18 @@ ipv8lab route simulate --config examples/three_asn_mesh.yaml
 ```
 
 Packet tracing shows each hop through the network.
+
+## BGP8 path selection with CF metric (Section 8.4)
+
+BGP8PathSelector maintains a per-prefix RIB and selects the best path using accumulated Cost Factor:
+
+| Step | Criterion |
+|------|-----------|
+| 1 | Filter invalid prefixes (/16 min for eBGP8), reject AS-path loops |
+| 2 | Lowest `CF_total = CF_external + CF_intrazone` |
+| 3 | Shortest AS-path (tie-break) |
+| 4 | Lowest origin ASN (further tie-break) |
+
+CF anomalies are flagged when measured RTT is faster than the physics floor (speed of light in fibre over great-circle distance).
+
+Withdraw a prefix → second-best path automatically becomes best.
