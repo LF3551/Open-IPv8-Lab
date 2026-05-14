@@ -12,6 +12,7 @@ from ipv8lab.cli.dashboard_cli import app as dashboard_app
 from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.route_cli import app as route_app
 from ipv8lab.cli.udp_cli import app as udp_app
+from ipv8lab.cli.zone_cli import app as zone_app
 
 app = typer.Typer(
     name="ipv8lab",
@@ -26,6 +27,7 @@ app.add_typer(route_app, name="route", help="Routing simulation.")
 app.add_typer(udp_app, name="udp", help="UDP transport experiments.")
 app.add_typer(capture_app, name="capture", help="Packet capture and replay.")
 app.add_typer(dashboard_app, name="dashboard", help="Web UI dashboard.")
+app.add_typer(zone_app, name="zone", help="Zone Server management.")
 
 if __name__ == "__main__":
     app()

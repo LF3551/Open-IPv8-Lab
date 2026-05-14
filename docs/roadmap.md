@@ -101,7 +101,4 @@
 - [x] Multi-zone simulation with Zone Server pairs
 - [x] BGP8 path selection with CF metric
 - [x] XLATE8 north-south traffic flow
-
-## Future
-
-- [ ] Interactive CLI for Zone Server management
+- [x] Interactive CLI for Zone Server management
