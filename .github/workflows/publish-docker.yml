@@ -1,4 +1,4 @@
-name: Publish to Docker Hub
+name: Publish Docker images
 
 on:
   release:
@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   docker:
@@ -25,11 +26,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: lf3551/open-ipv8-lab
+          images: |
+            lf3551/open-ipv8-lab
+            ghcr.io/lf3551/open-ipv8-lab
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
