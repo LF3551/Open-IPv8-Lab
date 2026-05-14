@@ -43,7 +43,7 @@ class TestPacketSummary:
         assert s["dst_asn"] == 64497
         assert s["payload_length"] == 4
         assert s["payload_text"] == "test"
-        assert s["version"] == 1
+        assert s["version"] == 8
 
 
 class TestAddressSummary:
