@@ -1,0 +1,101 @@
+network:
+  name: three-asn-mesh
+
+# Three autonomous systems connected in a triangle mesh:
+#
+#   ASN 64496 (node-a) <---> ASN 64497 (node-b)
+#         \                      /
+#          \                    /
+#           +-- ASN 64498 (node-c) --+
+#
+# Any node can reach any other node through at most 2 hops.
+
+nodes:
+  - name: node-a
+    address: 64496.10.0.1.1
+    type: host
+
+  - name: node-b
+    address: 64497.10.0.2.1
+    type: host
+
+  - name: node-c
+    address: 64498.10.0.3.1
+    type: host
+
+routers:
+  - name: router-a
+    asn: 64496
+
+  - name: router-b
+    asn: 64497
+
+  - name: router-c
+    asn: 64498
+
+links:
+  # Hosts to their routers
+  - from: node-a
+    to: router-a
+  - from: node-b
+    to: router-b
+  - from: node-c
+    to: router-c
+
+  # Mesh links between routers (bidirectional)
+  - from: router-a
+    to: router-b
+  - from: router-b
+    to: router-a
+
+  - from: router-a
+    to: router-c
+  - from: router-c
+    to: router-a
+
+  - from: router-b
+    to: router-c
+  - from: router-c
+    to: router-b
+
+  # Routers to hosts (for delivery)
+  - from: router-a
+    to: node-a
+  - from: router-b
+    to: node-b
+  - from: router-c
+    to: node-c
+
+routes:
+  # router-a knows how to reach ASN 64497 and 64498
+  - router: router-a
+    destination_prefix: "0.0.251.241"
+    next_hop: router-b
+    interface: mesh0
+
+  - router: router-a
+    destination_prefix: "0.0.251.242"
+    next_hop: router-c
+    interface: mesh1
+
+  # router-b knows how to reach ASN 64496 and 64498
+  - router: router-b
+    destination_prefix: "0.0.251.240"
+    next_hop: router-a
+    interface: mesh0
+
+  - router: router-b
+    destination_prefix: "0.0.251.242"
+    next_hop: router-c
+    interface: mesh1
+
+  # router-c knows how to reach ASN 64496 and 64497
+  - router: router-c
+    destination_prefix: "0.0.251.240"
+    next_hop: router-a
+    interface: mesh0
+
+  - router: router-c
+    destination_prefix: "0.0.251.241"
+    next_hop: router-b
+    interface: mesh1

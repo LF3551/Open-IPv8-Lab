@@ -25,6 +25,7 @@ class NetworkSimulator:
     nodes: dict[str, Node] = field(default_factory=dict)
     links: list[tuple[str, str]] = field(default_factory=list)
     trace: list[str] = field(default_factory=list)
+    _visited: set[str] = field(default_factory=set)
 
     # --- setup ----------------------------------------------------------------
 
@@ -42,6 +43,7 @@ class NetworkSimulator:
         Returns the trace log of hops.
         """
         self.trace.clear()
+        self._visited.clear()
         src_node = self.nodes[src_name]
         dst_addr = IPv8Address.parse(dst_address)
         pkt = IPv8Packet(
@@ -56,17 +58,33 @@ class NetworkSimulator:
 
     def _forward(self, current_name: str, pkt: IPv8Packet) -> None:
         """Recursively forward the packet through the network."""
+        # Cycle detection for forwarding
+        if current_name in self._visited:
+            self.trace.append(f"[{current_name}] Loop detected, packet dropped")
+            return
+        self._visited.add(current_name)
+
         # Check if destination is this node
-        for name, node in self.nodes.items():
-            if node.address.to_int() == pkt.dst.to_int():
-                if name == current_name:
-                    node.receive_packet(pkt)
+        current_node = self.nodes[current_name]
+        if current_node.address.to_int() == pkt.dst.to_int():
+            current_node.receive_packet(pkt)
+            self.trace.append(
+                f"[{current_name}] Packet delivered. "
+                f"Payload: {pkt.payload.decode(errors='replace')}"
+            )
+            return
+
+        # Check linked nodes for direct delivery
+        for frm, to in self.links:
+            if frm == current_name and to in self.nodes:
+                if self.nodes[to].address.to_int() == pkt.dst.to_int():
+                    self.trace.append(f"[{current_name}] -> [{to}]")
+                    self.nodes[to].receive_packet(pkt)
                     self.trace.append(
-                        f"[{name}] Packet delivered. Payload: {pkt.payload.decode(errors='replace')}"
+                        f"[{to}] Packet delivered. "
+                        f"Payload: {pkt.payload.decode(errors='replace')}"
                     )
                     return
-
-        current_node = self.nodes[current_name]
 
         # Try to find a route
         try:
@@ -74,18 +92,7 @@ class NetworkSimulator:
         except NoRouteFoundError:
             # No explicit route — try forwarding via linked nodes
             for frm, to in self.links:
-                if frm == current_name and to in self.nodes:
-                    next_node = self.nodes[to]
-                    # Check if the next node IS the destination
-                    if next_node.address.to_int() == pkt.dst.to_int():
-                        self.trace.append(f"[{current_name}] -> [{to}]")
-                        next_node.receive_packet(pkt)
-                        self.trace.append(
-                            f"[{to}] Packet delivered. "
-                            f"Payload: {pkt.payload.decode(errors='replace')}"
-                        )
-                        return
-                    # Otherwise forward to the linked node and let it route
+                if frm == current_name and to in self.nodes and to not in self._visited:
                     self.trace.append(f"[{current_name}] -> [{to}] (link)")
                     pkt.ttl -= 1
                     if pkt.ttl <= 0:
@@ -106,15 +113,6 @@ class NetworkSimulator:
         pkt.ttl -= 1
         if pkt.ttl <= 0:
             self.trace.append(f"[{next_hop}] TTL expired, packet dropped")
-            return
-
-        # Check if next_hop is the destination
-        if self.nodes[next_hop].address.to_int() == pkt.dst.to_int():
-            self.nodes[next_hop].receive_packet(pkt)
-            self.trace.append(
-                f"[{next_hop}] Packet delivered. "
-                f"Payload: {pkt.payload.decode(errors='replace')}"
-            )
             return
 
         self._forward(next_hop, pkt)
