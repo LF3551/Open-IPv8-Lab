@@ -20,6 +20,7 @@ from ipv8lab.cli.udp_cli import app as udp_app
 from ipv8lab.cli.multizone_cli import app as multizone_app
 from ipv8lab.cli.nat8_cli import app as nat8_app
 from ipv8lab.cli.netflow8_cli import app as netflow8_app
+from ipv8lab.cli.qos_cli import app as qos_app
 from ipv8lab.cli.xlate8_cli import app as xlate8_app
 from ipv8lab.cli.zone_cli import app as zone_app
 
@@ -45,6 +46,7 @@ app.add_typer(zone_app, name="zone", help="Zone Server management.")
 app.add_typer(multizone_app, name="multizone", help="Multi-zone simulation.")
 app.add_typer(nat8_app, name="nat8", help="NAT8 address translation gateway.")
 app.add_typer(netflow8_app, name="netflow8", help="NetFlow8 flow monitoring and telemetry.")
+app.add_typer(qos_app, name="qos", help="QoS traffic shaping based on TOS field.")
 app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
 
 if __name__ == "__main__":

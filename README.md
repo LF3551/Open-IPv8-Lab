@@ -146,7 +146,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-1101 tests covering all implemented spec sections.
+1160 tests covering all implemented spec sections.
 
 ## Project structure
 
