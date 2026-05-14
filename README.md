@@ -1,7 +1,7 @@
 # Open-IPv8-Lab
 
 <p align="center">
-  <img src="assets/logo.png" alt="Open-IPv8-Lab" width="100%">
+  <img src="https://raw.githubusercontent.com/LF3551/Open-IPv8-Lab/main/assets/logo.png" alt="Open-IPv8-Lab" width="100%">
 </p>
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
