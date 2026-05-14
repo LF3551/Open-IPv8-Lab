@@ -7,15 +7,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
 from ipv8lab.address import IPv8Address
 from ipv8lab.errors import NoRouteFoundError
 from ipv8lab.node import Node
-from ipv8lab.packet import IPv8Packet, PROTO_EXPERIMENTAL
-from ipv8lab.route import Route, RouteTable
+from ipv8lab.packet import IPv8Packet
+from ipv8lab.route import Route
 
 
 @dataclass(slots=True)

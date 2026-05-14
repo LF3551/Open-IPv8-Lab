@@ -4,7 +4,6 @@
 """Tests for ipv8lab.simulator."""
 
 import textwrap
-import tempfile
 from pathlib import Path
 
 import pytest
