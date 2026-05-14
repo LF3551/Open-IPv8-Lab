@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, and more.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, and all companion spec modules.
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -20,6 +20,10 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 
 | Section | Topic | Module |
 |---------|-------|--------|
+| 1.3 | DHCP8 lease (single-response provisioning) | `dhcp8.py` |
+| 1.3 | Zone Server (OAuth8 cache, ACL8 engine) | `zoneserver.py` |
+| 1.4 | East-west / north-south security | `zoneserver.py` |
+| 1.6 | Cost Factor (CF) metric simulation | `cost_factor.py` |
 | 3 | Address format (64-bit, ASN prefix + host) | `address.py` |
 | 4 | Address classes (unicast, multicast, broadcast, RINE, internal zone) | `address.py` |
 | 5.1 | Packet header (28-byte, version 8) | `packet.py` |
@@ -34,6 +38,9 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | 17.4 | PVRST (Zone Server root election) | `pvrst.py` |
 | 17.5 | NIC rate limits | `ratelimit.py` |
 | 18 | Security — ingress filtering, prefix protection | `security.py`, `validation.py` |
+| 18 | NetLog8 telemetry (SEC-ALERT, E3 traps) | `netlog8.py` |
+| — | WHOIS8 mock resolver (ASN/route validation) | `whois8.py` |
+| — | Companion specs (BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, Update8, WiFi8, SNMPv8) | `companions.py` |
 
 ## Goals
 
@@ -48,6 +55,12 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - PVRST Zone Server root election (Section 17.4)
 - NIC firmware rate limiting simulation (Section 17.5)
 - Border router ingress filtering and security checks (Section 18)
+- Cost Factor (CF) metric: 7-component path quality with physics floor (Section 1.6)
+- WHOIS8 route/destination validation
+- DHCP8 single-response lease provisioning (Section 1.3)
+- Zone Server OAuth8 JWT cache and ACL8 access control (Sections 1.3, 1.4)
+- NetLog8 telemetry with SEC-ALERT and E3 traps (Section 18)
+- Companion spec modules: BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, Update8, WiFi8, SNMPv8
 - Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
 
 ## Non-goals
@@ -106,7 +119,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-311 tests covering all implemented spec sections.
+497 tests covering all implemented spec sections.
 
 ## Project structure
 
@@ -126,6 +139,12 @@ src/ipv8lab/
 ├── ratelimit.py      # NIC rate limits (Section 17.5)
 ├── security.py       # Ingress filtering (Section 18)
 ├── validation.py     # Prefix validation (Sections 3.5, 3.9, 3.10)
+├── cost_factor.py    # Cost Factor (CF) metric (Section 1.6)
+├── whois8.py         # WHOIS8 mock resolver
+├── dhcp8.py          # DHCP8 lease simulation (Section 1.3)
+├── zoneserver.py     # Zone Server: OAuth8 cache, ACL8 (Sections 1.3, 1.4)
+├── netlog8.py        # NetLog8 telemetry client (Section 18)
+├── companions.py     # Companion spec modules (7 companion drafts)
 ├── errors.py         # Error hierarchy
 ├── node.py           # Node abstraction
 ├── simulator.py      # Mesh network simulator

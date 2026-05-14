@@ -77,13 +77,28 @@
 - [x] DNS A8 record type per Section 7
 - [x] VRF per Section 8.8
 - [x] PVRST per Section 17.4
-- [x] 311 tests total
+
+## v0.9 — Management suite & companion specs
+
+- [x] Cost Factor (CF) metric simulation per Section 1.6
+- [x] WHOIS8 mock resolver (ASN validation, route validation)
+- [x] DHCP8 lease simulation per Section 1.3 (single-response provisioning)
+- [x] Zone Server mock (OAuth8 cache, ACL8 engine) per Sections 1.3, 1.4
+- [x] NetLog8 telemetry client (SEC-ALERT, E3 traps) per Section 18
+- [x] Companion spec modules:
+  - [x] BGP8/IBGP8/OSPF8/IS-IS8 (draft-thain-routing-protocols-00)
+  - [x] RINE peering fabric (draft-thain-rine-00)
+  - [x] ARP8 with gratuitous announce (draft-thain-support8-00)
+  - [x] XLATE8 translation table (draft-thain-zoneserver-00)
+  - [x] Update8 and NIC certification (draft-thain-update8-00)
+  - [x] WiFi8 protocol (draft-thain-wifi8-00)
+  - [x] SNMPv8 MIB (draft-thain-ipv8-mib-00)
+- [x] 497 tests total
 
 ## Future
 
-- [x] Cost Factor (CF) metric simulation
-- [x] WHOIS8 mock resolver
-- [x] DHCP8 lease simulation
-- [x] Zone Server mock (OAuth8 cache, ACL8)
-- [x] NetLog8 telemetry client
-- [x] Companion spec modules (draft-thain-routing-protocols-00, etc.)
+- [ ] End-to-end integration scenario (DHCP8 → OAuth8 → ACL8 → routing)
+- [ ] Multi-zone simulation with Zone Server pairs
+- [ ] BGP8 path selection with CF metric
+- [ ] XLATE8 north-south traffic flow
+- [ ] Interactive CLI for Zone Server management
