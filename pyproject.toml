@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open-ipv8-lab"
-version = "0.5.0"
-description = "Experimental userspace IPv8 toolkit for address parsing, packet building, routing simulation, and local testbeds."
+version = "0.8.0"
+description = "Experimental userspace IPv8 toolkit implementing draft-thain-ipv8-00 — address parsing, packet building, routing simulation, ICMPv8, 8to4 tunnelling, and more."
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "Apache-2.0"}
@@ -19,7 +19,10 @@ keywords = [
   "userspace-networking",
   "packet-parser",
   "routing-simulator",
-  "protocol-research"
+  "protocol-research",
+  "draft-thain-ipv8-00",
+  "icmpv8",
+  "asn-routing",
 ]
 dependencies = [
   "typer>=0.12.0",

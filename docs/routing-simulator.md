@@ -1,10 +1,19 @@
-# Routing Simulator
+# Routing (Sections 8.7, 8.8)
 
-The routing simulator demonstrates IPv8-style prefix-based routing in memory.
+Per [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) Sections 8.7 and 8.8.
 
-## Route table
+## Two-tier routing table (Section 8.7)
 
-A route table maps destination prefixes to next hops:
+| Tier | Scope | Lookup key | Purpose |
+|------|-------|------------|---------|
+| 1 | Global | r.r.r.r | Routes to correct AS border router |
+| 2 | Local | n.n.n.n | Identical to existing IPv4 routing table |
+
+When `r.r.r.r = 0.0.0.0` the Tier 1 lookup is bypassed — standard IPv4 rules apply.
+
+Tier 2 supports `/8`, `/16`, `/24` prefix matching.
+
+## Route table config
 
 ```yaml
 routes:
@@ -21,22 +30,24 @@ routes:
     interface: "ipv4"
 ```
 
-## Lookup logic
+## VRF — Virtual Routing and Forwarding (Section 8.8)
 
-1. Extract the first 4 octets of the destination address as the routing prefix
-2. Search for an exact prefix match in the route table
-3. If prefix is `0.0.0.0`, the address is IPv4-compatible
-4. If prefix starts with `127`, the address is internal zone
-5. If a matching route is found, return the next hop
-6. If no route matches, fall back to a `0.0.0.0` default route
-7. If no default route exists, raise `NoRouteFoundError`
+VRF is mandatory for all IPv8 L3 devices:
 
-## Network simulation
+| VRF | VLAN | Purpose |
+|-----|------|---------|
+| management | 4090 | Device management traffic |
+| oob | 4091 | Out-of-band management |
+| default | — | Global/default routing table |
 
-A full network simulation loads a YAML config describing nodes, routers, links, and routes:
+VRF isolation is a routing table property — each VRF has its own independent `RouteTable`.
+
+## Mesh network simulation
+
+The simulator supports multi-hop mesh topologies with cycle detection:
 
 ```bash
-ipv8lab route simulate --config examples/two_asn_demo.yaml
+ipv8lab route simulate --config examples/three_asn_mesh.yaml
 ```
 
-The simulator traces the packet path through the network and displays each hop.
+Packet tracing shows each hop through the network.

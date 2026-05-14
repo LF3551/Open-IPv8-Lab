@@ -1,38 +1,67 @@
-# IPv8 Lab Packet Format
+# IPv8 Packet Header (Section 5.1)
 
-> **Note:** This is an internal experimental format for educational purposes.
-> It is **not** an official IPv8 wire format or an IETF standard.
+Per [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) Section 5.1.
+
+## Header format
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Version|  IHL  |Type of Service|         Total Length          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Identification        |Flags|      Fragment Offset    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Time to Live |    Protocol   |         Header Checksum       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Source ASN Prefix (r.r.r.r)                |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Source Host Address (n.n.n.n)              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                 Destination ASN Prefix (r.r.r.r)              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                 Destination Host Address (n.n.n.n)            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
 
 ## Header fields
 
-| Field          | Type   | Size    | Description                          |
-|----------------|--------|---------|--------------------------------------|
-| version        | uint8  | 1 byte  | Packet format version (currently 1)  |
-| ttl            | uint8  | 1 byte  | Time to live                         |
-| protocol       | uint8  | 1 byte  | Protocol identifier                  |
-| flags          | uint8  | 1 byte  | Reserved flags                       |
-| src_address    | uint64 | 8 bytes | Source IPv8 address                  |
-| dst_address    | uint64 | 8 bytes | Destination IPv8 address             |
-| payload_length | uint32 | 4 bytes | Length of payload in bytes            |
-| checksum       | uint32 | 4 bytes | CRC32 of header (with cksum=0) + payload |
+| Field | Size | Description |
+|-------|------|-------------|
+| Version | 4 bits | IP version number: **8** |
+| IHL | 4 bits | Internet Header Length (7 = 28 bytes) |
+| Type of Service | 1 byte | TOS / DSCP |
+| Total Length | 2 bytes | Header + payload |
+| Identification | 2 bytes | Fragment identification |
+| Flags | 3 bits | Fragmentation flags |
+| Fragment Offset | 13 bits | Fragment offset |
+| Time to Live | 1 byte | TTL hop count |
+| Protocol | 1 byte | Upper-layer protocol |
+| Header Checksum | 2 bytes | CRC32 truncated to 16 bits |
+| Source ASN Prefix | 4 bytes | r.r.r.r of source |
+| Source Host Address | 4 bytes | n.n.n.n of source |
+| Dest ASN Prefix | 4 bytes | r.r.r.r of destination |
+| Dest Host Address | 4 bytes | n.n.n.n of destination |
 
-**Total header size: 28 bytes**
+**Total header size: 28 bytes** (8 octets longer than IPv4)
 
-## Protocol values
-
-| Value | Meaning                  |
-|-------|--------------------------|
-| 1     | ICMP-like control message|
-| 6     | TCP-like payload         |
-| 17    | UDP-like payload         |
-| 253   | Experimental             |
-
-For MVP, protocol 253 (experimental) is used by default.
+**Wire format:** `!BBHHHBBHIIII`
 
 ## Checksum
 
-CRC32 computed over:
-1. Header with checksum field set to 0
-2. Payload bytes
+CRC32 computed over header (with checksum field set to 0) + payload, truncated to 16 bits (`crc32 & 0xFFFF`).
 
-Concatenated and passed through `zlib.crc32()`.
+## ICMPv8 (Section 9)
+
+ICMPv8 extends ICMP for 64-bit addresses. Message types:
+
+| Type | Name |
+|------|------|
+| 0 | Echo Reply |
+| 3 | Destination Unreachable (incl. ASN_UNREACHABLE) |
+| 5 | Redirect |
+| 8 | Echo Request |
+| 11 | Time Exceeded |
+| 12 | Parameter Problem |
+
+ICMPv8 uses one's complement checksum (RFC 1071). Header: `!BBHHH` (8 bytes).

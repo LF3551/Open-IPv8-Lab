@@ -53,10 +53,37 @@
 - [x] Mypy type checking in CI
 - [x] More unit tests (dump, hexdump, summaries)
 
-## v0.7 — Future ideas
+## v0.7 — Mesh, capture, dashboard, benchmarks, plugins
 
-- [ ] Multi-hop mesh topologies
-- [ ] Packet capture/replay
-- [ ] Web UI dashboard
-- [ ] Performance benchmarks
-- [ ] Plugin system for custom protocols
+- [x] Multi-hop mesh topologies with cycle detection
+- [x] Packet capture/replay (.iv8cap format)
+- [x] Web UI dashboard (dark theme, JSON API)
+- [x] Performance benchmarks (6 benchmarks)
+- [x] Plugin system for custom protocols
+- [x] Error hierarchy (IPv8LabError)
+
+## v0.8 — draft-thain-ipv8-00 spec compliance
+
+- [x] Address class classification per Section 4
+- [x] Spec-compliant packet header `!BBHHHBBHIIII` per Section 5.1
+- [x] Prefix validation and routing scope per Sections 3.5, 3.9, 3.10
+- [x] Two-tier routing table per Section 8.7
+- [x] Multicast/broadcast classification per Sections 10–12
+- [x] Border router ingress filtering per Section 18
+- [x] ICMPv8 protocol per Section 9
+- [x] 8to4 tunnelling per Section 13.3
+- [x] Device compliance tiers per Sections 17.1–17.3
+- [x] NIC rate limits per Section 17.5
+- [x] DNS A8 record type per Section 7
+- [x] VRF per Section 8.8
+- [x] PVRST per Section 17.4
+- [x] 311 tests total
+
+## Future
+
+- [ ] Cost Factor (CF) metric simulation
+- [ ] WHOIS8 mock resolver
+- [ ] DHCP8 lease simulation
+- [ ] Zone Server mock (OAuth8 cache, ACL8)
+- [ ] NetLog8 telemetry client
+- [ ] Companion spec modules (draft-thain-routing-protocols-00, etc.)
