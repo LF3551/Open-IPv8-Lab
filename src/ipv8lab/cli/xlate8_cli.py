@@ -330,7 +330,7 @@ def show_status(
     table = Table(title="XLATE8 Flow Status", show_header=False, box=None)
     table.add_column(style="bold cyan", min_width=20)
     table.add_column()
-    table.add_row("Zone prefix", data["zone_prefix"])
+    table.add_row("Zone prefix", str(data["zone_prefix"]))
     table.add_row("External ASN", str(data["external_asn"]))
     table.add_row("DNS records", str(data["dns_records"]))
     table.add_row("XLATE entries", str(data["xlate_entries"]))
