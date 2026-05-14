@@ -105,9 +105,9 @@
 - [x] Multi-zone CLI commands (`ipv8lab multizone`)
 - [x] BGP8 path selection CLI (`ipv8lab bgp8`)
 - [x] XLATE8 flow CLI (`ipv8lab xlate8`)
-- [x] 783 tests total
+- [x] Performance dashboard with CF visualisation (`ipv8lab cf`)
+- [x] 836 tests total
 
 ## Future
 
-- [ ] Performance dashboard with CF visualisation
 - [ ] PCAP export for Wireshark integration
