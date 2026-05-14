@@ -109,10 +109,11 @@
 - [x] 836 tests total
 - [x] PCAP export for Wireshark integration (`ipv8lab pcap`)
 - [x] 874 tests total
+- [x] IPv8 packet fragmentation and reassembly (`ipv8lab frag`)
+- [x] 936 tests total
 
 ## Future
 
-- [ ] IPv8 packet fragmentation and reassembly
 - [ ] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
 - [ ] NAT8 address translation gateway simulation
 - [ ] Flow monitoring and NetFlow8-style telemetry export

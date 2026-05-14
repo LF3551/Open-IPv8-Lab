@@ -11,6 +11,7 @@ from ipv8lab.cli.bgp8_cli import app as bgp8_app
 from ipv8lab.cli.capture_cli import app as capture_app
 from ipv8lab.cli.cf_dashboard_cli import app as cf_dashboard_app
 from ipv8lab.cli.dashboard_cli import app as dashboard_app
+from ipv8lab.cli.frag_cli import app as frag_app
 from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.pcap_cli import app as pcap_app
 from ipv8lab.cli.route_cli import app as route_app
@@ -34,6 +35,7 @@ app.add_typer(route_app, name="route", help="Routing simulation.")
 app.add_typer(udp_app, name="udp", help="UDP transport experiments.")
 app.add_typer(capture_app, name="capture", help="Packet capture and replay.")
 app.add_typer(cf_dashboard_app, name="cf", help="CF performance dashboard.")
+app.add_typer(frag_app, name="frag", help="Packet fragmentation and reassembly.")
 app.add_typer(dashboard_app, name="dashboard", help="Web UI dashboard.")
 app.add_typer(zone_app, name="zone", help="Zone Server management.")
 app.add_typer(multizone_app, name="multizone", help="Multi-zone simulation.")

@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, and interactive Zone Server CLI.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, and interactive Zone Server CLI.
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -46,6 +46,7 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | 8.4 | BGP8 path selection with CF metric (anomaly detection, failover) | `bgp8_selection.py` |
 | 1.4 | XLATE8 north-south traffic flow (DNS8 → XLATE8 → translation) | `xlate8_flow.py` |
 | — | PCAP export for Wireshark integration (PcapWriter, PcapReader, Lua dissector) | `pcap_export.py` |
+| 5.1 | IPv8 packet fragmentation and reassembly (DF/MF flags, offset, Reassembler) | `fragmentation.py` |
 | — | Interactive Zone Server CLI | `cli/zone_cli.py` |
 
 ## Goals
@@ -72,6 +73,7 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - BGP8 path selection with CF metric: per-prefix RIB, anomaly detection, failover
 - XLATE8 north-south traffic flow: DNS8 → XLATE8 → address translation (Section 1.4)
 - PCAP export for Wireshark integration: PcapWriter, PcapReader, Lua dissector
+- IPv8 packet fragmentation and reassembly: DF/MF flags, fragment offset, stateful Reassembler
 - Interactive Zone Server CLI: `ipv8lab zone` (init, status, services, ACL8, OAuth8, VLAN)
 - Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
 
@@ -144,7 +146,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-874 tests covering all implemented spec sections.
+936 tests covering all implemented spec sections.
 
 ## Project structure
 
@@ -175,6 +177,7 @@ src/ipv8lab/
 ├── bgp8_selection.py # BGP8 path selection with CF metric
 ├── xlate8_flow.py    # XLATE8 north-south traffic flow
 ├── pcap_export.py    # PCAP export for Wireshark (.pcap, Lua dissector)
+├── fragmentation.py  # Packet fragmentation and reassembly
 ├── cf_dashboard.py   # CF performance dashboard (HTML, JSON API)
 ├── errors.py         # Error hierarchy
 ├── node.py           # Node abstraction
