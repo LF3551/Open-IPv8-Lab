@@ -81,7 +81,7 @@
 
 ## Future
 
-- [ ] Cost Factor (CF) metric simulation
+- [x] Cost Factor (CF) metric simulation
 - [ ] WHOIS8 mock resolver
 - [ ] DHCP8 lease simulation
 - [ ] Zone Server mock (OAuth8 cache, ACL8)
