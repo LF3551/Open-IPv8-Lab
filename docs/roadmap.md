@@ -100,8 +100,8 @@
 - [x] End-to-end integration scenario (DHCP8 → OAuth8 → ACL8 → routing)
 - [x] Multi-zone simulation with Zone Server pairs
 - [x] BGP8 path selection with CF metric
+- [x] XLATE8 north-south traffic flow
 
 ## Future
 
-- [ ] XLATE8 north-south traffic flow
 - [ ] Interactive CLI for Zone Server management
