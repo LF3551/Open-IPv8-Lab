@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, and interactive Zone Server CLI.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, and interactive Zone Server CLI.
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -45,6 +45,7 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | — | Multi-zone simulation (Zone Server pairs, IBGP8 inter-zone routing) | `multizone.py` |
 | 8.4 | BGP8 path selection with CF metric (anomaly detection, failover) | `bgp8_selection.py` |
 | 1.4 | XLATE8 north-south traffic flow (DNS8 → XLATE8 → translation) | `xlate8_flow.py` |
+| — | PCAP export for Wireshark integration (PcapWriter, PcapReader, Lua dissector) | `pcap_export.py` |
 | — | Interactive Zone Server CLI | `cli/zone_cli.py` |
 
 ## Goals
@@ -136,7 +137,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-669 tests covering all implemented spec sections.
+669 874 tests covering all implemented spec sections.
 
 ## Project structure
 

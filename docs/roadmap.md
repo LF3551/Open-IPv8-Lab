@@ -107,7 +107,7 @@
 - [x] XLATE8 flow CLI (`ipv8lab xlate8`)
 - [x] Performance dashboard with CF visualisation (`ipv8lab cf`)
 - [x] 836 tests total
+- [x] PCAP export for Wireshark integration (`ipv8lab pcap`)
+- [x] 874 tests total
 
 ## Future
-
-- [ ] PCAP export for Wireshark integration

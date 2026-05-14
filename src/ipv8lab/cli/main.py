@@ -12,6 +12,7 @@ from ipv8lab.cli.capture_cli import app as capture_app
 from ipv8lab.cli.cf_dashboard_cli import app as cf_dashboard_app
 from ipv8lab.cli.dashboard_cli import app as dashboard_app
 from ipv8lab.cli.packet_cli import app as packet_app
+from ipv8lab.cli.pcap_cli import app as pcap_app
 from ipv8lab.cli.route_cli import app as route_app
 from ipv8lab.cli.udp_cli import app as udp_app
 from ipv8lab.cli.multizone_cli import app as multizone_app
@@ -28,6 +29,7 @@ app.add_typer(addr_app, name="addr", help="IPv8 address operations.")
 app.add_typer(bench_app, name="bench", help="Performance benchmarks.")
 app.add_typer(bgp8_app, name="bgp8", help="BGP8 path selection.")
 app.add_typer(packet_app, name="packet", help="IPv8 Lab packet operations.")
+app.add_typer(pcap_app, name="pcap", help="PCAP export for Wireshark.")
 app.add_typer(route_app, name="route", help="Routing simulation.")
 app.add_typer(udp_app, name="udp", help="UDP transport experiments.")
 app.add_typer(capture_app, name="capture", help="Packet capture and replay.")
