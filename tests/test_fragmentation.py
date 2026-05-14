@@ -16,7 +16,6 @@ from ipv8lab.fragmentation import (
     HEADER_SIZE,
     MIN_MTU,
     FragmentationError,
-    ReassemblyError,
     Reassembler,
     can_fragment,
     fragment,
