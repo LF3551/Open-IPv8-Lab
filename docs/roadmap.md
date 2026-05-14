@@ -84,6 +84,6 @@
 - [x] Cost Factor (CF) metric simulation
 - [x] WHOIS8 mock resolver
 - [x] DHCP8 lease simulation
-- [ ] Zone Server mock (OAuth8 cache, ACL8)
+- [x] Zone Server mock (OAuth8 cache, ACL8)
 - [ ] NetLog8 telemetry client
 - [ ] Companion spec modules (draft-thain-routing-protocols-00, etc.)
