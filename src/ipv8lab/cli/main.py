@@ -18,6 +18,7 @@ from ipv8lab.cli.route_cli import app as route_app
 from ipv8lab.cli.traceroute_cli import app as traceroute_app
 from ipv8lab.cli.udp_cli import app as udp_app
 from ipv8lab.cli.multizone_cli import app as multizone_app
+from ipv8lab.cli.nat8_cli import app as nat8_app
 from ipv8lab.cli.xlate8_cli import app as xlate8_app
 from ipv8lab.cli.zone_cli import app as zone_app
 
@@ -41,6 +42,7 @@ app.add_typer(frag_app, name="frag", help="Packet fragmentation and reassembly."
 app.add_typer(dashboard_app, name="dashboard", help="Web UI dashboard.")
 app.add_typer(zone_app, name="zone", help="Zone Server management.")
 app.add_typer(multizone_app, name="multizone", help="Multi-zone simulation.")
+app.add_typer(nat8_app, name="nat8", help="NAT8 address translation gateway.")
 app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
 
 if __name__ == "__main__":
