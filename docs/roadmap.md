@@ -93,7 +93,6 @@
   - [x] Update8 and NIC certification (draft-thain-update8-00)
   - [x] WiFi8 protocol (draft-thain-wifi8-00)
   - [x] SNMPv8 MIB (draft-thain-ipv8-mib-00)
-- [x] 497 tests total
 
 ## v0.10 — Integration scenarios
 
@@ -106,13 +105,9 @@
 - [x] BGP8 path selection CLI (`ipv8lab bgp8`)
 - [x] XLATE8 flow CLI (`ipv8lab xlate8`)
 - [x] Performance dashboard with CF visualisation (`ipv8lab cf`)
-- [x] 836 tests total
 - [x] PCAP export for Wireshark integration (`ipv8lab pcap`)
-- [x] 874 tests total
 - [x] IPv8 packet fragmentation and reassembly (`ipv8lab frag`)
-- [x] 936 tests total
 - [x] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
-- [x] 1335 tests total
 
 ## Future
 
@@ -122,5 +117,6 @@
 - [x] Docker-based multi-node testbed
 - [x] TUI dashboard (Rich Live / Textual)
 - [x] Packet fuzzer for protocol security testing
-- [ ] mTLS / encryption layer for Zone Server auth
+- [x] mTLS / encryption layer for Zone Server auth
+- [x] 1406 tests total
 - [ ] PyPI package publishing

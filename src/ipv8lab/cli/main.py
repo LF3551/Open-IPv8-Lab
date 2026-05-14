@@ -20,6 +20,7 @@ from ipv8lab.cli.route_cli import app as route_app
 from ipv8lab.cli.traceroute_cli import app as traceroute_app
 from ipv8lab.cli.tui_cli import app as tui_app
 from ipv8lab.cli.udp_cli import app as udp_app
+from ipv8lab.cli.mtls_cli import app as mtls_app
 from ipv8lab.cli.multizone_cli import app as multizone_app
 from ipv8lab.cli.nat8_cli import app as nat8_app
 from ipv8lab.cli.netflow8_cli import app as netflow8_app
@@ -53,6 +54,7 @@ app.add_typer(nat8_app, name="nat8", help="NAT8 address translation gateway.")
 app.add_typer(netflow8_app, name="netflow8", help="NetFlow8 flow monitoring and telemetry.")
 app.add_typer(qos_app, name="qos", help="QoS traffic shaping based on TOS field.")
 app.add_typer(tui_app, name="tui", help="TUI dashboard (Rich Live / Textual).")
+app.add_typer(mtls_app, name="mtls", help="mTLS encryption layer for Zone Server auth.")
 app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
 
 if __name__ == "__main__":
