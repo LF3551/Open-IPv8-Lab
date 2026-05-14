@@ -36,14 +36,27 @@
 
 ## v0.5 — UDP transport experiment
 
-- [ ] Run nodes as local processes
-- [ ] Send IPv8 Lab packets over UDP
-- [ ] Demonstrate userspace IPv8-over-UDP transport
+- [x] UDP framing protocol (magic + length)
+- [x] Async UDP transport (send/receive)
+- [x] UDP node runner with forwarding
+- [x] UDP network orchestrator
+- [x] CLI command: `ipv8lab udp run`
+- [x] UDP demo example
+- [x] Unit tests (transport + UDP runner)
 
 ## v0.6 — Developer tooling
 
-- [ ] Packet dump utility
-- [ ] JSON output mode
-- [ ] Better documentation
-- [ ] More tests
-- [ ] GitHub Actions CI
+- [x] Packet hex dump utility (`ipv8lab packet dump`)
+- [x] JSON output mode (`--json` flag)
+- [x] Address summary JSON
+- [x] Packet summary JSON
+- [x] Mypy type checking in CI
+- [x] More unit tests (dump, hexdump, summaries)
+
+## v0.7 — Future ideas
+
+- [ ] Multi-hop mesh topologies
+- [ ] Packet capture/replay
+- [ ] Web UI dashboard
+- [ ] Performance benchmarks
+- [ ] Plugin system for custom protocols

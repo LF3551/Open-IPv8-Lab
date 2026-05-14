@@ -3,6 +3,7 @@
 
 """CLI commands for IPv8 Lab packet operations."""
 
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -11,6 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from ipv8lab.address import IPv8Address
+from ipv8lab.dump import hexdump, packet_summary
 from ipv8lab.errors import IPv8LabError
 from ipv8lab.packet import IPv8Packet
 
@@ -24,6 +26,7 @@ def build_packet(
     dst: str = typer.Option(..., help="Destination IPv8 address."),
     payload: str = typer.Option("", help="Payload string."),
     output: Optional[str] = typer.Option(None, "-o", "--output", help="Write packet to file."),
+    as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
 ) -> None:
     """Build an experimental IPv8 Lab packet."""
     try:
@@ -36,15 +39,20 @@ def build_packet(
     pkt = IPv8Packet(src=src_addr, dst=dst_addr, payload=payload.encode())
     raw = pkt.to_bytes()
 
-    table = Table(show_header=False, box=None, pad_edge=False)
-    table.add_column(style="bold cyan", min_width=20)
-    table.add_column()
-    table.add_row("Source", src_addr.full_notation)
-    table.add_row("Destination", dst_addr.full_notation)
-    table.add_row("Payload length", f"{len(pkt.payload)} bytes")
-    table.add_row("Total size", f"{len(raw)} bytes")
-    table.add_row("Checksum", f"0x{pkt.checksum:08X}")
-    console.print(table)
+    if as_json:
+        info = packet_summary(pkt)
+        info["total_size"] = len(raw)
+        console.print(json.dumps(info, indent=2))
+    else:
+        table = Table(show_header=False, box=None, pad_edge=False)
+        table.add_column(style="bold cyan", min_width=20)
+        table.add_column()
+        table.add_row("Source", src_addr.full_notation)
+        table.add_row("Destination", dst_addr.full_notation)
+        table.add_row("Payload length", f"{len(pkt.payload)} bytes")
+        table.add_row("Total size", f"{len(raw)} bytes")
+        table.add_row("Checksum", f"0x{pkt.checksum:08X}")
+        console.print(table)
 
     if output:
         Path(output).write_bytes(raw)
@@ -54,6 +62,7 @@ def build_packet(
 @app.command("parse")
 def parse_packet(
     file: str = typer.Argument(help="Path to a binary packet file."),
+    as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
 ) -> None:
     """Parse an IPv8 Lab packet from a binary file."""
     path = Path(file)
@@ -68,6 +77,10 @@ def parse_packet(
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1)
 
+    if as_json:
+        console.print(json.dumps(packet_summary(pkt), indent=2))
+        return
+
     table = Table(show_header=False, box=None, pad_edge=False)
     table.add_column(style="bold cyan", min_width=20)
     table.add_column()
@@ -81,3 +94,19 @@ def parse_packet(
     table.add_row("Checksum", f"0x{pkt.checksum:08X}")
     table.add_row("Payload", pkt.payload.decode(errors="replace"))
     console.print(table)
+
+
+@app.command("dump")
+def dump_packet(
+    file: str = typer.Argument(help="Path to a binary packet file."),
+) -> None:
+    """Hex dump of a binary IPv8 Lab packet file."""
+    path = Path(file)
+    if not path.exists():
+        console.print(f"[red]Error:[/red] File not found: {file}")
+        raise typer.Exit(1)
+
+    raw = path.read_bytes()
+    console.print(f"[bold]File:[/bold] {file}  ({len(raw)} bytes)")
+    console.print()
+    console.print(hexdump(raw))

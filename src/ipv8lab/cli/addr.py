@@ -3,11 +3,14 @@
 
 """CLI commands for IPv8 address operations."""
 
+import json
+
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from ipv8lab.address import IPv8Address, asn_to_prefix_str, prefix_str_to_asn
+from ipv8lab.dump import address_summary
 from ipv8lab.errors import IPv8LabError
 
 app = typer.Typer(no_args_is_help=True)
@@ -15,13 +18,20 @@ console = Console()
 
 
 @app.command("parse")
-def parse_address(address: str = typer.Argument(help="IPv8 address to parse.")) -> None:
+def parse_address(
+    address: str = typer.Argument(help="IPv8 address to parse."),
+    as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
+) -> None:
     """Parse an IPv8 address and display its components."""
     try:
         addr = IPv8Address.parse(address)
     except IPv8LabError as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(1)
+
+    if as_json:
+        console.print(json.dumps(address_summary(address), indent=2))
+        return
 
     parts = address.strip().split(".")
     fmt = "ASN dot notation" if len(parts) == 5 else "Full 8-octet notation"

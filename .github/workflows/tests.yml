@@ -27,5 +27,8 @@ jobs:
       - name: Lint with ruff
         run: ruff check src/ tests/
 
+      - name: Type check with mypy
+        run: mypy src/ipv8lab/ --ignore-missing-imports
+
       - name: Run tests
         run: pytest -v
