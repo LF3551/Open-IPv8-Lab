@@ -1,0 +1,39 @@
+network:
+  name: two-asn-demo
+
+nodes:
+  - name: node-a
+    address: 64496.192.0.2.1
+    type: host
+
+  - name: node-b
+    address: 64497.198.51.100.7
+    type: host
+
+routers:
+  - name: router-a
+    asn: 64496
+
+  - name: router-b
+    asn: 64497
+
+links:
+  - from: node-a
+    to: router-a
+
+  - from: router-a
+    to: router-b
+
+  - from: router-b
+    to: node-b
+
+routes:
+  - router: router-a
+    destination_prefix: "0.0.251.241"
+    next_hop: router-b
+    interface: lab1
+
+  - router: router-b
+    destination_prefix: "0.0.251.240"
+    next_hop: router-a
+    interface: lab1

@@ -1,0 +1,23 @@
+# Copyright 2026 Aleksei Aleinikov
+# SPDX-License-Identifier: Apache-2.0
+
+"""ipv8lab CLI — main entry point."""
+
+import typer
+
+from ipv8lab.cli.addr import app as addr_app
+from ipv8lab.cli.packet_cli import app as packet_app
+from ipv8lab.cli.route_cli import app as route_app
+
+app = typer.Typer(
+    name="ipv8lab",
+    help="Open-IPv8-Lab — Experimental userspace IPv8 toolkit.",
+    no_args_is_help=True,
+)
+
+app.add_typer(addr_app, name="addr", help="IPv8 address operations.")
+app.add_typer(packet_app, name="packet", help="IPv8 Lab packet operations.")
+app.add_typer(route_app, name="route", help="Routing simulation.")
+
+if __name__ == "__main__":
+    app()
