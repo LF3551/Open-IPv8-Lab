@@ -84,7 +84,7 @@ class KeyPair:
         if rng is None:
             private = secrets.token_bytes(32)
         else:
-            private = bytes(rng.randbelow(256) for _ in range(32))
+            private = bytes(rng.randint(0, 255) for _ in range(32))
         public = hashlib.sha256(b"pub:" + private).digest()
         return KeyPair(private_key=private, public_key=public)
 

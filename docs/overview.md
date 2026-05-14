@@ -31,6 +31,14 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 - PCAP export for Wireshark integration: PcapWriter, PcapReader, Lua dissector (DLT_USER0)
 - IPv8 packet fragmentation and reassembly: DF/MF flags, fragment offset, stateful Reassembler
 - Interactive CLI for Zone Server management (`ipv8lab zone`)
+- Traceroute8 diagnostic utility (`ipv8lab traceroute`)
+- NAT8 address translation gateway simulation (`ipv8lab nat8`)
+- NetFlow8 flow monitoring and telemetry export (`ipv8lab netflow8`)
+- QoS / traffic shaping based on TOS field (`ipv8lab qos`)
+- Docker-based multi-node testbed (`ipv8lab docker`)
+- TUI dashboard — Rich Live / Textual (`ipv8lab tui`)
+- Packet fuzzer for protocol security testing (`ipv8lab fuzz`)
+- mTLS / encryption layer for Zone Server authentication (`ipv8lab mtls`)
 - Mesh network simulation, packet capture/replay, web dashboard, benchmarks, plugin system
 
 ## What it does NOT do
@@ -44,6 +52,6 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 
 1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-00
 2. **Userspace only** — everything runs as a normal user process
-3. **Tested** — 1335 tests covering all implemented sections
+3. **Tested** — 1406 tests covering all implemented sections
 4. **Extensible** — plugin system for custom protocol experiments
 5. **Safe** — no system modifications, no privilege escalation

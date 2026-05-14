@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, and interactive Zone Server CLI.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, NAT8, NetFlow8, QoS, Docker testbed, TUI dashboard, packet fuzzer, mTLS encryption layer, and interactive Zone Server CLI.
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -48,6 +48,13 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | — | PCAP export for Wireshark integration (PcapWriter, PcapReader, Lua dissector) | `pcap_export.py` |
 | 5.1 | IPv8 packet fragmentation and reassembly (DF/MF flags, offset, Reassembler) | `fragmentation.py` |
 | — | Interactive Zone Server CLI | `cli/zone_cli.py` |
+| — | NAT8 address translation gateway | `nat8.py` |
+| — | NetFlow8 flow monitoring and telemetry export | `netflow8.py` |
+| — | QoS / traffic shaping based on TOS field | `qos.py` |
+| — | Docker-based multi-node testbed | `docker_testbed.py` |
+| — | TUI dashboard (Rich Live / Textual) | `tui_dashboard.py` |
+| — | Packet fuzzer for protocol security testing | `fuzzer.py` |
+| — | mTLS / encryption layer for Zone Server auth | `mtls.py` |
 
 ## Goals
 
@@ -75,6 +82,14 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - PCAP export for Wireshark integration: PcapWriter, PcapReader, Lua dissector
 - IPv8 packet fragmentation and reassembly: DF/MF flags, fragment offset, stateful Reassembler
 - Interactive Zone Server CLI: `ipv8lab zone` (init, status, services, ACL8, OAuth8, VLAN)
+- Traceroute8 diagnostic: `ipv8lab traceroute` (multi-hop trace simulation)
+- NAT8 address translation gateway simulation: `ipv8lab nat8`
+- NetFlow8 flow monitoring and telemetry export: `ipv8lab netflow8`
+- QoS / traffic shaping based on TOS field: `ipv8lab qos`
+- Docker-based multi-node testbed: `ipv8lab docker`
+- TUI dashboard — Rich Live / Textual: `ipv8lab tui`
+- Packet fuzzer for protocol security testing: `ipv8lab fuzz`
+- mTLS / encryption layer for Zone Server authentication: `ipv8lab mtls`
 - Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
 
 ## Non-goals
@@ -125,6 +140,16 @@ ipv8lab pcap demo -o demo.pcap
 ipv8lab pcap inspect demo.pcap
 ipv8lab pcap dissector -o ipv8_dissector.lua
 ipv8lab pcap export trace.iv8cap trace.pcap
+
+# mTLS encryption layer
+ipv8lab mtls init
+ipv8lab mtls issue my-device
+ipv8lab mtls handshake my-device
+ipv8lab mtls encrypt my-device "secret message"
+
+# Packet fuzzer
+ipv8lab fuzz run --iterations 1000
+ipv8lab fuzz run --strategy all --json
 ```
 
 ## Example output
@@ -146,7 +171,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-1335 tests covering all implemented spec sections.
+1406 tests covering all implemented spec sections.
 
 ## Project structure
 
@@ -189,6 +214,14 @@ src/ipv8lab/
 ├── benchmark.py      # Performance benchmarks
 ├── plugin.py         # Plugin system
 ├── dump.py           # Hex dump & JSON output
+├── nat8.py           # NAT8 address translation gateway
+├── netflow8.py       # NetFlow8 telemetry export
+├── qos.py            # QoS / traffic shaping (TOS field)
+├── docker_testbed.py # Docker-based multi-node testbed
+├── tui_dashboard.py  # TUI dashboard (Textual)
+├── fuzzer.py         # Packet fuzzer for security testing
+├── mtls.py           # mTLS encryption layer for Zone Server
+├── traceroute8.py    # Traceroute8 diagnostic utility
 └── cli/              # Typer CLI commands
 ```
 

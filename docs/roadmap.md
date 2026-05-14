@@ -109,14 +109,17 @@
 - [x] IPv8 packet fragmentation and reassembly (`ipv8lab frag`)
 - [x] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
 
+## v0.11 — Security, operations & tooling
+
+- [x] NAT8 address translation gateway simulation (`ipv8lab nat8`)
+- [x] Flow monitoring and NetFlow8-style telemetry export (`ipv8lab netflow8`)
+- [x] QoS / traffic shaping based on TOS field (`ipv8lab qos`)
+- [x] Docker-based multi-node testbed (`ipv8lab docker`)
+- [x] TUI dashboard — Rich Live / Textual (`ipv8lab tui`)
+- [x] Packet fuzzer for protocol security testing (`ipv8lab fuzz`)
+- [x] mTLS / encryption layer for Zone Server auth (`ipv8lab mtls`)
+- [x] 1406 tests total
+
 ## Future
 
-- [x] NAT8 address translation gateway simulation
-- [x] Flow monitoring and NetFlow8-style telemetry export
-- [x] QoS / traffic shaping based on TOS field
-- [x] Docker-based multi-node testbed
-- [x] TUI dashboard (Rich Live / Textual)
-- [x] Packet fuzzer for protocol security testing
-- [x] mTLS / encryption layer for Zone Server auth
-- [x] 1406 tests total
 - [ ] PyPI package publishing
