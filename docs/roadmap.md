@@ -112,14 +112,14 @@
 - [x] IPv8 packet fragmentation and reassembly (`ipv8lab frag`)
 - [x] 936 tests total
 - [x] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
-- [x] 1160 tests total
+- [x] 1220 tests total
 
 ## Future
 
 - [x] NAT8 address translation gateway simulation
 - [x] Flow monitoring and NetFlow8-style telemetry export
 - [x] QoS / traffic shaping based on TOS field
-- [ ] Docker-based multi-node testbed
+- [x] Docker-based multi-node testbed
 - [ ] TUI dashboard (Rich Live / Textual)
 - [ ] Packet fuzzer for protocol security testing
 - [ ] mTLS / encryption layer for Zone Server auth
