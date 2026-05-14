@@ -112,12 +112,12 @@
 - [x] IPv8 packet fragmentation and reassembly (`ipv8lab frag`)
 - [x] 936 tests total
 - [x] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
-- [x] 1042 tests total
+- [x] 1101 tests total
 
 ## Future
 
 - [x] NAT8 address translation gateway simulation
-- [ ] Flow monitoring and NetFlow8-style telemetry export
+- [x] Flow monitoring and NetFlow8-style telemetry export
 - [ ] QoS / traffic shaping based on TOS field
 - [ ] Docker-based multi-node testbed
 - [ ] TUI dashboard (Rich Live / Textual)
