@@ -86,4 +86,4 @@
 - [x] DHCP8 lease simulation
 - [x] Zone Server mock (OAuth8 cache, ACL8)
 - [x] NetLog8 telemetry client
-- [ ] Companion spec modules (draft-thain-routing-protocols-00, etc.)
+- [x] Companion spec modules (draft-thain-routing-protocols-00, etc.)
