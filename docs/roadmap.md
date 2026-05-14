@@ -112,7 +112,7 @@
 - [x] IPv8 packet fragmentation and reassembly (`ipv8lab frag`)
 - [x] 936 tests total
 - [x] Traceroute8 diagnostic utility (`ipv8lab traceroute`)
-- [x] 1270 tests total
+- [x] 1335 tests total
 
 ## Future
 
@@ -121,6 +121,6 @@
 - [x] QoS / traffic shaping based on TOS field
 - [x] Docker-based multi-node testbed
 - [x] TUI dashboard (Rich Live / Textual)
-- [ ] Packet fuzzer for protocol security testing
+- [x] Packet fuzzer for protocol security testing
 - [ ] mTLS / encryption layer for Zone Server auth
 - [ ] PyPI package publishing
