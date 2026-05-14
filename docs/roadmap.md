@@ -95,9 +95,12 @@
   - [x] SNMPv8 MIB (draft-thain-ipv8-mib-00)
 - [x] 497 tests total
 
+## v0.10 — Integration scenarios
+
+- [x] End-to-end integration scenario (DHCP8 → OAuth8 → ACL8 → routing)
+
 ## Future
 
-- [ ] End-to-end integration scenario (DHCP8 → OAuth8 → ACL8 → routing)
 - [ ] Multi-zone simulation with Zone Server pairs
 - [ ] BGP8 path selection with CF metric
 - [ ] XLATE8 north-south traffic flow
