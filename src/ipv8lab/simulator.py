@@ -52,7 +52,6 @@ class NetworkSimulator:
             payload=payload.encode(),
         )
         src_node.send_packet(pkt)
-        self.trace.append(f"[{src_node.name}] Sending packet to {dst_addr.full_notation}")
         self._forward(src_node.name, pkt)
         return list(self.trace)
 
@@ -60,29 +59,27 @@ class NetworkSimulator:
         """Recursively forward the packet through the network."""
         # Cycle detection for forwarding
         if current_name in self._visited:
-            self.trace.append(f"[{current_name}] Loop detected, packet dropped")
+            self.trace.append(f"{current_name} -> {current_name}  loop detected, packet dropped")
             return
         self._visited.add(current_name)
 
         # Check if destination is this node
         current_node = self.nodes[current_name]
         if current_node.address.to_int() == pkt.dst.to_int():
-            current_node.receive_packet(pkt)
             self.trace.append(
-                f"[{current_name}] Packet delivered. "
-                f"Payload: {pkt.payload.decode(errors='replace')}"
+                f"delivered:{current_name}:{pkt.payload.decode(errors='replace')}"
             )
+            current_node.receive_packet(pkt)
             return
 
         # Check linked nodes for direct delivery
         for frm, to in self.links:
             if frm == current_name and to in self.nodes:
                 if self.nodes[to].address.to_int() == pkt.dst.to_int():
-                    self.trace.append(f"[{current_name}] -> [{to}]")
+                    self.trace.append(f"{current_name} -> {to}  (link)")
                     self.nodes[to].receive_packet(pkt)
                     self.trace.append(
-                        f"[{to}] Packet delivered. "
-                        f"Payload: {pkt.payload.decode(errors='replace')}"
+                        f"delivered:{to}:{pkt.payload.decode(errors='replace')}"
                     )
                     return
 
@@ -93,26 +90,26 @@ class NetworkSimulator:
             # No explicit route — try forwarding via linked nodes
             for frm, to in self.links:
                 if frm == current_name and to in self.nodes and to not in self._visited:
-                    self.trace.append(f"[{current_name}] -> [{to}] (link)")
+                    self.trace.append(f"{current_name} -> {to}  (link)")
                     pkt.ttl -= 1
                     if pkt.ttl <= 0:
-                        self.trace.append(f"[{to}] TTL expired, packet dropped")
+                        self.trace.append(f"{to} -> *  TTL expired, packet dropped")
                         return
                     self._forward(to, pkt)
                     return
-            self.trace.append(f"[{current_name}] No route to {pkt.dst.full_notation}")
+            self.trace.append(f"{current_name} -> *  no route to {pkt.dst.full_notation}")
             return
 
         next_hop = route.next_hop
-        self.trace.append(f"[{current_name}] -> [{next_hop}] via {route.interface}")
+        self.trace.append(f"{current_name} -> {next_hop}  via {route.interface}")
 
         if next_hop not in self.nodes:
-            self.trace.append(f"[{next_hop}] Node not found in simulation")
+            self.trace.append(f"{next_hop} -> *  node not found in simulation")
             return
 
         pkt.ttl -= 1
         if pkt.ttl <= 0:
-            self.trace.append(f"[{next_hop}] TTL expired, packet dropped")
+            self.trace.append(f"{next_hop} -> *  TTL expired, packet dropped")
             return
 
         self._forward(next_hop, pkt)

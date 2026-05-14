@@ -52,6 +52,7 @@ def simulate(
 
     console.print(f"[bold]Network:[/bold] {sim.name}")
     console.print(f"[bold]From:[/bold] {src} → [bold]To:[/bold] {dst}")
+    console.print(f"[bold]Destination:[/bold] {dst}")
     console.print(f"[bold]Payload:[/bold] {payload}")
     console.print()
 
@@ -62,5 +63,20 @@ def simulate(
         raise typer.Exit(1)
 
     console.print("[bold green]Trace:[/bold green]")
+    delivered_to: str = ""
+    delivered_payload: str = ""
     for line in trace:
+        if line.startswith("delivered:"):
+            parts = line.split(":", 2)
+            delivered_to = parts[1] if len(parts) > 1 else ""
+            delivered_payload = parts[2] if len(parts) > 2 else ""
+            continue
+        # Render hop line with alignment
         console.print(f"  {line}")
+
+    console.print()
+    if delivered_to:
+        console.print(f"Packet delivered to [bold]{delivered_to}[/bold].")
+        console.print(f"Payload: {delivered_payload}")
+    else:
+        console.print("[red]Packet was not delivered.[/red]")
