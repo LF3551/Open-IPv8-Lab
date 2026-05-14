@@ -14,6 +14,7 @@ from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.route_cli import app as route_app
 from ipv8lab.cli.udp_cli import app as udp_app
 from ipv8lab.cli.multizone_cli import app as multizone_app
+from ipv8lab.cli.xlate8_cli import app as xlate8_app
 from ipv8lab.cli.zone_cli import app as zone_app
 
 app = typer.Typer(
@@ -32,6 +33,7 @@ app.add_typer(capture_app, name="capture", help="Packet capture and replay.")
 app.add_typer(dashboard_app, name="dashboard", help="Web UI dashboard.")
 app.add_typer(zone_app, name="zone", help="Zone Server management.")
 app.add_typer(multizone_app, name="multizone", help="Multi-zone simulation.")
+app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
 
 if __name__ == "__main__":
     app()

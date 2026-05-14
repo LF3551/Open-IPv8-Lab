@@ -104,10 +104,10 @@
 - [x] Interactive CLI for Zone Server management (`ipv8lab zone`)
 - [x] Multi-zone CLI commands (`ipv8lab multizone`)
 - [x] BGP8 path selection CLI (`ipv8lab bgp8`)
-- [x] 746 tests total
+- [x] XLATE8 flow CLI (`ipv8lab xlate8`)
+- [x] 783 tests total
 
 ## Future
 
-- [ ] XLATE8 flow CLI (`ipv8lab xlate8`)
 - [ ] Performance dashboard with CF visualisation
 - [ ] PCAP export for Wireshark integration
