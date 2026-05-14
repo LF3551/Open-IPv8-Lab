@@ -55,12 +55,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Update Docker Hub description
-        uses: peter-evans/dockerhub-description@v4
-        continue-on-error: true
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: lf3551/open-ipv8-lab
-          short-description: "Experimental userspace IPv8 toolkit implementing draft-thain-ipv8-00"
           readme-filepath: ./README.md
