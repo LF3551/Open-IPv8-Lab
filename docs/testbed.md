@@ -173,3 +173,27 @@ ipv8lab zone oauth-validate <token>
 # PVRST VLAN check
 ipv8lab zone vlan-check 100
 ```
+
+### PCAP export for Wireshark (`ipv8lab pcap`)
+
+Export IPv8 packet captures to standard PCAP format for analysis in Wireshark:
+
+```bash
+# Generate a demo .pcap with sample packets
+ipv8lab pcap demo -o demo.pcap
+
+# Convert .iv8cap capture to .pcap
+ipv8lab pcap export trace.iv8cap trace.pcap
+
+# Inspect a .pcap file
+ipv8lab pcap inspect demo.pcap
+
+# Write packets directly to .pcap
+ipv8lab pcap write test.pcap --src 64496.10.0.1.1 --dst 64497.10.0.1.100 -n 10
+
+# Generate Wireshark Lua dissector
+ipv8lab pcap dissector -o ipv8_dissector.lua
+```
+
+The PCAP files use classic libpcap format with DLT_USER0 (147) link type.
+The Lua dissector auto-registers with `wtap_encap` for seamless Wireshark integration.

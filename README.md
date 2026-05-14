@@ -71,6 +71,7 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - Multi-zone simulation with Zone Server pairs and IBGP8-style inter-zone routing
 - BGP8 path selection with CF metric: per-prefix RIB, anomaly detection, failover
 - XLATE8 north-south traffic flow: DNS8 → XLATE8 → address translation (Section 1.4)
+- PCAP export for Wireshark integration: PcapWriter, PcapReader, Lua dissector
 - Interactive Zone Server CLI: `ipv8lab zone` (init, status, services, ACL8, OAuth8, VLAN)
 - Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
 
@@ -116,6 +117,12 @@ ipv8lab zone status
 ipv8lab zone acl-add "*" gateway --action permit
 ipv8lab zone oauth-issue device-42
 ipv8lab zone vlan-check 100
+
+# PCAP export for Wireshark
+ipv8lab pcap demo -o demo.pcap
+ipv8lab pcap inspect demo.pcap
+ipv8lab pcap dissector -o ipv8_dissector.lua
+ipv8lab pcap export trace.iv8cap trace.pcap
 ```
 
 ## Example output
@@ -137,7 +144,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-669 874 tests covering all implemented spec sections.
+874 tests covering all implemented spec sections.
 
 ## Project structure
 
@@ -167,6 +174,8 @@ src/ipv8lab/
 ├── multizone.py      # Multi-zone simulation with Zone Server pairs
 ├── bgp8_selection.py # BGP8 path selection with CF metric
 ├── xlate8_flow.py    # XLATE8 north-south traffic flow
+├── pcap_export.py    # PCAP export for Wireshark (.pcap, Lua dissector)
+├── cf_dashboard.py   # CF performance dashboard (HTML, JSON API)
 ├── errors.py         # Error hierarchy
 ├── node.py           # Node abstraction
 ├── simulator.py      # Mesh network simulator
