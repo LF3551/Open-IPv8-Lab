@@ -39,7 +39,7 @@ ipv8lab route simulate --config examples/three_asn_mesh.yaml
 Nodes run as separate async processes communicating over UDP:
 
 ```bash
-ipv8lab udp run --config examples/udp_demo.py
+ipv8lab udp run --config examples/two_asn_demo.yaml
 ```
 
 UDP framing uses `IV8L` magic header + 4-byte length prefix.
@@ -49,8 +49,8 @@ UDP framing uses `IV8L` magic header + 4-byte length prefix.
 Capture packets to `.iv8cap` files for replay:
 
 ```bash
-ipv8lab capture start --output trace.iv8cap
-ipv8lab capture replay --input trace.iv8cap
+ipv8lab capture read trace.iv8cap
+ipv8lab capture info trace.iv8cap
 ```
 
 ## Web dashboard
@@ -58,7 +58,7 @@ ipv8lab capture replay --input trace.iv8cap
 Minimal web UI for topology visualization and packet sending:
 
 ```bash
-ipv8lab dashboard --port 8080
+ipv8lab dashboard serve examples/two_asn_demo.yaml --port 8080
 ```
 
 JSON API: `/api/topology`, `/api/send`
