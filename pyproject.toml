@@ -45,6 +45,9 @@ ipv8lab = "ipv8lab.cli.main:app"
 [project.urls]
 Homepage = "https://github.com/LF3551/Open-IPv8-Lab"
 Repository = "https://github.com/LF3551/Open-IPv8-Lab"
+Documentation = "https://open-ipv8-lab.readthedocs.io"
+Changelog = "https://github.com/LF3551/Open-IPv8-Lab/blob/main/CHANGELOG.md"
+Issues = "https://github.com/LF3551/Open-IPv8-Lab/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
