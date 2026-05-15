@@ -35,6 +35,7 @@ from ipv8lab.cli.multizone_cli import app as multizone_app
 from ipv8lab.cli.nat8_cli import app as nat8_app
 from ipv8lab.cli.netflow8_cli import app as netflow8_app
 from ipv8lab.cli.qos_cli import app as qos_app
+from ipv8lab.cli.whois8_proto_cli import app as whois8_proto_app
 from ipv8lab.cli.xlate8_cli import app as xlate8_app
 from ipv8lab.cli.xlate8_lb_cli import app as xlate8_lb_app
 from ipv8lab.cli.zone_cli import app as zone_app
@@ -78,6 +79,7 @@ app.add_typer(cgnat_app, name="cgnat", help="CGNAT Behaviour simulation per Sect
 app.add_typer(cloud_vpc_app, name="vpc", help="Cloud Provider VPC simulation per Section 17.")
 app.add_typer(rine_prot_app, name="rineprot", help="RINE Prefix Protection per Section 19.3.")
 app.add_typer(prefix_enforce_app, name="prefixenf", help="/16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7.")
+app.add_typer(whois8_proto_app, name="whois8", help="Standalone WHOIS8 protocol (draft-thain-whois8-00).")
 
 if __name__ == "__main__":
     app()
