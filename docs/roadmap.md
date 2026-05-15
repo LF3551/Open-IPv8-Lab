@@ -121,7 +121,7 @@
 - [x] Inter-Company Interop Prefix (127.127.0.0) and Two-XLATE8 Interop Model per Sections 4.6–4.7
 - [x] Private Interop ASN (65534/65533) reservation per Section 4.8
 - [x] Interior Link Convention (222.0.0.0/8) address validation per Section 4.10
-- [ ] Address Usage Model — consolidated address space table per Section 4.11
+- [x] Address Usage Model — consolidated address space table per Section 4.11
 - [ ] Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2
 - [ ] CGNAT Behaviour simulation (r.r.r.r preservation, n.n.n.n-only NAT) per Section 15
 - [ ] XLATE8 Even/Odd Load Balancing per Section 15.1
