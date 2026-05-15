@@ -4,6 +4,11 @@ All notable changes to Open-IPv8-Lab are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.12.8] — 2026-05-15
+
+### Changed
+- Fixed release pipeline: Homebrew formula auto-update now works end-to-end
+
 ## [0.12.7] — 2026-05-15
 
 ### Changed
