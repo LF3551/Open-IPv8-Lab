@@ -4,6 +4,14 @@ All notable changes to Open-IPv8-Lab are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.12.6] — 2026-05-15
+
+### Added
+- Homebrew formula in-repo (`Formula/open-ipv8-lab.rb`) for install via tap
+
+### Changed
+- Release workflow now auto-updates Homebrew formula URL and SHA256 on each tag
+
 ## [0.12.5] — 2026-05-15
 
 ### Added
