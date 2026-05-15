@@ -16,6 +16,7 @@ from ipv8lab.cli.docker_cli import app as docker_app
 from ipv8lab.cli.frag_cli import app as frag_app
 from ipv8lab.cli.fuzzer_cli import app as fuzzer_app
 from ipv8lab.cli.interop_cli import app as interop_app
+from ipv8lab.cli.interior_link_cli import app as ilink_app
 from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.pcap_cli import app as pcap_app
 from ipv8lab.cli.route_cli import app as route_app
@@ -60,6 +61,7 @@ app.add_typer(tui_app, name="tui", help="TUI dashboard (Rich Live / Textual).")
 app.add_typer(mtls_app, name="mtls", help="mTLS encryption layer for Zone Server auth.")
 app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
 app.add_typer(interop_app, name="interop", help="Inter-Company Interop and Two-XLATE8 model (Sections 4.6-4.7).")
+app.add_typer(ilink_app, name="ilink", help="Interior Link Convention (222.0.0.0/8) per Section 4.10.")
 
 if __name__ == "__main__":
     app()
