@@ -1,3 +1,5 @@
+[← Back to README](../README.md)
+
 # CLI Reference
 
 All commands support `--json` for machine-readable output.
