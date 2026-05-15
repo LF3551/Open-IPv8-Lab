@@ -31,4 +31,11 @@ jobs:
         run: mypy src/ipv8lab/ --ignore-missing-imports
 
       - name: Run tests
-        run: pytest -v
+        run: pytest -v --cov=ipv8lab --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.13'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_on_error: false

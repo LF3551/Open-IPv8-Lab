@@ -9,6 +9,7 @@
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 [![PyPI](https://img.shields.io/pypi/v/open-ipv8-lab.svg)](https://pypi.org/project/open-ipv8-lab/)
 [![Docs](https://readthedocs.org/projects/open-ipv8-lab/badge/?version=latest)](https://open-ipv8-lab.readthedocs.io)
+[![codecov](https://codecov.io/gh/LF3551/Open-IPv8-Lab/graph/badge.svg)](https://codecov.io/gh/LF3551/Open-IPv8-Lab)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20201237.svg)](https://doi.org/10.5281/zenodo.20201237)
 
 Experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. **58 modules**, **35 CLI commands**, **1827 tests**.
