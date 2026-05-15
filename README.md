@@ -164,6 +164,7 @@ pytest -v
 |-----|-------------|
 | **[Examples](docs/examples.md)** | 10 step-by-step walkthroughs |
 | **[CLI Reference](docs/cli-reference.md)** | All 35 commands with usage examples |
+| **[Python API](docs/python-api.md)** | Using ipv8lab as a Python library |
 | **[Spec Coverage](docs/spec-coverage.md)** | Full draft-thain-ipv8-02 mapping |
 | **[Architecture](docs/architecture.md)** | Module categories & dependencies |
 | [Overview](docs/overview.md) | Project overview |
