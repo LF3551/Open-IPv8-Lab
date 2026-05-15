@@ -50,6 +50,7 @@ jobs:
 
       - name: Create pull request for formula update
         if: steps.formula_commit.outputs.changed == 'true'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -59,6 +60,12 @@ jobs:
             --head "${{ steps.formula_commit.outputs.branch }}" \
             --title "chore: update Homebrew formula for ${{ github.ref_name }}" \
             --body "Automated Homebrew formula update for release ${{ github.ref_name }}."
+
+      - name: Note when PR creation is blocked by repo policy
+        if: steps.formula_commit.outputs.changed == 'true' && failure()
+        run: |
+          echo "Homebrew formula branch was pushed, but PR creation is blocked by repository settings."
+          echo "Enable: Settings -> Actions -> General -> Workflow permissions -> Allow GitHub Actions to create and approve pull requests."
 
   release:
     needs: update-homebrew-formula
