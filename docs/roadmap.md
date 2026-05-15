@@ -115,9 +115,16 @@
 - [x] Packet fuzzer for protocol security testing (`ipv8lab fuzz`)
 - [x] mTLS / encryption layer for Zone Server auth (`ipv8lab mtls`)
 
-## Future — draft-thain-ipv8-02 compliance
+## v0.12 — Full spec compliance & companion protocols
 
-- [x] ARP8-driven version selection simulation per Section 2 (neighbor discovery, per-hop IPv8/IPv4 downgrade)
+- [x] Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4 (`ipv8lab ilinkprot`)
+- [x] /16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7 (`ipv8lab prefixenf`)
+- [x] Companion spec: draft-thain-whois8-00 — standalone WHOIS8 protocol (`ipv8lab whois8`)
+- [x] Companion spec: draft-thain-netlog8-00 — standalone NetLog8 protocol (`ipv8lab netlog8proto`)
+
+## Previously completed — draft-thain-ipv8-02 compliance
+
+- [x] ARP8-driven version selection simulation per Section 2
 - [x] Inter-Company Interop Prefix (127.127.0.0) and Two-XLATE8 Interop Model per Sections 4.6–4.7
 - [x] Private Interop ASN (65534/65533) reservation per Section 4.8
 - [x] Interior Link Convention (222.0.0.0/8) address validation per Section 4.10
@@ -127,8 +134,7 @@
 - [x] XLATE8 Even/Odd Load Balancing per Section 15.1
 - [x] Cloud Provider VPC simulation (zone prefix → VPC mapping) per Section 17
 - [x] RINE Prefix Protection (100.x.x.x filtering, SEC-ALERT) per Section 19.3
-- [x] Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4
-- [x] /16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7
-- [x] Companion spec: draft-thain-whois8-00 (standalone WHOIS8 protocol)
-- [x] Companion spec: draft-thain-netlog8-00 (standalone NetLog8 protocol)
+
+## Future
+
 - [ ] PyPI package publishing

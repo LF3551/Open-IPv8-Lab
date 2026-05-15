@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, NAT8, NetFlow8, QoS, Docker testbed, TUI dashboard, packet fuzzer, mTLS encryption layer, and interactive Zone Server CLI.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, NAT8, NetFlow8, QoS, Docker testbed, TUI dashboard, packet fuzzer, mTLS encryption layer, interactive Zone Server CLI, Interior Link Convention Protection, /16 Minimum Prefix Enforcement, standalone WHOIS8 protocol (draft-thain-whois8-00), and standalone NetLog8 protocol (draft-thain-netlog8-00).
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -55,6 +55,10 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | — | TUI dashboard (Rich Live / Textual) | `tui_dashboard.py` |
 | — | Packet fuzzer for protocol security testing | `fuzzer.py` |
 | — | mTLS / encryption layer for Zone Server auth | `mtls.py` |
+| 19.4 | Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) | `ilink_protection.py` |
+| 19.7 | /16 Minimum Prefix Enforcement at eBGP8 boundaries | `prefix_enforce.py` |
+| — | Standalone WHOIS8 protocol (draft-thain-whois8-00) | `whois8_proto.py` |
+| — | Standalone NetLog8 protocol (draft-thain-netlog8-00) | `netlog8_proto.py` |
 
 ## Goals
 
@@ -90,6 +94,10 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - TUI dashboard — Rich Live / Textual: `ipv8lab tui`
 - Packet fuzzer for protocol security testing: `ipv8lab fuzz`
 - mTLS / encryption layer for Zone Server authentication: `ipv8lab mtls`
+- Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering): `ipv8lab ilinkprot`
+- /16 Minimum Prefix Enforcement at eBGP8 boundaries: `ipv8lab prefixenf`
+- Standalone WHOIS8 protocol — server, client with cache, record signing, RIR hierarchy: `ipv8lab whois8`
+- Standalone NetLog8 protocol — wire framing, collector, relay, rate limiting, export: `ipv8lab netlog8proto`
 - Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
 
 ## Non-goals
@@ -171,7 +179,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-1406 tests covering all implemented spec sections.
+1827 tests covering all implemented spec sections.
 
 ## Project structure
 
@@ -222,6 +230,10 @@ src/ipv8lab/
 ├── fuzzer.py         # Packet fuzzer for security testing
 ├── mtls.py           # mTLS encryption layer for Zone Server
 ├── traceroute8.py    # Traceroute8 diagnostic utility
+├── ilink_protection.py # Interior Link Convention Protection (Section 19.4)
+├── prefix_enforce.py # /16 Minimum Prefix Enforcement (Section 19.7)
+├── whois8_proto.py   # Standalone WHOIS8 protocol (draft-thain-whois8-00)
+├── netlog8_proto.py  # Standalone NetLog8 protocol (draft-thain-netlog8-00)
 └── cli/              # Typer CLI commands
 ```
 
