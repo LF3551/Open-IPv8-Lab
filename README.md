@@ -19,6 +19,26 @@ Created and maintained by **Aleksei Aleinikov** ([@LF3551](https://github.com/LF
 
 ---
 
+## Demo
+
+<details>
+<summary><b>CLI Overview</b> — address parsing, packet building, hex dump</summary>
+
+<p align="center">
+  <img src="assets/demo-overview.gif" alt="CLI Overview Demo" width="100%">
+</p>
+</details>
+
+<details open>
+<summary><b>Traceroute8</b> — linear, diamond, loop detection, multi-path</summary>
+
+<p align="center">
+  <img src="assets/demo-traceroute.gif" alt="Traceroute Demo" width="100%">
+</p>
+</details>
+
+---
+
 ## Quick Start
 
 ```bash
