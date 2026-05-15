@@ -172,6 +172,7 @@ pytest -v
 | [Routing Simulator](docs/routing-simulator.md) | Two-tier routing (Sections 8.7, 8.8) |
 | [Testbed](docs/testbed.md) | Local testbed setup |
 | [Glossary](docs/glossary.md) | Key terms and abbreviations |
+| [FAQ](docs/faq.md) | Frequently asked questions & troubleshooting |
 | [Roadmap](docs/roadmap.md) | Version history & future plans |
 | [Changelog](CHANGELOG.md) | Release-by-release changes |
 
