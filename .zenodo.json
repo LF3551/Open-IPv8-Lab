@@ -1,0 +1,36 @@
+{
+  "title": "Open-IPv8-Lab: Experimental IPv8 Toolkit",
+  "description": "Userspace toolkit implementing draft-thain-ipv8-02 — the Internet Protocol Version 8 specification. 58 modules, 35 CLI commands, 1827 tests.",
+  "upload_type": "software",
+  "license": {
+    "id": "Apache-2.0"
+  },
+  "creators": [
+    {
+      "name": "Aleinikov, Aleksei",
+      "affiliation": "",
+      "orcid": ""
+    }
+  ],
+  "keywords": [
+    "ipv8",
+    "networking",
+    "protocol",
+    "routing",
+    "simulation",
+    "draft-thain-ipv8-02"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/LF3551/Open-IPv8-Lab",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://www.ietf.org/archive/id/draft-thain-ipv8-02.html",
+      "relation": "references",
+      "scheme": "url"
+    }
+  ],
+  "access_right": "open"
+}
