@@ -45,7 +45,7 @@ addr.prefix_str       # "0.0.251.240"
 addr.host_str         # "192.0.2.1"
 addr.full_notation    # "0.0.251.240.192.0.2.1"
 addr.asn_notation     # "64496.192.0.2.1"
-addr.address_class    # "unicast"
+addr.address_class    # "asn-unicast"
 
 # Classification
 addr.is_unicast()          # True
@@ -431,8 +431,8 @@ pkt = IPv8Packet(
 
 violations = filt.check(pkt)
 for v in violations:
-    print(f"[{v.severity}] §{v.section}: {v.message}")
-# [SEC-ALERT] §18.1: ASN spoofing detected
+    print(f"[{v.severity.value}] §{v.section}: {v.message}")
+# [SEC-ALERT] §18.1: ASN prefix spoofing detected
 ```
 
 ---
