@@ -130,5 +130,5 @@
 - [x] Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4
 - [x] /16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7
 - [x] Companion spec: draft-thain-whois8-00 (standalone WHOIS8 protocol)
-- [ ] Companion spec: draft-thain-netlog8-00 (standalone NetLog8 protocol)
+- [x] Companion spec: draft-thain-netlog8-00 (standalone NetLog8 protocol)
 - [ ] PyPI package publishing

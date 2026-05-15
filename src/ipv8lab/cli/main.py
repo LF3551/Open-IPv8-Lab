@@ -34,6 +34,7 @@ from ipv8lab.cli.mtls_cli import app as mtls_app
 from ipv8lab.cli.multizone_cli import app as multizone_app
 from ipv8lab.cli.nat8_cli import app as nat8_app
 from ipv8lab.cli.netflow8_cli import app as netflow8_app
+from ipv8lab.cli.netlog8_proto_cli import app as netlog8_proto_app
 from ipv8lab.cli.qos_cli import app as qos_app
 from ipv8lab.cli.whois8_proto_cli import app as whois8_proto_app
 from ipv8lab.cli.xlate8_cli import app as xlate8_app
@@ -80,6 +81,7 @@ app.add_typer(cloud_vpc_app, name="vpc", help="Cloud Provider VPC simulation per
 app.add_typer(rine_prot_app, name="rineprot", help="RINE Prefix Protection per Section 19.3.")
 app.add_typer(prefix_enforce_app, name="prefixenf", help="/16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7.")
 app.add_typer(whois8_proto_app, name="whois8", help="Standalone WHOIS8 protocol (draft-thain-whois8-00).")
+app.add_typer(netlog8_proto_app, name="netlog8proto", help="Standalone NetLog8 protocol (draft-thain-netlog8-00).")
 
 if __name__ == "__main__":
     app()
