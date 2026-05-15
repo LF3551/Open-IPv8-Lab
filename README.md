@@ -37,12 +37,12 @@ ipv8lab zone init --prefix 127.1.0.0
 ipv8lab zone oauth-issue device-42
 
 # Security filtering
-ipv8lab ilinkprot bgp8 --prefix 222.0.0.0 --origin 64496
-ipv8lab prefixenf check --prefix 0.0.251.240 --length 24 --origin 64496
+ipv8lab ilinkprot bgp8 64496.222.0.0.1
+ipv8lab prefixenf check 64496.10.1.0.0 24 --peer-asn 64497
 
 # WHOIS8 registry
-ipv8lab whois8 register --asn 64496 --holder "Example Corp" --rir ARIN
-ipv8lab whois8 lookup --asn 64496
+ipv8lab whois8 register 64496 "Example Corp" --rir ARIN
+ipv8lab whois8 lookup 64496
 
 # Export to Wireshark
 ipv8lab pcap demo -o demo.pcap

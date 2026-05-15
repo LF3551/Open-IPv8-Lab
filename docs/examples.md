@@ -69,7 +69,7 @@ $ ipv8lab addr parse 64496.192.0.2.1 --json
 
 ```bash
 # Show the full address space allocation table (Section 4.11)
-$ ipv8lab usage show
+$ ipv8lab usage table
 ```
 
 ---
@@ -192,17 +192,11 @@ Load `ipv8_dissector.lua` in Wireshark: **Help → About → Folders → Persona
 Per-prefix RIB with CF metric, anomaly detection, failover.
 
 ```bash
-# Initialize BGP8 router
+# BGP8 path selection (positional: PREFIX ORIGIN_ASN)
 $ ipv8lab bgp8 init --asn 64496
-
-# Advertise a prefix
-$ ipv8lab bgp8 advertise --prefix 0.0.251.240 --next-hop 0.0.251.241
-
-# View RIB
+$ ipv8lab bgp8 advertise 64496.0.0.0.0/8 64496 --next-hop 0.0.251.241
 $ ipv8lab bgp8 rib
-
-# Best-path selection
-$ ipv8lab bgp8 best-path --prefix 0.0.251.240 --json
+$ ipv8lab bgp8 select 64496.0.0.0.0/8 --json
 ```
 
 ### XLATE8 traffic flow
@@ -226,16 +220,16 @@ $ ipv8lab xlate8lb status --json
 
 ```bash
 $ ipv8lab rineprot init
-$ ipv8lab rineprot bgp8 --prefix 100.0.0.0
-$ ipv8lab rineprot traps --json
+$ ipv8lab rineprot bgp8 64496.100.0.0.1
+$ ipv8lab rineprot alerts --json
 ```
 
 ### Interior Link Protection (Section 19.4)
 
 ```bash
 $ ipv8lab ilinkprot init
-$ ipv8lab ilinkprot bgp8 --prefix 222.0.0.0 --origin 64496
-$ ipv8lab ilinkprot packet --src 222.0.0.1.10.0.0.1 --dst 64496.10.0.0.1
+$ ipv8lab ilinkprot bgp8 64496.222.0.0.1
+$ ipv8lab ilinkprot packet 64496.222.0.0.1
 $ ipv8lab ilinkprot traps --json
 ```
 
@@ -243,7 +237,7 @@ $ ipv8lab ilinkprot traps --json
 
 ```bash
 $ ipv8lab prefixenf init
-$ ipv8lab prefixenf check --prefix 0.0.251.240 --length 24 --origin 64496
+$ ipv8lab prefixenf check 64496.10.1.0.0 24 --peer-asn 64497
 $ ipv8lab prefixenf alerts --json
 ```
 
@@ -251,7 +245,7 @@ $ ipv8lab prefixenf alerts --json
 
 ```bash
 $ ipv8lab cgnat init
-$ ipv8lab cgnat translate --src 10.0.0.1
+$ ipv8lab cgnat translate 64496.10.0.0.1
 $ ipv8lab cgnat status --json
 ```
 
@@ -265,23 +259,23 @@ Standalone WHOIS8 protocol per draft-thain-whois8-00.
 # Initialize server
 $ ipv8lab whois8 init
 
-# Register an ASN
-$ ipv8lab whois8 register --asn 64496 --holder "Example Corp" --rir ARIN
+# Register an ASN (positional: ASN HOLDER)
+$ ipv8lab whois8 register 64496 "Example Corp" --rir ARIN
 
-# Register a route object
-$ ipv8lab whois8 route --asn 64496 --prefix 0.0.251.240 --length 16
+# Register a route object (positional: ASN PREFIX_LENGTH)
+$ ipv8lab whois8 route 64496 16
 
-# Lookup
-$ ipv8lab whois8 lookup --asn 64496
+# Lookup (positional: ASN)
+$ ipv8lab whois8 lookup 64496
 
-# Validate route authorization
-$ ipv8lab whois8 validate --asn 64496 --prefix 0.0.251.240
+# Validate route authorization (positional: ASN [PREFIX_LENGTH])
+$ ipv8lab whois8 validate 64496 16
 
-# Anycast lookup
-$ ipv8lab whois8 anycast --prefix 0.0.251.240
+# Anycast lookup (positional: ASN)
+$ ipv8lab whois8 anycast 64496
 
-# Verify HMAC-SHA256 signature
-$ ipv8lab whois8 verify --asn 64496
+# Verify HMAC-SHA256 signature (positional: ASN)
+$ ipv8lab whois8 verify 64496
 
 # List all records
 $ ipv8lab whois8 list --json
@@ -297,23 +291,23 @@ Standalone NetLog8 protocol per draft-thain-netlog8-00.
 # Initialize collector
 $ ipv8lab netlog8proto init
 
-# Log a message (severity 6 = Informational, facility 1)
-$ ipv8lab netlog8proto log --severity 6 --facility 1 --message "link up"
+# Log a message (positional: MESSAGE, severity/facility as text)
+$ ipv8lab netlog8proto log "link up" --severity INFO --facility GENERAL
 
-# Security alert
-$ ipv8lab netlog8proto sec-alert --message "spoofed prefix detected" --source 64496
+# Security alert (positional: MESSAGE)
+$ ipv8lab netlog8proto sec-alert "spoofed prefix detected"
 
-# E3 trap
-$ ipv8lab netlog8proto e3-trap --message "interior link leak" --source 222.0.0.1
+# E3 trap (positional: MESSAGE)
+$ ipv8lab netlog8proto e3-trap "interior link leak"
 
 # Query by severity
-$ ipv8lab netlog8proto query --severity 4
+$ ipv8lab netlog8proto query --severity ALERT
 
-# Add alert rule
-$ ipv8lab netlog8proto add-rule --name critical --severity-min 2
+# Add alert rule (positional: NAME)
+$ ipv8lab netlog8proto add-rule critical --severity ALERT
 
 # Export
-$ ipv8lab netlog8proto export --format jsonl
+$ ipv8lab netlog8proto export --fmt jsonl
 
 # Wire header info
 $ ipv8lab netlog8proto header-info
@@ -331,9 +325,9 @@ $ ipv8lab zone init --prefix 127.1.0.0
 $ ipv8lab zone oauth-issue device-42
 $ ipv8lab zone acl-add device-42 gateway --action permit
 $ ipv8lab route simulate --config examples/two_asn_demo.yaml
-$ ipv8lab netlog8proto log --severity 6 --facility 1 --message "integration test"
-$ ipv8lab whois8 register --asn 64496 --holder "Lab Corp" --rir ARIN
-$ ipv8lab whois8 validate --asn 64496 --prefix 0.0.251.240
+$ ipv8lab netlog8proto log "integration test" --severity INFO --facility GENERAL
+$ ipv8lab whois8 register 64496 "Lab Corp" --rir ARIN
+$ ipv8lab whois8 validate 64496 16
 ```
 
 ### NAT8 & NetFlow8
@@ -341,13 +335,13 @@ $ ipv8lab whois8 validate --asn 64496 --prefix 0.0.251.240
 ```bash
 # NAT8 gateway
 $ ipv8lab nat8 init --mode dynamic
-$ ipv8lab nat8 add --inside 10.0.0.1 --outside 64496.10.0.0.1
-$ ipv8lab nat8 table
+$ ipv8lab nat8 add-static 10.0.0.1 64496.10.0.0.1
+$ ipv8lab nat8 mappings
 
 # NetFlow8 monitoring
 $ ipv8lab netflow8 init
-$ ipv8lab netflow8 flows
-$ ipv8lab netflow8 export --format jsonl
+$ ipv8lab netflow8 top
+$ ipv8lab netflow8 export --all --json
 ```
 
 ### QoS & Docker Testbed
@@ -355,7 +349,7 @@ $ ipv8lab netflow8 export --format jsonl
 ```bash
 # QoS classification
 $ ipv8lab qos init
-$ ipv8lab qos classify --tos 46
+$ ipv8lab qos classify --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --tos 46
 $ ipv8lab qos queues
 
 # Docker testbed
