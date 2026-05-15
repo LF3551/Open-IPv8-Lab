@@ -23,6 +23,7 @@ from ipv8lab.cli.interior_link_cli import app as ilink_app
 from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.pcap_cli import app as pcap_app
 from ipv8lab.cli.route_cli import app as route_app
+from ipv8lab.cli.rine_protection_cli import app as rine_prot_app
 from ipv8lab.cli.socket_api_cli import app as socket_api_app
 from ipv8lab.cli.traceroute_cli import app as traceroute_app
 from ipv8lab.cli.tui_cli import app as tui_app
@@ -72,6 +73,7 @@ app.add_typer(ilink_app, name="ilink", help="Interior Link Convention (222.0.0.0
 app.add_typer(socket_api_app, name="socket", help="Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2.")
 app.add_typer(cgnat_app, name="cgnat", help="CGNAT Behaviour simulation per Section 15.")
 app.add_typer(cloud_vpc_app, name="vpc", help="Cloud Provider VPC simulation per Section 17.")
+app.add_typer(rine_prot_app, name="rineprot", help="RINE Prefix Protection per Section 19.3.")
 
 if __name__ == "__main__":
     app()
