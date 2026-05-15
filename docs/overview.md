@@ -4,6 +4,36 @@
 
 Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification.
 
+## Why IPv8? — Comparison with IPv4 and IPv6
+
+IPv8 is **not** a successor to IPv6. It is an independent experimental protocol described in draft-thain-ipv8-02, designed around a fundamentally different addressing and routing philosophy.
+
+| | IPv4 | IPv6 | IPv8 |
+|---|------|------|------|
+| **Address size** | 32-bit | 128-bit | 64-bit |
+| **Address format** | `a.b.c.d` | `xxxx:xxxx:…:xxxx` | `ASN.a.b.c.d` (ASN dot notation) |
+| **Address structure** | Flat / CIDR prefix | Interface ID + prefix | **ASN routing prefix (32-bit) + host (32-bit)** |
+| **Routing model** | BGP + IGP, flat RIB | Same as IPv4 | **Two-tier**: Tier 1 (inter-AS by ASN prefix) + Tier 2 (intra-AS by host) |
+| **Path metric** | AS-path length, MED | Same as IPv4 | **Cost Factor (CF)** — 7 components: RTT, jitter, loss, bandwidth, hops, policy, Haversine physics floor |
+| **NAT** | Widespread (NAT44) | Discouraged | **XLATE8** — structured north-south translation with DNS validation |
+| **Service discovery** | DNS, mDNS | DNS, NDP, SLAAC | **Zone Server** — centralised OAuth8 + ACL8 + DHCP8 + DNS8 per AS |
+| **Host config** | DHCP | SLAAC / DHCPv6 | **DHCP8** — single-response provisioning with all endpoints |
+| **Security at border** | ACL, uRPF | ACL, IPsec | **Ingress filtering** + NIC rate limits + RINE prefix protection + mandatory compliance tiers |
+| **Transition** | — | 6to4, NAT64, DS-Lite | **8to4 tunnelling** — IPv8 inside IPv4 for legacy transit |
+| **Management** | SNMP, NetFlow | Same | **SNMPv8 MIB**, **NetLog8** (SEC-ALERT, E3 traps), **NetFlow8** |
+| **Address exhaustion** | ~4.3 billion (exhausted) | ~3.4 × 10³⁸ | ~4.3 billion hosts per ASN × ~4.3 billion ASNs |
+| **IETF status** | Standard (RFC 791) | Standard (RFC 8200) | **Experimental** (draft-thain-ipv8-02) |
+
+### Key architectural differences
+
+1. **ASN-centric addressing** — the network operator (ASN) is embedded directly in every address, eliminating the need for separate prefix allocation registries
+2. **Mandatory Zone Server** — every AS has a centralised authority for authentication (OAuth8), access control (ACL8), and host configuration (DHCP8) — security is built into the architecture, not bolted on
+3. **Cost Factor routing** — BGP8 uses a physics-aware 7-component metric instead of simple AS-path length, enabling quality-based path selection
+4. **Structured NAT** — XLATE8 replaces ad-hoc NAT with a defined translation model including DNS validation and even/odd load balancing
+5. **Companion protocol suite** — IPv8 ships with purpose-built replacements: ARP8, WHOIS8, NetLog8, WiFi8, Update8, rather than adapting IPv4-era protocols
+
+> **Note:** IPv8 is an experimental protocol for research and education. IPv6 is the production successor to IPv4 and remains the IETF standard for next-generation Internet addressing.
+
 ## What it does
 
 - Parses and validates IPv8 64-bit addresses (ASN dot notation and full 8-octet format)
