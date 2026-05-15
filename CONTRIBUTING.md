@@ -9,7 +9,7 @@ git clone https://github.com/LF3551/Open-IPv8-Lab.git
 cd Open-IPv8-Lab
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -v          # 1827 tests must pass
+pytest -v
 ruff check src/ tests/
 mypy src/
 ```
