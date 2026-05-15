@@ -11,7 +11,7 @@ authors:
 repository-code: "https://github.com/LF3551/Open-IPv8-Lab"
 url: "https://www.alekseialeinikov.com"
 license: Apache-2.0
-version: 0.12.3
+version: 0.12.4
 date-released: "2026-05-15"
 identifiers:
   - type: doi
