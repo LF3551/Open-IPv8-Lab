@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Device compliance tiers per draft-thain-ipv8-00 Section 17.1-17.3.
+"""Device compliance tiers per draft-thain-ipv8-02 Section 17.1-17.3.
 
 Validates device capability sets against IPv8 compliance requirements.
 """

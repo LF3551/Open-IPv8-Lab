@@ -1,6 +1,6 @@
 # Overview
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) — the Internet Protocol Version 8 specification.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification.
 
 ## What it does
 
@@ -50,7 +50,7 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 
 ## Design principles
 
-1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-00
+1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-02
 2. **Userspace only** — everything runs as a normal user process
 3. **Tested** — 1406 tests covering all implemented sections
 4. **Extensible** — plugin system for custom protocol experiments

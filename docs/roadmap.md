@@ -62,7 +62,7 @@
 - [x] Plugin system for custom protocols
 - [x] Error hierarchy (IPv8LabError)
 
-## v0.8 — draft-thain-ipv8-00 spec compliance
+## v0.8 — draft-thain-ipv8-02 spec compliance
 
 - [x] Address class classification per Section 4
 - [x] Spec-compliant packet header `!BBHHHBBHIIII` per Section 5.1

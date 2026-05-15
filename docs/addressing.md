@@ -1,6 +1,6 @@
 # IPv8 Addressing (Sections 3, 4, 6)
 
-Per [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) Sections 3–4 and 6.
+Per [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) Sections 3–4 and 6.
 
 ## Address format (Section 3.1)
 

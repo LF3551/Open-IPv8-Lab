@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""NetLog8 telemetry client per draft-thain-ipv8-00.
+"""NetLog8 telemetry client per draft-thain-ipv8-02.
 
 NetLog8 is the unified telemetry format for all IPv8 network services.
 Every IPv8 device (Tier 1/2/3) MUST implement a NetLog8 client.

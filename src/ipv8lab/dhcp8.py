@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""DHCP8 lease simulation per draft-thain-ipv8-00 Section 1.3.
+"""DHCP8 lease simulation per draft-thain-ipv8-02 Section 1.3.
 
 A device connecting to an IPv8 network sends one DHCP8 Discover and
 receives one response containing every service endpoint it requires.

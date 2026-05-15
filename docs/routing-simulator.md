@@ -1,6 +1,6 @@
 # Routing (Sections 8.7, 8.8)
 
-Per [draft-thain-ipv8-00](https://www.ietf.org/archive/id/draft-thain-ipv8-00.html) Sections 8.7 and 8.8.
+Per [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) Sections 8.7 and 8.8.
 
 ## Two-tier routing table (Section 8.7)
 

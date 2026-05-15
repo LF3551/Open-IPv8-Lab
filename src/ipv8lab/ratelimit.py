@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""NIC rate limits per draft-thain-ipv8-00 Section 17.5.
+"""NIC rate limits per draft-thain-ipv8-02 Section 17.5.
 
 IPv8 certified NIC firmware enforces rate limits that cannot be
 overridden by software:

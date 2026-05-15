@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Zone Server mock per draft-thain-ipv8-00 Section 1.3.
+"""Zone Server mock per draft-thain-ipv8-02 Section 1.3.
 
 The Zone Server is the central operational concept in IPv8 — a paired
 active/active platform that runs every service a network segment

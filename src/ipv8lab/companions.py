@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Companion spec module stubs per draft-thain-ipv8-00.
+"""Companion spec module stubs per draft-thain-ipv8-02.
 
 Models data structures and basic behaviours from companion
 specifications referenced in the core IPv8 spec:

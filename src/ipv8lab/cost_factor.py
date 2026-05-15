@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Cost Factor (CF) metric per draft-thain-ipv8-00 Section 1.6.
+"""Cost Factor (CF) metric per draft-thain-ipv8-02 Section 1.6.
 
 CF is a 32-bit accumulated metric derived from seven components
 measured from TCP session telemetry:

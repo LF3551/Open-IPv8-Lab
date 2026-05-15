@@ -309,7 +309,7 @@ button.secondary:hover{background:#30363d}
 </head>
 <body>
 <h1>CF Performance Dashboard</h1>
-<p class="subtitle">Cost Factor visualisation per draft-thain-ipv8-00 Section 1.6</p>
+<p class="subtitle">Cost Factor visualisation per draft-thain-ipv8-02 Section 1.6</p>
 <div id="error"></div>
 
 <div class="summary-grid" id="summary"></div>

@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""DNS A8 record type per draft-thain-ipv8-00 Section 7.
+"""DNS A8 record type per draft-thain-ipv8-02 Section 7.
 
 An A8 record carries a 64-bit IPv8 address in network byte order.
 The nominal A8 response is an even/odd pair providing load balancing

@@ -3,7 +3,7 @@
 -- or ~/Library/Application Support/Wireshark/plugins/ (macOS)
 -- or %APPDATA%\Wireshark\plugins\ (Windows)
 
-local ipv8 = Proto("ipv8", "IPv8 Protocol (draft-thain-ipv8-00)")
+local ipv8 = Proto("ipv8", "IPv8 Protocol (draft-thain-ipv8-02)")
 
 -- Header fields
 local f_version   = ProtoField.uint8("ipv8.version", "Version", base.DEC, nil, 0xF0)

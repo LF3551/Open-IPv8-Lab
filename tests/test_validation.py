@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Tests for prefix validation rules per draft-thain-ipv8-00."""
+"""Tests for prefix validation rules per draft-thain-ipv8-02."""
 
 from ipv8lab.address import IPv8Address
 from ipv8lab.validation import (

@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""VRF — Virtual Routing and Forwarding per draft-thain-ipv8-00 Section 8.8.
+"""VRF — Virtual Routing and Forwarding per draft-thain-ipv8-02 Section 8.8.
 
 VRF is mandatory for all IPv8 L3 devices.
 - Management VRF (VLAN 4090): device management traffic
