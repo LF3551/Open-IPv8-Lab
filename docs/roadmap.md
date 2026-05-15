@@ -119,7 +119,7 @@
 
 - [x] ARP8-driven version selection simulation per Section 2 (neighbor discovery, per-hop IPv8/IPv4 downgrade)
 - [x] Inter-Company Interop Prefix (127.127.0.0) and Two-XLATE8 Interop Model per Sections 4.6–4.7
-- [ ] Private Interop ASN (65534/65533) reservation per Section 4.8
+- [x] Private Interop ASN (65534/65533) reservation per Section 4.8
 - [ ] Interior Link Convention (222.0.0.0/8) address validation per Section 4.10
 - [ ] Address Usage Model — consolidated address space table per Section 4.11
 - [ ] Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2

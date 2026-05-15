@@ -42,6 +42,18 @@ class TestValidatePrefix:
         assert result.scope == RoutingScope.PEERING
         assert result.routable_externally is False
 
+    def test_private_peering_asn_65534(self):
+        addr = IPv8Address.parse("0.0.255.254.10.0.0.1")
+        result = validate_prefix(addr)
+        assert result.scope == RoutingScope.PRIVATE
+        assert result.routable_externally is False
+
+    def test_documentation_asn_65533(self):
+        addr = IPv8Address.parse("0.0.255.253.10.0.0.1")
+        result = validate_prefix(addr)
+        assert result.scope == RoutingScope.PRIVATE
+        assert result.routable_externally is False
+
     def test_interior_link_not_external(self):
         addr = IPv8Address.parse("64496.222.0.0.1")
         result = validate_prefix(addr)
@@ -142,6 +154,12 @@ class TestASNReservation:
     def test_asn_zero_ok(self):
         assert check_asn_reservation(0) is None
 
-    def test_asn_65534_ok(self):
-        # Private peering, not in reserved ranges
-        assert check_asn_reservation(65534) is None
+    def test_asn_65534_reserved_for_private_peering(self):
+        result = check_asn_reservation(65534)
+        assert result is not None
+        assert "private" in result.lower()
+
+    def test_asn_65533_reserved_for_documentation(self):
+        result = check_asn_reservation(65533)
+        assert result is not None
+        assert "documentation" in result.lower()

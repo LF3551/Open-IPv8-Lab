@@ -48,6 +48,10 @@ _INTERNAL_ZONE_ASN_MAX = 2_147_483_647  # 127.255.255.255 as 32-bit int
 _RINE_ASN_MIN = 1_677_721_600  # 100.0.0.0
 _RINE_ASN_MAX = 1_694_498_815  # 100.255.255.255
 
+# Private Interop ASN (Section 4.8)
+PRIVATE_PEERING_ASN = 65534   # Private inter-company BGP8 peering
+DOCUMENTATION_ASN = 65533     # Documentation and testing
+
 
 def validate_prefix(addr: IPv8Address) -> PrefixValidation:
     """Validate an address against prefix rules and determine routing scope."""
@@ -75,6 +79,24 @@ def validate_prefix(addr: IPv8Address) -> PrefixValidation:
         return PrefixValidation(
             address=addr,
             scope=RoutingScope.INTERNAL,
+            routable_externally=False,
+            violations=(),
+        )
+
+    # Private inter-company peering — ASN 65534 (Section 4.8)
+    if addr.is_private_peering_asn():
+        return PrefixValidation(
+            address=addr,
+            scope=RoutingScope.PRIVATE,
+            routable_externally=False,
+            violations=(),
+        )
+
+    # Documentation/testing — ASN 65533 (Section 4.8)
+    if addr.is_documentation_asn():
+        return PrefixValidation(
+            address=addr,
+            scope=RoutingScope.PRIVATE,
             routable_externally=False,
             violations=(),
         )
@@ -193,5 +215,15 @@ def check_asn_reservation(asn: int) -> str | None:
             f"ASN {asn} is in the RINE reserved range "
             f"({_RINE_ASN_MIN}-{_RINE_ASN_MAX}) "
             "and MUST NOT be allocated for public internet routing"
+        )
+    if asn == PRIVATE_PEERING_ASN:
+        return (
+            f"ASN {asn} is reserved for private inter-company BGP8 peering "
+            "per Section 4.8 (consistent with RFC 6996)"
+        )
+    if asn == DOCUMENTATION_ASN:
+        return (
+            f"ASN {asn} is reserved for documentation and testing "
+            "per Section 4.8"
         )
     return None
