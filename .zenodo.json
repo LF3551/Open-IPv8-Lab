@@ -1,6 +1,6 @@
 {
   "title": "Open-IPv8-Lab: Experimental IPv8 Toolkit",
-  "description": "Userspace toolkit implementing draft-thain-ipv8-02 — the Internet Protocol Version 8 specification. 58 modules, 35 CLI commands, 1827 tests.",
+  "description": "Userspace toolkit for experimenting with Internet Protocol Version 8 (draft-thain-ipv8-02). Provides CLI-driven address management, packet construction, routing simulation, and protocol conformance testing in a pure-Python environment.",
   "upload_type": "software",
   "license": {
     "id": "Apache-2.0"
