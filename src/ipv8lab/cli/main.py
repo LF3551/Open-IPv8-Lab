@@ -23,6 +23,7 @@ from ipv8lab.cli.interop_cli import app as interop_app
 from ipv8lab.cli.interior_link_cli import app as ilink_app
 from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.pcap_cli import app as pcap_app
+from ipv8lab.cli.prefix_enforce_cli import app as prefix_enforce_app
 from ipv8lab.cli.route_cli import app as route_app
 from ipv8lab.cli.rine_protection_cli import app as rine_prot_app
 from ipv8lab.cli.socket_api_cli import app as socket_api_app
@@ -76,6 +77,7 @@ app.add_typer(socket_api_app, name="socket", help="Socket API Compatibility mock
 app.add_typer(cgnat_app, name="cgnat", help="CGNAT Behaviour simulation per Section 15.")
 app.add_typer(cloud_vpc_app, name="vpc", help="Cloud Provider VPC simulation per Section 17.")
 app.add_typer(rine_prot_app, name="rineprot", help="RINE Prefix Protection per Section 19.3.")
+app.add_typer(prefix_enforce_app, name="prefixenf", help="/16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7.")
 
 if __name__ == "__main__":
     app()
