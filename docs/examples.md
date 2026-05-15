@@ -82,14 +82,14 @@ $ ipv8lab usage table
 # Build a packet with payload
 $ ipv8lab packet build --src 64496.192.0.2.1 --dst 64497.198.51.100.7 --payload "hello"
 
-# Hex dump of a packet
-$ ipv8lab packet dump --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --payload "test"
+# Hex dump of a binary packet file
+$ ipv8lab packet dump packet.bin
 
 # Fragment a large packet (MTU = 64 bytes)
 $ ipv8lab frag fragment --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --size 256 --mtu 64
 
 # Packet fuzzer — test header robustness
-$ ipv8lab fuzz run --iterations 100 --json
+$ ipv8lab fuzz run --count 100 --json
 ```
 
 ---
@@ -103,7 +103,7 @@ Two-tier routing: Tier 1 (ASN prefix) → Tier 2 (host n.n.n.n).
 $ ipv8lab route simulate --config examples/two_asn_demo.yaml
 
 # Traceroute diagnostic
-$ ipv8lab traceroute trace --dst 64497.10.0.0.1 --hops 8 --json
+$ ipv8lab traceroute run 64496.10.0.0.1 64497.10.0.0.1 --hops 8 --json
 ```
 
 ### Cost Factor metric
@@ -111,8 +111,8 @@ $ ipv8lab traceroute trace --dst 64497.10.0.0.1 --hops 8 --json
 7-component path quality score (Section 1.6).
 
 ```bash
-# Compute CF for a path
-$ ipv8lab cf compute --latency 12.5 --bandwidth 1000 --jitter 0.3
+# Run demo with 4 paths (includes anomaly detection)
+$ ipv8lab cf demo --json
 ```
 
 ---
@@ -125,17 +125,14 @@ Zone Server provides OAuth8, ACL8, DHCP8, service registry per Sections 1.3–1.
 # Step 1: Initialize Zone Server for a zone prefix
 $ ipv8lab zone init --prefix 127.1.0.0
 
-# Step 2: Issue an OAuth8 JWT token for a device
-$ ipv8lab zone oauth-issue device-42
-
-# Step 3: Add an ACL8 rule
+# Step 2: Add an ACL8 rule
 $ ipv8lab zone acl-add "*" gateway --action permit
 
-# Step 4: Check VLAN compliance
+# Step 3: Check VLAN compliance
 $ ipv8lab zone vlan-check 100
 
-# Step 5: List registered services
-$ ipv8lab zone services
+# Step 4: List registered services
+$ ipv8lab zone service-list
 
 # Full status
 $ ipv8lab zone status --json
@@ -159,7 +156,7 @@ $ ipv8lab mtls encrypt my-device "secret payload"
 
 ```bash
 # Initialize 3 zones with Zone Server pairs
-$ ipv8lab multizone init --zones 3
+$ ipv8lab multizone init
 $ ipv8lab multizone status --json
 ```
 
@@ -204,7 +201,7 @@ $ ipv8lab bgp8 select 64496.0.0.0.0/8 --json
 ```bash
 # North-south translation
 $ ipv8lab xlate8 init
-$ ipv8lab xlate8 translate --src 64496.10.0.0.1
+$ ipv8lab xlate8 demo --json
 $ ipv8lab xlate8 table
 
 # Even/Odd Load Balancing (Section 15.1)
@@ -322,7 +319,6 @@ Full lifecycle: DHCP8 → OAuth8 → ACL8 → routing → telemetry.
 ```bash
 # Run the built-in integration scenario
 $ ipv8lab zone init --prefix 127.1.0.0
-$ ipv8lab zone oauth-issue device-42
 $ ipv8lab zone acl-add device-42 gateway --action permit
 $ ipv8lab route simulate --config examples/two_asn_demo.yaml
 $ ipv8lab netlog8proto log "integration test" --severity INFO --facility GENERAL
@@ -334,27 +330,20 @@ $ ipv8lab whois8 validate 64496 16
 
 ```bash
 # NAT8 gateway
-$ ipv8lab nat8 init --mode dynamic
-$ ipv8lab nat8 add-static 10.0.0.1 64496.10.0.0.1
-$ ipv8lab nat8 mappings
+$ ipv8lab nat8 demo --json
 
 # NetFlow8 monitoring
-$ ipv8lab netflow8 init
-$ ipv8lab netflow8 top
-$ ipv8lab netflow8 export --all --json
+$ ipv8lab netflow8 demo --json
 ```
 
 ### QoS & Docker Testbed
 
 ```bash
 # QoS classification
-$ ipv8lab qos init
-$ ipv8lab qos classify --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --tos 46
-$ ipv8lab qos queues
+$ ipv8lab qos demo
 
 # Docker testbed
-$ ipv8lab docker generate --nodes 4 --topology mesh
-$ ipv8lab docker status --json
+$ ipv8lab docker demo --json
 ```
 
 ---
@@ -363,6 +352,6 @@ $ ipv8lab docker status --json
 
 - **JSON everywhere**: Add `--json` to any command for machine-readable output
 - **Benchmarks**: `ipv8lab bench run --json` for all 6 benchmarks
-- **TUI**: `ipv8lab tui launch` for a live terminal dashboard
-- **Web dashboard**: `ipv8lab dashboard serve --port 8080`
-- **Packet capture**: `ipv8lab capture start -o trace.iv8cap` then `ipv8lab pcap export trace.iv8cap out.pcap`
+- **TUI**: `ipv8lab tui run` for a live terminal dashboard
+- **Web dashboard**: `ipv8lab dashboard serve examples/two_asn_demo.yaml --port 8080`
+- **Packet capture**: `ipv8lab capture info trace.iv8cap` then `ipv8lab pcap export trace.iv8cap out.pcap`

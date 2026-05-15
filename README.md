@@ -34,7 +34,7 @@ ipv8lab route simulate --config examples/two_asn_demo.yaml
 
 # Zone Server lifecycle
 ipv8lab zone init --prefix 127.1.0.0
-ipv8lab zone oauth-issue device-42
+ipv8lab zone status --json
 
 # Security filtering
 ipv8lab ilinkprot bgp8 64496.222.0.0.1

@@ -82,8 +82,8 @@ ipv8lab packet build --src 64496.192.0.2.1 --dst 64497.198.51.100.7 --payload "h
 # Parse a packet from binary file
 ipv8lab packet parse packet.bin
 
-# Hex dump
-ipv8lab packet dump --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --payload "test"
+# Hex dump of a binary packet file
+ipv8lab packet dump packet.bin
 ```
 
 ## route
@@ -93,12 +93,6 @@ Two-tier routing simulation.
 ```bash
 # Simulate routing with YAML config
 ipv8lab route simulate --config examples/two_asn_demo.yaml
-
-# Add a route
-ipv8lab route add --prefix 0.0.251.240 --next-hop 0.0.251.241 --metric 10
-
-# Lookup destination
-ipv8lab route lookup 64496.10.0.0.1
 ```
 
 ## zone
@@ -115,14 +109,11 @@ ipv8lab zone status
 # Add ACL rule
 ipv8lab zone acl-add "*" gateway --action permit
 
-# Issue OAuth8 token
-ipv8lab zone oauth-issue device-42
-
 # Validate VLAN
 ipv8lab zone vlan-check 100
 
 # List services
-ipv8lab zone services
+ipv8lab zone service-list
 ```
 
 ## multizone
@@ -131,7 +122,7 @@ Multi-zone simulation with Zone Server pairs.
 
 ```bash
 # Initialize multi-zone topology
-ipv8lab multizone init --zones 3
+ipv8lab multizone init
 
 # Show topology status
 ipv8lab multizone status
@@ -166,8 +157,8 @@ XLATE8 north-south traffic flow.
 # Initialize XLATE8 gateway
 ipv8lab xlate8 init
 
-# Translate address
-ipv8lab xlate8 translate --src 64496.10.0.0.1
+# Egress flow: DNS8 → XLATE8 → translate
+ipv8lab xlate8 demo --json
 
 # Show translation table
 ipv8lab xlate8 table
@@ -313,11 +304,8 @@ ipv8lab qos demo
 CF (Cost Factor) performance dashboard.
 
 ```bash
-# Compute CF for a path
-ipv8lab cf compute --latency 12.5 --bandwidth 1000 --jitter 0.3
-
-# Launch HTML dashboard
-ipv8lab cf dashboard --port 8080
+# Run demo with 4 paths
+ipv8lab cf demo --json
 
 # Status
 ipv8lab cf status --json
@@ -329,13 +317,13 @@ Packet fuzzer for protocol security testing.
 
 ```bash
 # Run fuzzer (1000 iterations)
-ipv8lab fuzz run --iterations 1000
+ipv8lab fuzz run --count 1000
 
 # All strategies
-ipv8lab fuzz run --strategy all --json
+ipv8lab fuzz run --strategy combined --json
 
-# Show results
-ipv8lab fuzz results
+# List strategies
+ipv8lab fuzz strategies
 ```
 
 ## mtls
@@ -352,11 +340,8 @@ ipv8lab mtls issue my-device
 # TLS handshake simulation
 ipv8lab mtls handshake my-device
 
-# Encrypt message
+# Encrypt message (positional: DEVICE MESSAGE)
 ipv8lab mtls encrypt my-device "secret payload"
-
-# Decrypt message
-ipv8lab mtls decrypt my-device <ciphertext>
 ```
 
 ## docker
@@ -364,11 +349,8 @@ ipv8lab mtls decrypt my-device <ciphertext>
 Docker-based multi-node testbed.
 
 ```bash
-# Generate testbed config
-ipv8lab docker generate --nodes 4 --topology mesh
-
-# Build containers
-ipv8lab docker build
+# Run demo testbed
+ipv8lab docker demo --json
 
 # Show status
 ipv8lab docker status --json
@@ -380,10 +362,10 @@ TUI dashboard powered by Rich Live / Textual.
 
 ```bash
 # Launch TUI
-ipv8lab tui launch
+ipv8lab tui run
 
-# Status
-ipv8lab tui status --json
+# Demo data
+ipv8lab tui demo --json
 ```
 
 ## bench
@@ -394,9 +376,6 @@ Performance benchmarks.
 # Run all benchmarks
 ipv8lab bench run
 
-# Run specific benchmark
-ipv8lab bench run --name address
-
 # JSON output
 ipv8lab bench run --json
 ```
@@ -406,13 +385,10 @@ ipv8lab bench run --json
 Packet capture and replay (.iv8cap format).
 
 ```bash
-# Start capture
-ipv8lab capture start -o trace.iv8cap
+# Read packets from a capture file
+ipv8lab capture read trace.iv8cap
 
-# Replay capture
-ipv8lab capture replay trace.iv8cap
-
-# Show capture info
+# Show capture file info
 ipv8lab capture info trace.iv8cap
 ```
 
@@ -422,10 +398,7 @@ Web UI dashboard (dark theme, JSON API).
 
 ```bash
 # Launch web dashboard
-ipv8lab dashboard serve --port 8080
-
-# Status
-ipv8lab dashboard status --json
+ipv8lab dashboard serve examples/two_asn_demo.yaml --port 8080
 ```
 
 ## udp
@@ -433,11 +406,8 @@ ipv8lab dashboard status --json
 UDP transport experiments.
 
 ```bash
-# Run UDP node
-ipv8lab udp run --port 9000
-
-# Send packet
-ipv8lab udp send --dst 127.0.0.1:9001 --payload "hello"
+# Run UDP transport demo
+ipv8lab udp run --config examples/two_asn_demo.yaml
 ```
 
 ## usage
@@ -460,11 +430,14 @@ ipv8lab usage classify 64496.192.0.2.1
 ARP8-driven version selection per Section 2.
 
 ```bash
-# Initialize ARP8
-ipv8lab arp8 init
+# Discover neighbour (positional: TARGET)
+ipv8lab arp8 discover 64496.10.0.0.1
 
-# Resolve address
-ipv8lab arp8 resolve 64496.10.0.0.1
+# Show version selection (positional: SRC DST)
+ipv8lab arp8 select 64496.10.0.0.1 64497.10.0.0.2
+
+# Show ARP8 cache
+ipv8lab arp8 cache --json
 
 # Status
 ipv8lab arp8 status --json
@@ -478,11 +451,11 @@ Inter-Company Interop and Two-XLATE8 model (Sections 4.6–4.7).
 # Initialize interop
 ipv8lab interop init
 
-# Show interop prefix
-ipv8lab interop show
-
-# Status
+# Show interop status
 ipv8lab interop status --json
+
+# Run demo
+ipv8lab interop demo --json
 ```
 
 ## ilink
@@ -490,14 +463,14 @@ ipv8lab interop status --json
 Interior Link Convention (222.0.0.0/8) per Section 4.10.
 
 ```bash
-# Initialize interior link
-ipv8lab ilink init
+# Generate interior link /31 pairs
+ipv8lab ilink generate 64496
 
 # Validate address
-ipv8lab ilink validate 222.0.0.1.10.0.0.1
+ipv8lab ilink validate 64496.222.0.0.1
 
-# Status
-ipv8lab ilink status --json
+# Summary
+ipv8lab ilink summary 64496 --json
 ```
 
 ## socket
@@ -505,11 +478,11 @@ ipv8lab ilink status --json
 Socket API Compatibility mock (AF_INET8) per Section 6.2.
 
 ```bash
-# Initialize socket mock
-ipv8lab socket init
+# Show AF_INET8 info
+ipv8lab socket info --json
 
-# Create socket
-ipv8lab socket create --family AF_INET8 --type SOCK_DGRAM
+# Create sockaddr_in8 (positional: ADDRESS)
+ipv8lab socket create 64496.10.0.0.1 --json
 
 # Status
 ipv8lab socket status --json
@@ -526,8 +499,8 @@ ipv8lab cgnat init
 # Translate (positional: ADDRESS)
 ipv8lab cgnat translate 64496.10.0.0.1
 
-# Validate translation preserved r.r.r.r
-ipv8lab cgnat validate 64496.10.0.0.1
+# Validate translation preserved r.r.r.r (positional: ORIGINAL TRANSLATED)
+ipv8lab cgnat validate 64496.10.0.0.1 64496.10.0.0.1
 
 # Show bindings
 ipv8lab cgnat bindings
@@ -542,10 +515,10 @@ Cloud Provider VPC simulation per Section 17.
 
 ```bash
 # Initialize VPC
-ipv8lab vpc init --zone-prefix 127.1.0.0
+ipv8lab vpc init --asn 64496
 
-# Show VPC mapping
-ipv8lab vpc show
+# Show VPC list
+ipv8lab vpc list --json
 
 # Status
 ipv8lab vpc status --json
