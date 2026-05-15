@@ -129,7 +129,8 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - /16 Minimum Prefix Enforcement at eBGP8 boundaries: `ipv8lab prefixenf`
 - Standalone WHOIS8 protocol — server, client with cache, record signing, RIR hierarchy: `ipv8lab whois8`
 - Standalone NetLog8 protocol — wire framing, collector, relay, rate limiting, export: `ipv8lab netlog8proto`
-- Mesh network simulation, packet capture, web dashboard, benchmarks, plugins
+- Performance benchmarks (address, packet, routing, checksum, fragmentation, multicast): `ipv8lab bench`
+- Mesh network simulation, packet capture, web dashboard, plugins
 
 ## Non-goals
 
