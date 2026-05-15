@@ -124,7 +124,7 @@
 - [x] Address Usage Model — consolidated address space table per Section 4.11
 - [x] Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2
 - [x] CGNAT Behaviour simulation (r.r.r.r preservation, n.n.n.n-only NAT) per Section 15
-- [ ] XLATE8 Even/Odd Load Balancing per Section 15.1
+- [x] XLATE8 Even/Odd Load Balancing per Section 15.1
 - [ ] Cloud Provider VPC simulation (zone prefix → VPC mapping) per Section 17
 - [ ] RINE Prefix Protection (100.x.x.x filtering, SEC-ALERT) per Section 19.3
 - [ ] Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4

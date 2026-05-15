@@ -32,6 +32,7 @@ from ipv8lab.cli.nat8_cli import app as nat8_app
 from ipv8lab.cli.netflow8_cli import app as netflow8_app
 from ipv8lab.cli.qos_cli import app as qos_app
 from ipv8lab.cli.xlate8_cli import app as xlate8_app
+from ipv8lab.cli.xlate8_lb_cli import app as xlate8_lb_app
 from ipv8lab.cli.zone_cli import app as zone_app
 
 app = typer.Typer(
@@ -64,6 +65,7 @@ app.add_typer(qos_app, name="qos", help="QoS traffic shaping based on TOS field.
 app.add_typer(tui_app, name="tui", help="TUI dashboard (Rich Live / Textual).")
 app.add_typer(mtls_app, name="mtls", help="mTLS encryption layer for Zone Server auth.")
 app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
+app.add_typer(xlate8_lb_app, name="xlate8lb", help="XLATE8 Even/Odd Load Balancing per Section 15.1.")
 app.add_typer(interop_app, name="interop", help="Inter-Company Interop and Two-XLATE8 model (Sections 4.6-4.7).")
 app.add_typer(ilink_app, name="ilink", help="Interior Link Convention (222.0.0.0/8) per Section 4.10.")
 app.add_typer(socket_api_app, name="socket", help="Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2.")
