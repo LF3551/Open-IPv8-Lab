@@ -171,7 +171,9 @@ pytest -v
 | [Packet Format](docs/packet-format.md) | 28-byte header (Section 5.1) |
 | [Routing Simulator](docs/routing-simulator.md) | Two-tier routing (Sections 8.7, 8.8) |
 | [Testbed](docs/testbed.md) | Local testbed setup |
+| [Glossary](docs/glossary.md) | Key terms and abbreviations |
 | [Roadmap](docs/roadmap.md) | Version history & future plans |
+| [Changelog](CHANGELOG.md) | Release-by-release changes |
 
 ---
 
