@@ -4,6 +4,11 @@ All notable changes to Open-IPv8-Lab are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.12.7] — 2026-05-15
+
+### Changed
+- Release automation now updates Homebrew formula via auto-generated pull request (compatible with protected main branch)
+
 ## [0.12.6] — 2026-05-15
 
 ### Added
