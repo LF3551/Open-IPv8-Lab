@@ -120,6 +120,20 @@
 - [x] mTLS / encryption layer for Zone Server auth (`ipv8lab mtls`)
 - [x] 1406 tests total
 
-## Future
+## Future — draft-thain-ipv8-02 compliance
 
+- [ ] ARP8-driven version selection simulation per Section 2 (neighbor discovery, per-hop IPv8/IPv4 downgrade)
+- [ ] Inter-Company Interop Prefix (127.127.0.0) and Two-XLATE8 Interop Model per Sections 4.6–4.7
+- [ ] Private Interop ASN (65534/65533) reservation per Section 4.8
+- [ ] Interior Link Convention (222.0.0.0/8) address validation per Section 4.10
+- [ ] Address Usage Model — consolidated address space table per Section 4.11
+- [ ] Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2
+- [ ] CGNAT Behaviour simulation (r.r.r.r preservation, n.n.n.n-only NAT) per Section 15
+- [ ] XLATE8 Even/Odd Load Balancing per Section 15.1
+- [ ] Cloud Provider VPC simulation (zone prefix → VPC mapping) per Section 17
+- [ ] RINE Prefix Protection (100.x.x.x filtering, SEC-ALERT) per Section 19.3
+- [ ] Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4
+- [ ] /16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7
+- [ ] Companion spec: draft-thain-whois8-00 (standalone WHOIS8 protocol)
+- [ ] Companion spec: draft-thain-netlog8-00 (standalone NetLog8 protocol)
 - [ ] PyPI package publishing
