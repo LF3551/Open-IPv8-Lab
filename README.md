@@ -68,6 +68,19 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | 19.7 | /16 Minimum Prefix Enforcement at eBGP8 boundaries | `prefix_enforce.py` |
 | — | Standalone WHOIS8 protocol (draft-thain-whois8-00) | `whois8_proto.py` |
 | — | Standalone NetLog8 protocol (draft-thain-netlog8-00) | `netlog8_proto.py` |
+| — | CRC32 checksum utilities | `checksum.py` |
+| — | Traceroute8 diagnostic utility | `traceroute8.py` |
+| — | CF performance dashboard (HTML, JSON API) | `cf_dashboard.py` |
+| — | Network simulator (YAML config, mesh topologies) | `simulator.py` |
+| — | Node abstraction for network simulation | `node.py` |
+| — | UDP transport (async send/receive) | `transport.py` |
+| — | Async UDP node orchestration | `udp_runner.py` |
+| — | Packet capture and replay (.iv8cap format) | `capture.py` |
+| — | Web dashboard (dark theme, JSON API) | `dashboard.py` |
+| — | Performance benchmarks | `benchmark.py` |
+| — | Plugin system for custom protocols | `plugin.py` |
+| — | Error hierarchy (IPv8LabError) | `errors.py` |
+| — | Hex dump and JSON output utilities | `dump.py` |
 
 ## Goals
 
