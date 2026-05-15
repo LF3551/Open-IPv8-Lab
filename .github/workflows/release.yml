@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-homebrew-formula:
@@ -28,18 +29,36 @@ jobs:
           sed -i "s|^  sha256 .*|  sha256 \"${SHA256}\"|" Formula/open-ipv8-lab.rb
 
       - name: Commit formula update
+        id: formula_commit
         run: |
           set -euo pipefail
           if git diff --quiet -- Formula/open-ipv8-lab.rb; then
             echo "No formula changes detected"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          BRANCH="ci/homebrew-${{ github.ref_name }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
           git add Formula/open-ipv8-lab.rb
           git commit -m "chore: update Homebrew formula for ${{ github.ref_name }}"
-          git push
+          git push origin "$BRANCH" --force
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request for formula update
+        if: steps.formula_commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh pr create \
+            --base main \
+            --head "${{ steps.formula_commit.outputs.branch }}" \
+            --title "chore: update Homebrew formula for ${{ github.ref_name }}" \
+            --body "Automated Homebrew formula update for release ${{ github.ref_name }}."
 
   release:
     needs: update-homebrew-formula
