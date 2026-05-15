@@ -12,6 +12,7 @@ from ipv8lab.cli.bench_cli import app as bench_app
 from ipv8lab.cli.bgp8_cli import app as bgp8_app
 from ipv8lab.cli.capture_cli import app as capture_app
 from ipv8lab.cli.cf_dashboard_cli import app as cf_dashboard_app
+from ipv8lab.cli.cgnat_cli import app as cgnat_app
 from ipv8lab.cli.dashboard_cli import app as dashboard_app
 from ipv8lab.cli.docker_cli import app as docker_app
 from ipv8lab.cli.frag_cli import app as frag_app
@@ -66,6 +67,7 @@ app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow."
 app.add_typer(interop_app, name="interop", help="Inter-Company Interop and Two-XLATE8 model (Sections 4.6-4.7).")
 app.add_typer(ilink_app, name="ilink", help="Interior Link Convention (222.0.0.0/8) per Section 4.10.")
 app.add_typer(socket_api_app, name="socket", help="Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2.")
+app.add_typer(cgnat_app, name="cgnat", help="CGNAT Behaviour simulation per Section 15.")
 
 if __name__ == "__main__":
     app()
