@@ -7,7 +7,6 @@
 - [x] Prefix to ASN conversion
 - [x] Address validation
 - [x] CLI command: `ipv8lab addr`
-- [x] Unit tests
 
 ## v0.2 — Packet format
 
@@ -16,7 +15,6 @@
 - [x] Packet parsing
 - [x] CRC32 checksum
 - [x] CLI command: `ipv8lab packet`
-- [x] Unit tests
 
 ## v0.3 — Routing simulator
 
@@ -42,7 +40,6 @@
 - [x] UDP network orchestrator
 - [x] CLI command: `ipv8lab udp run`
 - [x] UDP demo example
-- [x] Unit tests (transport + UDP runner)
 
 ## v0.6 — Developer tooling
 
@@ -51,7 +48,6 @@
 - [x] Address summary JSON
 - [x] Packet summary JSON
 - [x] Mypy type checking in CI
-- [x] More unit tests (dump, hexdump, summaries)
 
 ## v0.7 — Mesh, capture, dashboard, benchmarks, plugins
 
@@ -118,11 +114,10 @@
 - [x] TUI dashboard — Rich Live / Textual (`ipv8lab tui`)
 - [x] Packet fuzzer for protocol security testing (`ipv8lab fuzz`)
 - [x] mTLS / encryption layer for Zone Server auth (`ipv8lab mtls`)
-- [x] 1406 tests total
 
 ## Future — draft-thain-ipv8-02 compliance
 
-- [ ] ARP8-driven version selection simulation per Section 2 (neighbor discovery, per-hop IPv8/IPv4 downgrade)
+- [x] ARP8-driven version selection simulation per Section 2 (neighbor discovery, per-hop IPv8/IPv4 downgrade)
 - [ ] Inter-Company Interop Prefix (127.127.0.0) and Two-XLATE8 Interop Model per Sections 4.6–4.7
 - [ ] Private Interop ASN (65534/65533) reservation per Section 4.8
 - [ ] Interior Link Convention (222.0.0.0/8) address validation per Section 4.10
