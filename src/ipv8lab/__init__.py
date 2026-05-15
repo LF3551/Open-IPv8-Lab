@@ -3,4 +3,4 @@
 
 """Open-IPv8-Lab — Experimental userspace IPv8 toolkit."""
 
-__version__ = "0.12.4"
+__version__ = "0.12.5"

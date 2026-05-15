@@ -4,6 +4,16 @@ All notable changes to Open-IPv8-Lab are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.12.5] — 2026-05-15
+
+### Added
+- Community health files: CODEOWNERS, Code of Conduct, pull request template, and issue templates
+- Release visibility enhancements: repository homepage, funding config, and social preview asset
+
+### Changed
+- PyPI metadata improved with classifiers for Python versions, license, audience, and topics
+- CI uploads coverage to Codecov and README includes coverage badge
+
 ## [0.12.0] — 2026-05-15
 
 ### Added
