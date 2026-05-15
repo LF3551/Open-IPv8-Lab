@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discussions
+    url: https://github.com/LF3551/Open-IPv8-Lab/discussions
+    about: Ask questions and share ideas in Discussions
+  - name: Documentation
+    url: https://open-ipv8-lab.readthedocs.io
+    about: Check the documentation before opening an issue
