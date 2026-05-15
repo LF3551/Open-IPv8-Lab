@@ -122,7 +122,7 @@
 - [x] Private Interop ASN (65534/65533) reservation per Section 4.8
 - [x] Interior Link Convention (222.0.0.0/8) address validation per Section 4.10
 - [x] Address Usage Model — consolidated address space table per Section 4.11
-- [ ] Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2
+- [x] Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2
 - [ ] CGNAT Behaviour simulation (r.r.r.r preservation, n.n.n.n-only NAT) per Section 15
 - [ ] XLATE8 Even/Odd Load Balancing per Section 15.1
 - [ ] Cloud Provider VPC simulation (zone prefix → VPC mapping) per Section 17

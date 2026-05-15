@@ -21,6 +21,7 @@ from ipv8lab.cli.interior_link_cli import app as ilink_app
 from ipv8lab.cli.packet_cli import app as packet_app
 from ipv8lab.cli.pcap_cli import app as pcap_app
 from ipv8lab.cli.route_cli import app as route_app
+from ipv8lab.cli.socket_api_cli import app as socket_api_app
 from ipv8lab.cli.traceroute_cli import app as traceroute_app
 from ipv8lab.cli.tui_cli import app as tui_app
 from ipv8lab.cli.udp_cli import app as udp_app
@@ -64,6 +65,7 @@ app.add_typer(mtls_app, name="mtls", help="mTLS encryption layer for Zone Server
 app.add_typer(xlate8_app, name="xlate8", help="XLATE8 north-south traffic flow.")
 app.add_typer(interop_app, name="interop", help="Inter-Company Interop and Two-XLATE8 model (Sections 4.6-4.7).")
 app.add_typer(ilink_app, name="ilink", help="Interior Link Convention (222.0.0.0/8) per Section 4.10.")
+app.add_typer(socket_api_app, name="socket", help="Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2.")
 
 if __name__ == "__main__":
     app()
