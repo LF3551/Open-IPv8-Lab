@@ -43,6 +43,10 @@ Created and maintained by **Aleksei Aleinikov** ([@LF3551](https://github.com/LF
 ## Quick Start
 
 ```bash
+# Install with Homebrew (macOS)
+brew tap LF3551/open-ipv8-lab https://github.com/LF3551/Open-IPv8-Lab
+brew install LF3551/open-ipv8-lab/open-ipv8-lab
+
 # Install
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
