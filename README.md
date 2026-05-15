@@ -8,7 +8,7 @@
 [![SPDX](https://img.shields.io/badge/SPDX-Apache--2.0-brightgreen.svg)](https://spdx.org/licenses/Apache-2.0.html)
 [![Tests](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/LF3551/Open-IPv8-Lab/actions/workflows/tests.yml)
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, NAT8, NetFlow8, QoS, Docker testbed, TUI dashboard, packet fuzzer, mTLS encryption layer, interactive Zone Server CLI, Interior Link Convention Protection, /16 Minimum Prefix Enforcement, standalone WHOIS8 protocol (draft-thain-whois8-00), and standalone NetLog8 protocol (draft-thain-netlog8-00).
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. It covers ASN-based 64-bit addressing, packet encoding/decoding, two-tier routing, ICMPv8, 8to4 tunnelling, security filtering, VRF, PVRST, Cost Factor, WHOIS8, DHCP8, Zone Server (OAuth8/ACL8), NetLog8 telemetry, all companion spec modules, end-to-end integration scenarios, multi-zone simulation, BGP8 path selection with CF metric, XLATE8 north-south traffic flow, PCAP export for Wireshark integration, IPv8 packet fragmentation and reassembly, NAT8, NetFlow8, QoS, Docker testbed, TUI dashboard, packet fuzzer, mTLS encryption layer, interactive Zone Server CLI, ARP8-driven version selection, Socket API compatibility (AF_INET8), Inter-Company Interop and Two-XLATE8 model, Interior Link Convention, XLATE8 Even/Odd Load Balancing, CGNAT behaviour simulation, Cloud Provider VPC mapping, Address Usage Model, RINE Prefix Protection, Interior Link Convention Protection, /16 Minimum Prefix Enforcement, standalone WHOIS8 protocol (draft-thain-whois8-00), and standalone NetLog8 protocol (draft-thain-netlog8-00).
 
 Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551)).
 
@@ -55,6 +55,15 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 | — | TUI dashboard (Rich Live / Textual) | `tui_dashboard.py` |
 | — | Packet fuzzer for protocol security testing | `fuzzer.py` |
 | — | mTLS / encryption layer for Zone Server auth | `mtls.py` |
+| 2 | ARP8-driven version selection | `arp8_version.py` |
+| 4.6–4.7 | Inter-Company Interop and Two-XLATE8 model | `interop.py` |
+| 4.10 | Interior Link Convention (222.0.0.0/8) | `interior_link.py` |
+| 4.11 | Address Usage Model — consolidated address space table | `addr_usage.py` |
+| 6.2 | Socket API Compatibility mock (AF_INET8, sockaddr_in8) | `socket_api.py` |
+| 15 | CGNAT Behaviour simulation (r.r.r.r, n.n.n.n-only NAT) | `cgnat.py` |
+| 15.1 | XLATE8 Even/Odd Load Balancing | `xlate8_lb.py` |
+| 17 | Cloud Provider VPC simulation (zone prefix → VPC mapping) | `cloud_vpc.py` |
+| 19.3 | RINE Prefix Protection (100.x.x.x filtering, SEC-ALERT) | `rine_protection.py` |
 | 19.4 | Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) | `ilink_protection.py` |
 | 19.7 | /16 Minimum Prefix Enforcement at eBGP8 boundaries | `prefix_enforce.py` |
 | — | Standalone WHOIS8 protocol (draft-thain-whois8-00) | `whois8_proto.py` |
@@ -94,6 +103,15 @@ Created and maintained by Aleksei Aleinikov ([@LF3551](https://github.com/LF3551
 - TUI dashboard — Rich Live / Textual: `ipv8lab tui`
 - Packet fuzzer for protocol security testing: `ipv8lab fuzz`
 - mTLS / encryption layer for Zone Server authentication: `ipv8lab mtls`
+- ARP8-driven version selection per Section 2: `ipv8lab arp8`
+- Inter-Company Interop and Two-XLATE8 model (Sections 4.6–4.7): `ipv8lab interop`
+- Interior Link Convention (222.0.0.0/8) per Section 4.10: `ipv8lab ilink`
+- Address Usage Model — consolidated address space table (Section 4.11): `ipv8lab usage`
+- Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2: `ipv8lab socket`
+- CGNAT Behaviour simulation (r.r.r.r, n.n.n.n-only NAT) per Section 15: `ipv8lab cgnat`
+- XLATE8 Even/Odd Load Balancing per Section 15.1: `ipv8lab xlate8lb`
+- Cloud Provider VPC simulation per Section 17: `ipv8lab vpc`
+- RINE Prefix Protection (100.x.x.x filtering) per Section 19.3: `ipv8lab rineprot`
 - Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering): `ipv8lab ilinkprot`
 - /16 Minimum Prefix Enforcement at eBGP8 boundaries: `ipv8lab prefixenf`
 - Standalone WHOIS8 protocol — server, client with cache, record signing, RIR hierarchy: `ipv8lab whois8`
@@ -230,6 +248,15 @@ src/ipv8lab/
 ├── fuzzer.py         # Packet fuzzer for security testing
 ├── mtls.py           # mTLS encryption layer for Zone Server
 ├── traceroute8.py    # Traceroute8 diagnostic utility
+├── arp8_version.py   # ARP8-driven version selection (Section 2)
+├── interop.py        # Inter-Company Interop and Two-XLATE8 (Sections 4.6–4.7)
+├── interior_link.py  # Interior Link Convention (Section 4.10)
+├── addr_usage.py     # Address Usage Model (Section 4.11)
+├── socket_api.py     # Socket API Compatibility mock (Section 6.2)
+├── cgnat.py          # CGNAT Behaviour simulation (Section 15)
+├── xlate8_lb.py      # XLATE8 Even/Odd Load Balancing (Section 15.1)
+├── cloud_vpc.py      # Cloud Provider VPC simulation (Section 17)
+├── rine_protection.py # RINE Prefix Protection (Section 19.3)
 ├── ilink_protection.py # Interior Link Convention Protection (Section 19.4)
 ├── prefix_enforce.py # /16 Minimum Prefix Enforcement (Section 19.7)
 ├── whois8_proto.py   # Standalone WHOIS8 protocol (draft-thain-whois8-00)

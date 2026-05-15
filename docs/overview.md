@@ -39,6 +39,19 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 - TUI dashboard — Rich Live / Textual (`ipv8lab tui`)
 - Packet fuzzer for protocol security testing (`ipv8lab fuzz`)
 - mTLS / encryption layer for Zone Server authentication (`ipv8lab mtls`)
+- ARP8-driven version selection per Section 2 (`ipv8lab arp8`)
+- Inter-Company Interop and Two-XLATE8 model per Sections 4.6–4.7 (`ipv8lab interop`)
+- Interior Link Convention (222.0.0.0/8) per Section 4.10 (`ipv8lab ilink`)
+- Address Usage Model — consolidated address space table per Section 4.11 (`ipv8lab usage`)
+- Socket API Compatibility mock (AF_INET8, sockaddr_in8) per Section 6.2 (`ipv8lab socket`)
+- CGNAT Behaviour simulation per Section 15 (`ipv8lab cgnat`)
+- XLATE8 Even/Odd Load Balancing per Section 15.1 (`ipv8lab xlate8lb`)
+- Cloud Provider VPC simulation per Section 17 (`ipv8lab vpc`)
+- RINE Prefix Protection (100.x.x.x filtering) per Section 19.3 (`ipv8lab rineprot`)
+- Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4 (`ipv8lab ilinkprot`)
+- /16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7 (`ipv8lab prefixenf`)
+- Standalone WHOIS8 protocol (draft-thain-whois8-00): server, client with cache, record signing (`ipv8lab whois8`)
+- Standalone NetLog8 protocol (draft-thain-netlog8-00): wire framing, collector, relay, rate limiting (`ipv8lab netlog8proto`)
 - Mesh network simulation, packet capture/replay, web dashboard, benchmarks, plugin system
 
 ## What it does NOT do
@@ -52,6 +65,6 @@ Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv
 
 1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-02
 2. **Userspace only** — everything runs as a normal user process
-3. **Tested** — 1406 tests covering all implemented sections
+3. **Tested** — 1827 tests covering all implemented sections
 4. **Extensible** — plugin system for custom protocol experiments
 5. **Safe** — no system modifications, no privilege escalation
