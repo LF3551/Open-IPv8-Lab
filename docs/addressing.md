@@ -1,4 +1,4 @@
-[← Back to README](../README.md)
+[← Home](index.md)
 
 # IPv8 Addressing (Sections 3, 4, 6)
 

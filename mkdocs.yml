@@ -1,0 +1,76 @@
+site_name: Open-IPv8-Lab
+site_url: https://open-ipv8-lab.readthedocs.io
+site_description: Experimental userspace IPv8 toolkit implementing draft-thain-ipv8-02
+site_author: Aleksei Aleinikov
+repo_url: https://github.com/LF3551/Open-IPv8-Lab
+repo_name: LF3551/Open-IPv8-Lab
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 Aleksei Aleinikov
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Architecture: architecture.md
+  - CLI Reference: cli-reference.md
+  - Python API: python-api.md
+  - Addressing: addressing.md
+  - Packet Format: packet-format.md
+  - Routing Simulator: routing-simulator.md
+  - Testbed: testbed.md
+  - Spec Coverage: spec-coverage.md
+  - Examples: examples.md
+  - FAQ: faq.md
+  - Glossary: glossary.md
+  - Roadmap: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/LF3551
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/open-ipv8-lab/
+    - icon: fontawesome/brands/orcid
+      link: https://orcid.org/0009-0003-8866-3131
