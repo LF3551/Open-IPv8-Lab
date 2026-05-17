@@ -3,8 +3,8 @@ class OpenIpv8Lab < Formula
 
   desc "Experimental userspace IPv8 toolkit"
   homepage "https://github.com/LF3551/Open-IPv8-Lab"
-  url "https://github.com/LF3551/Open-IPv8-Lab/archive/refs/tags/v0.12.5.tar.gz"
-  sha256 "ccd0452efc71b4050f3ec404723c3f4bc267d7913ee442f4d455a40379425bf7"
+  url "https://github.com/LF3551/Open-IPv8-Lab/archive/refs/tags/v0.12.9.tar.gz"
+  sha256 "c67c0e96289d78518ac7328b31ae5be1132b08eb7dc9ba576482d07bb467c73d"
   license "Apache-2.0"
 
   depends_on "python@3.13"
