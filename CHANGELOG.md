@@ -4,6 +4,19 @@ All notable changes to Open-IPv8-Lab are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.13.0] — 2026-05-17
+
+### Added
+- PEP 561 `py.typed` marker for downstream type checking
+- `.pre-commit-config.yaml` with ruff lint/format hooks
+- `.devcontainer/` for GitHub Codespaces
+- `.editorconfig` for consistent code style
+- `Makefile` with dev, lint, test, cov, docs targets
+- Docs CI workflow (`.github/workflows/docs.yml`)
+
+### Fixed
+- Removed `.DS_Store` from repository
+
 ## [0.12.9] — 2026-05-17
 
 ### Fixed
