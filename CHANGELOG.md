@@ -4,6 +4,15 @@ All notable changes to Open-IPv8-Lab are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.12.9] — 2026-05-17
+
+### Fixed
+- PyPI publish now triggers on tag push (was blocked by GITHUB_TOKEN event limitation)
+
+### Changed
+- Bumped CI actions: actions/setup-python v6, actions/checkout v6, docker/setup-buildx-action v4, docker/login-action v4, docker/build-push-action v7
+- Bumped mkdocs-material to >=9.7.6
+
 ## [0.12.8] — 2026-05-15
 
 ### Changed
