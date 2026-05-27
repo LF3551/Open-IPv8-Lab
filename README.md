@@ -12,7 +12,7 @@
 [![codecov](https://codecov.io/gh/LF3551/Open-IPv8-Lab/graph/badge.svg)](https://codecov.io/gh/LF3551/Open-IPv8-Lab)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20201237.svg)](https://doi.org/10.5281/zenodo.20201237)
 
-Experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. **58 modules**, **35 CLI commands**, **1827 tests**.
+Experimental userspace toolkit implementing [draft-thain-ipv8](https://www.ietf.org/archive/id/draft-thain-ipv8.html) — the Internet Protocol Version 8 specification. **58 modules**, **35 CLI commands**, **2109 tests**.
 
 > **Educational project.** Not an official IPv8 implementation, not production networking software.
 
@@ -141,8 +141,8 @@ ipv8lab addr parse 64496-192.0.2.1 --json
 
 | Feature | CLI | Draft |
 |---------|-----|-------|
-| WHOIS8 protocol (server, client, HMAC signing) | `ipv8lab whois8` | whois8-00 |
-| NetLog8 protocol (wire framing, collector, relay) | `ipv8lab netlog8proto` | netlog8-00 |
+| WHOIS8 protocol (server, client, HMAC signing) | `ipv8lab whois8` | draft-thain-whois8 |
+| NetLog8 protocol (wire framing, collector, relay) | `ipv8lab netlog8proto` | draft-thain-netlog8 |
 | BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, WiFi8, SNMPv8 | — | 7 companion drafts |
 
 ### Operations & Tooling
@@ -170,12 +170,13 @@ ipv8lab addr parse 64496-192.0.2.1 --json
 ```
 $ ipv8lab addr parse 64496-192.0.2.1
 
-Input                64496-192.0.2.1
-Format               canonical hyphenated
-RN                   64496
-Routing prefix       0.0.251.240
-Host part            192.0.2.1
-Full notation        0.0.251.240.192.0.2.1
+Input                 64496-192.0.2.1
+Format                canonical hyphenated
+RN                    64496
+Routing prefix        0.0.251.240
+Local address (LA)    192.0.2.1
+Canonical             64496-192.0.2.1
+Full notation         0.0.251.240.192.0.2.1
 ```
 
 ---
@@ -186,7 +187,7 @@ Full notation        0.0.251.240.192.0.2.1
 pytest -v
 ```
 
-1827 tests covering all 58 modules.
+2109 tests covering all 58 modules.
 
 ---
 
@@ -197,7 +198,7 @@ pytest -v
 | **[Examples](docs/examples.md)** | 10 step-by-step walkthroughs |
 | **[CLI Reference](docs/cli-reference.md)** | All 35 commands with usage examples |
 | **[Python API](docs/python-api.md)** | Using ipv8lab as a Python library |
-| **[Spec Coverage](docs/spec-coverage.md)** | Full draft-thain-ipv8-02 mapping |
+| **[Spec Coverage](docs/spec-coverage.md)** | Full draft-thain-ipv8 mapping |
 | **[Architecture](docs/architecture.md)** | Module categories & dependencies |
 | [Overview](docs/overview.md) | Project overview |
 | [Addressing](docs/addressing.md) | IPv8 address format (Sections 3, 4, 6) |
