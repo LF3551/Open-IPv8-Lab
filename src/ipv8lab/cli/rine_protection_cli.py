@@ -54,7 +54,7 @@ def check_packet(
     addr = IPv8Address.parse(address)
     result = f.filter_packet(addr, interface, InterfaceType(iface_type))
     d = {
-        "address": addr.full_notation,
+        "address": addr.canonical,
         "is_rine": is_rine_prefix(addr),
         "action": result.action.value,
         "reason": result.reason,
@@ -63,7 +63,7 @@ def check_packet(
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"{result.action.value.upper()}: {addr.full_notation}")
+        typer.echo(f"{result.action.value.upper()}: {addr.canonical}")
         if result.reason:
             typer.echo(f"  {result.reason}")
 
@@ -76,10 +76,10 @@ def check_bgp8(
 ) -> None:
     """Check a BGP8 advertisement against the RINE filter."""
     f = _get_filter()
-    addr = IPv8Address.parse(prefix)
+    addr = IPv8Address.parse(prefix.split("/")[0])
     result = f.filter_bgp8_advertisement(addr, interface)
     d = {
-        "prefix": addr.full_notation,
+        "prefix": addr.canonical,
         "action": result.action.value,
         "reason": result.reason,
         "alert": result.alert.to_dict() if result.alert else None,
@@ -87,7 +87,7 @@ def check_bgp8(
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"{result.action.value.upper()}: {addr.full_notation}")
+        typer.echo(f"{result.action.value.upper()}: {addr.canonical}")
         if result.reason:
             typer.echo(f"  {result.reason}")
 

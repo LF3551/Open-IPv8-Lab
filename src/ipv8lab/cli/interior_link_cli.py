@@ -34,14 +34,14 @@ def generate(
             {
                 "link_id": lk.link_id,
                 "label": lk.label,
-                "side_a": lk.side_a.full_notation,
-                "side_b": lk.side_b.full_notation,
+                "side_a": lk.side_a.canonical,
+                "side_b": lk.side_b.canonical,
             }
             for lk in links
         ]))
     else:
         for lk in links:
-            typer.echo(f"Link {lk.link_id}: {lk.side_a.full_notation} ↔ {lk.side_b.full_notation}")
+            typer.echo(f"Link {lk.link_id}: {lk.side_a.canonical} ↔ {lk.side_b.canonical}")
 
 
 @app.command(name="validate")

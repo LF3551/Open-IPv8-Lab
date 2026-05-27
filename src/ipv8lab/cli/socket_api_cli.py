@@ -121,7 +121,7 @@ def simulate(
         for e in sock.events:
             addr_s = ""
             if e.address and isinstance(e.address, SockaddrIn8):
-                addr_s = f" → {e.address.sin8_rn}.{e.address.sin8_addr}:{e.address.sin8_port}"
+                addr_s = f" → {e.address.sin8_rn}-{e.address.sin8_addr}:{e.address.sin8_port}"
             typer.echo(f"  {e.action:<10}{addr_s}")
 
 

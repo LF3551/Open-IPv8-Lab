@@ -17,6 +17,7 @@ from ipv8lab.whois8_proto import (
     WHOIS8Server,
     QueryType,
     RIR,
+    ResponseCode,
     RouteRecord,
 )
 
@@ -216,6 +217,52 @@ def cache(
         typer.echo(f"Cache size: {d['cache_size']}")
         typer.echo(f"Hits:       {d['cache_hits']}")
         typer.echo(f"Misses:     {d['cache_misses']}")
+
+
+@app.command()
+def demo(
+    as_json: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Run a self-contained WHOIS8 demo (register, route, lookup, validate)."""
+    server = WHOIS8Server(server_id="whois8-demo")
+    client = WHOIS8Client(server=server)
+
+    asns = [
+        (64496, "ACME Corp", "US", RIR.ARIN),
+        (64497, "BetaCo", "DE", RIR.RIPE),
+        (64498, "GammaTel", "JP", RIR.APNIC),
+    ]
+    for asn, holder, country, rir in asns:
+        server.register_asn(WHOIS8ASNRecord(
+            asn=asn, holder=holder, country=country, rir=rir, created_at=time.time(),
+        ))
+
+    server.register_route(RouteRecord(asn=64496, prefix_length=16))
+    server.register_route(RouteRecord(asn=64497, prefix_length=16))
+
+    steps = []
+    for asn, holder, _, _ in asns:
+        resp = client.lookup(asn)
+        ok = resp.code == ResponseCode.OK and resp.record is not None
+        steps.append({"step": f"lookup_{asn}", "ok": ok, "holder": holder})
+
+    resp_route = client.validate_route(64496, 16)
+    steps.append({"step": "route_validate_64496", "ok": resp_route.code == ResponseCode.OK})
+
+    if as_json:
+        typer.echo(json.dumps({"steps": steps, "summary": server.summary()}))
+        return
+
+    typer.echo("WHOIS8 Demo")
+    typer.echo(f"  Server: {server.server_id}")
+    for s in steps:
+        mark = "✓" if s["ok"] else "✗"
+        detail = s.get("holder", "")
+        typer.echo(f"  {mark}  {s['step']}" + (f": {detail}" if detail else ""))
+    sm = server.summary()
+    typer.echo(f"\nRegistered: {sm['registered_asns']} ASNs, {sm['registered_routes']} routes")
+    all_ok = all(s["ok"] for s in steps)
+    typer.echo("\nAll steps passed!" if all_ok else "\nSome steps failed.")
 
 
 @app.command()

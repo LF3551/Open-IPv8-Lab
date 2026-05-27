@@ -100,9 +100,9 @@ def resolve(
         typer.echo(json.dumps(vpc.to_dict() if vpc else None))
     else:
         if vpc:
-            typer.echo(f"{addr.full_notation} → VPC {vpc.vpc_id} ({vpc.customer})")
+            typer.echo(f"{addr.canonical} → VPC {vpc.vpc_id} ({vpc.customer})")
         else:
-            typer.echo(f"{addr.full_notation} → no matching VPC")
+            typer.echo(f"{addr.canonical} → no matching VPC")
 
 
 @app.command()
@@ -117,10 +117,10 @@ def check(
     d_addr = IPv8Address.parse(dst)
     ok = fabric.can_communicate(s, d_addr)
     if as_json:
-        typer.echo(json.dumps({"src": s.full_notation, "dst": d_addr.full_notation, "reachable": ok}))
+        typer.echo(json.dumps({"src": s.canonical, "dst": d_addr.canonical, "reachable": ok}))
     else:
         status = "reachable" if ok else "NOT reachable"
-        typer.echo(f"{s.full_notation} → {d_addr.full_notation}: {status}")
+        typer.echo(f"{s.canonical} → {d_addr.canonical}: {status}")
 
 
 @app.command()

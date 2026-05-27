@@ -52,8 +52,8 @@ def translate(
     addr = IPv8Address.parse(address)
     result = engine.translate(addr, src_port=port)
     d = {
-        "original": result.original.full_notation,
-        "translated": result.translated.full_notation,
+        "original": result.original.canonical,
+        "translated": result.translated.canonical,
         "violation": result.violation.value,
         "prefix_preserved": result.original.prefix_str == result.translated.prefix_str,
         "note": result.note,
@@ -79,7 +79,7 @@ def validate(
     orig = IPv8Address.parse(original)
     trans = IPv8Address.parse(translated)
     v = engine.validate_translation(orig, trans)
-    d = {"original": orig.full_notation, "translated": trans.full_notation, "violation": v.value}
+    d = {"original": orig.canonical, "translated": trans.canonical, "violation": v.value}
     if as_json:
         typer.echo(json.dumps(d))
     else:
@@ -97,8 +97,8 @@ def bindings(
     engine = _get_engine()
     data = [
         {
-            "inside": b.inside.full_notation,
-            "outside": b.outside.full_notation,
+            "inside": b.inside.canonical,
+            "outside": b.outside.canonical,
             "port_inside": b.port_inside,
             "port_outside": b.port_outside,
         }

@@ -43,7 +43,7 @@ def init(
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"LB initialised: even={pair.even.full_notation} odd={pair.odd.full_notation}")
+        typer.echo(f"LB initialised: even={pair.even.canonical} odd={pair.odd.canonical}")
         typer.echo(f"Strategy: {strategy}")
 
 
@@ -59,14 +59,14 @@ def connect(
     d = {
         "client": conn.client_addr,
         "client_port": conn.client_port,
-        "selected": conn.selected.full_notation,
+        "selected": conn.selected.canonical,
         "parity": conn.parity.value,
         "seq": conn.seq,
     }
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"→ {conn.selected.full_notation} ({conn.parity.value}) seq={conn.seq}")
+        typer.echo(f"→ {conn.selected.canonical} ({conn.parity.value}) seq={conn.seq}")
 
 
 @app.command()
@@ -80,14 +80,14 @@ def simulate(
     lb.reset()
     conns = lb.distribute(client_addr=client, count=count)
     data = [
-        {"seq": c.seq, "selected": c.selected.full_notation, "parity": c.parity.value}
+        {"seq": c.seq, "selected": c.selected.canonical, "parity": c.parity.value}
         for c in conns
     ]
     if as_json:
         typer.echo(json.dumps({"connections": data, "stats": lb.stats}))
     else:
         for c in conns:
-            typer.echo(f"  [{c.seq}] → {c.selected.full_notation} ({c.parity.value})")
+            typer.echo(f"  [{c.seq}] → {c.selected.canonical} ({c.parity.value})")
         s = lb.stats
         typer.echo(f"Total: {s['total']}  Even: {s['even']}  Odd: {s['odd']}")
 
@@ -116,7 +116,7 @@ def status(
         typer.echo(json.dumps(d))
     else:
         typer.echo(f"Strategy: {lb.strategy.value}")
-        typer.echo(f"Even:     {lb.pair.even.full_notation}")
-        typer.echo(f"Odd:      {lb.pair.odd.full_notation}")
+        typer.echo(f"Even:     {lb.pair.even.canonical}")
+        typer.echo(f"Odd:      {lb.pair.odd.canonical}")
         s = lb.stats
         typer.echo(f"Conns:    {s['total']} (even={s['even']}, odd={s['odd']})")
