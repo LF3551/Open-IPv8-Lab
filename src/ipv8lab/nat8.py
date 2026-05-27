@@ -432,6 +432,8 @@ class NATGateway:
 
     def release(self, internal: str | IPv8Address) -> bool:
         """Manually release a dynamic mapping."""
+        if isinstance(internal, str):
+            internal = IPv8Address.parse(internal)
         key = str(internal)
         m = self._mappings.pop(key, None)
         if m is None:
@@ -442,6 +444,8 @@ class NATGateway:
 
     def release_pat(self, internal: str | IPv8Address, port: int) -> bool:
         """Manually release a PAT mapping."""
+        if isinstance(internal, str):
+            internal = IPv8Address.parse(internal)
         key = (str(internal), port)
         m = self._pat_mappings.pop(key, None)
         if m is None:
@@ -452,9 +456,13 @@ class NATGateway:
     # ---- queries ----
 
     def get_mapping(self, internal: str | IPv8Address) -> NATMapping | None:
+        if isinstance(internal, str):
+            internal = IPv8Address.parse(internal)
         return self._mappings.get(str(internal))
 
     def get_pat_mapping(self, internal: str | IPv8Address, port: int) -> NATMapping | None:
+        if isinstance(internal, str):
+            internal = IPv8Address.parse(internal)
         return self._pat_mappings.get((str(internal), port))
 
     def all_mappings(self) -> list[NATMapping]:

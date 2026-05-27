@@ -2,11 +2,29 @@
 
 # Architecture
 
+
+## An RN is a Fancy VRF (Section 3.2)
+
+A **Routing Number (RN)** is not merely an address prefix — it is a full
+Virtual Routing & Forwarding (VRF) context.  Every interface binding creates a
+VRF named `ipv8-asn-<RN>` with Route Distinguisher `<RN>:65535`.
+
+Key rules:
+- A router keeps a **local VRF only for RNs it originates or terminates**.
+  Transit RNs live in the RIB (`route.py`) but have no forwarding context.
+- A segment has **exactly one Primary RN**.  All IPv4-addressed devices on the
+  segment share that Primary RN as their RN context.
+- A device MAY hold **Secondary RN addresses** in other RNs (multi-homing).
+
+> **Important:** The union-on-`iphdr` model (treating RN as a pure prefix
+> overlay on the IP header) is **not** the implementation model.  RNs are
+> VRF identifiers that drive forwarding table selection.
+
 ## Design Principles
 
-1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-02 or a companion draft
+1. **Spec-driven** — every module maps to a section in draft-thain-ipv8 or a companion draft
 2. **Userspace only** — everything runs as a normal user process, no kernel modifications
-3. **Tested** — 1827 tests covering all modules
+3. **Tested** — 2100+ tests covering all modules
 4. **Extensible** — plugin system for custom protocol experiments
 5. **CLI-first** — every feature is accessible via `ipv8lab` CLI with `--json` support
 
@@ -86,9 +104,8 @@ bgp8_selection.py ──→ cost_factor.py
 
 ### Translation & NAT
 
-- **xlate8_flow.py** — North-south traffic: DNS8 → XLATE8 → translation
-- **xlate8_lb.py** — Even/Odd Load Balancing (Section 15.1)
-- **cgnat.py** — CGNAT: r.r.r.r preservation, n.n.n.n-only NAT
+- **xlate8.py** — Unified XLATE8 subsystem: 5 modes (native/4-to-8/8-to-4/NAPT-RN/encap), north-south flow, even/odd LB
+- **cgnat.py** — CGNAT: RN preservation, LA-only NAT (Section 15)
 - **nat8.py** — NAT8 gateway: static, dynamic, PAT
 
 ### Security & Compliance
@@ -112,8 +129,8 @@ security.py ──→ validation.py
 
 ### Companion Protocols
 
-- **whois8_proto.py** — Standalone WHOIS8 (draft-thain-whois8-00): server, client, HMAC signing, RIR hierarchy
-- **netlog8_proto.py** — Standalone NetLog8 (draft-thain-netlog8-00): wire framing, collector, relay, rate limiter
+- **whois8_proto.py** — Standalone WHOIS8 (draft-thain-whois8): server, client, HMAC signing, RIR hierarchy
+- **netlog8_proto.py** — Standalone NetLog8 (draft-thain-netlog8): wire framing, collector, relay, rate limiter
 - **whois8.py** — WHOIS8 mock resolver
 - **netlog8.py** — NetLog8 telemetry client (SEC-ALERT, E3 traps)
 - **companions.py** — BGP8, OSPF8, IS-IS8, RINE, ARP8, XLATE8, Update8, WiFi8, SNMPv8

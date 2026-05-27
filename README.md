@@ -52,10 +52,10 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 
 # Parse an IPv8 address
-ipv8lab addr parse 64496.192.0.2.1
+ipv8lab addr parse 64496-192.0.2.1
 
 # Build a packet
-ipv8lab packet build --src 64496.192.0.2.1 --dst 64497.198.51.100.7 --payload "hello"
+ipv8lab packet build --src 64496-192.0.2.1 --dst 64497-198.51.100.7 --payload "hello"
 
 # Routing simulation
 ipv8lab route simulate --config examples/two_asn_demo.yaml
@@ -65,8 +65,8 @@ ipv8lab zone init --prefix 127.1.0.0
 ipv8lab zone status --json
 
 # Security filtering
-ipv8lab ilinkprot bgp8 64496.222.0.0.1
-ipv8lab prefixenf check 64496.10.1.0.0 24 --peer-asn 64497
+ipv8lab ilinkprot bgp8 64496-222.0.0.1
+ipv8lab prefixenf check 64496-10.1.0.0 24 --peer-asn 64497
 
 # WHOIS8 registry
 ipv8lab whois8 register 64496 "Example Corp" --rir ARIN
@@ -77,8 +77,12 @@ ipv8lab pcap demo -o demo.pcap
 ipv8lab pcap dissector -o ipv8_dissector.lua
 
 # JSON output on any command
-ipv8lab addr parse 64496.192.0.2.1 --json
+ipv8lab addr parse 64496-192.0.2.1 --json
 ```
+
+> **Note:** The canonical locator form is `<RN>-<LA>` (e.g. `64496-192.0.2.1`).
+> Legacy notations `64496.192.0.2.1` and `0.0.251.240.192.0.2.1` are still
+> accepted on input for backwards compatibility.
 
 ➜ **[More examples](docs/examples.md)** — 10 step-by-step walkthroughs
 
@@ -164,11 +168,11 @@ ipv8lab addr parse 64496.192.0.2.1 --json
 ## Example Output
 
 ```
-$ ipv8lab addr parse 64496.192.0.2.1
+$ ipv8lab addr parse 64496-192.0.2.1
 
-Input                64496.192.0.2.1
-Format               ASN dot notation
-ASN                  64496
+Input                64496-192.0.2.1
+Format               canonical hyphenated
+RN                   64496
 Routing prefix       0.0.251.240
 Host part            192.0.2.1
 Full notation        0.0.251.240.192.0.2.1

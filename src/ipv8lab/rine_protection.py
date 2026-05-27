@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""RINE Prefix Protection per draft-thain-ipv8-02 Section 19.3.
+"""RINE Prefix Protection per draft-thain-ipv8- Section 19.3.
 
 The 100.x.x.x RINE prefix MUST NOT appear in eBGP8 advertisements
 or on non-peering interfaces.  NetLog8 SEC-ALERT MUST be generated

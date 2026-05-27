@@ -6,7 +6,7 @@
 
 ### What is Open-IPv8-Lab?
 
-An experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification. It is **not** production networking software and does **not** modify your system's network stack. See [Overview](overview.md) for a full description and [IPv8 vs IPv4/IPv6 comparison](overview.md#why-ipv8--comparison-with-ipv4-and-ipv6).
+An experimental userspace toolkit implementing [draft-thain-ipv8](https://www.ietf.org/archive/id/draft-thain-ipv8.html) — the Internet Protocol Version 8 specification. It is **not** production networking software and does **not** modify your system's network stack. See [Overview](overview.md) for a full description and [IPv8 vs IPv4/IPv6 comparison](overview.md#why-ipv8--comparison-with-ipv4-and-ipv6).
 
 ### Does IPv8 replace IPv6?
 
@@ -22,7 +22,7 @@ Linux, macOS, and Windows (including WSL2). Any platform with Python 3.11+ shoul
 
 ### Where is the spec?
 
-[draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the full IETF Internet-Draft. The [Spec Coverage](spec-coverage.md) doc maps every section to source code.
+[draft-thain-ipv8](https://www.ietf.org/archive/id/draft-thain-ipv8.html) — the full IETF Internet-Draft. The [Spec Coverage](spec-coverage.md) doc maps every section to source code.
 
 ---
 
@@ -91,10 +91,10 @@ Most commands use **positional arguments**, not `--option` flags. Check `--help`
 
 ```bash
 # Wrong:
-ipv8lab addr parse --address 64496.192.0.2.1
+ipv8lab addr parse --address 64496-192.0.2.1
 
 # Right:
-ipv8lab addr parse 64496.192.0.2.1
+ipv8lab addr parse 64496-192.0.2.1
 ```
 
 ### How do I get JSON output?
@@ -102,7 +102,7 @@ ipv8lab addr parse 64496.192.0.2.1
 Add `--json` to any command:
 
 ```bash
-ipv8lab addr parse 64496.192.0.2.1 --json
+ipv8lab addr parse 64496-192.0.2.1 --json
 ipv8lab zone status --json
 ipv8lab bench run --json
 ```

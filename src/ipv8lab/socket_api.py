@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Socket API Compatibility mock per draft-thain-ipv8-02 Section 6.2.
+"""Socket API Compatibility mock per draft-thain-ipv8- Section 6.2.
 
 Provides AF_INET8, sockaddr_in8, and a mock IPv8 socket that
 transparently handles r.r.r.r prefix management for legacy AF_INET
@@ -23,7 +23,7 @@ from ipv8lab.address import IPv8Address
 # ---------------------------------------------------------------------------
 
 AF_INET = socket.AF_INET        # 2
-AF_INET8 = 30                   # New address family for IPv8
+AF_INET8 = 46                   # Address family for IPv8 (spec §6, IANA-provisional)
 
 
 class SocketType(IntEnum):
@@ -40,26 +40,31 @@ class SockaddrIn8:
     """``struct sockaddr_in8`` per Section 6.2.
 
     Fields:
-        sin8_family: AF_INET8 (30)
+        sin8_family: AF_INET8 (46)
         sin8_port:   port number (0-65535)
-        sin8_asn:    r.r.r.r ASN prefix as uint32
+        sin8_rn:     Routing Number (RN) as uint32  [was sin8_asn]
         sin8_addr:   n.n.n.n host address as dotted-quad string
     """
 
     sin8_family: int = AF_INET8
     sin8_port: int = 0
-    sin8_asn: int = 0
+    sin8_rn: int = 0
     sin8_addr: str = "0.0.0.0"
+
+    @property
+    def sin8_asn(self) -> int:
+        """Backwards-compatible alias for :attr:`sin8_rn`."""
+        return self.sin8_rn
 
     def to_ipv8_address(self) -> IPv8Address:
         """Convert to an IPv8Address."""
-        return IPv8Address.parse(f"{self.sin8_asn}.{self.sin8_addr}")
+        return IPv8Address.parse(f"{self.sin8_rn}.{self.sin8_addr}")
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "sin8_family": self.sin8_family,
             "sin8_port": self.sin8_port,
-            "sin8_asn": self.sin8_asn,
+            "sin8_rn": self.sin8_rn,
             "sin8_addr": self.sin8_addr,
         }
 
@@ -69,18 +74,22 @@ class SockaddrIn8:
         return cls(
             sin8_family=AF_INET8,
             sin8_port=port,
-            sin8_asn=addr.asn,
+            sin8_rn=addr.rn,
             sin8_addr=addr.host_str,
         )
 
     @classmethod
     def from_ipv4_tuple(cls, addr_tuple: tuple[str, int], asn: int = 0) -> SockaddrIn8:
-        """Create from a legacy (host, port) tuple with optional ASN."""
+        """Create from a legacy (host, port) tuple with optional RN.
+
+        The *asn* parameter is kept for backwards compatibility; it maps
+        directly to :attr:`sin8_rn`.
+        """
         host, port = addr_tuple
         return cls(
             sin8_family=AF_INET8,
             sin8_port=port,
-            sin8_asn=asn,
+            sin8_rn=asn,
             sin8_addr=host,
         )
 
@@ -124,14 +133,14 @@ class CompatLayer:
     def upgrade_connect(self, addr: tuple[str, int]) -> SockaddrIn8:
         """Upgrade a legacy ``connect(host, port)`` to sockaddr_in8.
 
-        Transparently prepends r.r.r.r from DNS8 resolution.
+        Transparently prepends RN from DNS8 resolution.
         """
         host, port = addr
         asn = self.resolve(host)
         return SockaddrIn8(
             sin8_family=AF_INET8,
             sin8_port=port,
-            sin8_asn=asn,
+            sin8_rn=asn,
             sin8_addr=host,
         )
 

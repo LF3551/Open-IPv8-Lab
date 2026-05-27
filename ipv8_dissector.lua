@@ -3,7 +3,7 @@
 -- or ~/Library/Application Support/Wireshark/plugins/ (macOS)
 -- or %APPDATA%\Wireshark\plugins\ (Windows)
 
-local ipv8 = Proto("ipv8", "IPv8 Protocol (draft-thain-ipv8-02)")
+local ipv8 = Proto("ipv8", "IPv8 Protocol (draft-thain-ipv8)")
 
 -- Header fields
 local f_version   = ProtoField.uint8("ipv8.version", "Version", base.DEC, nil, 0xF0)
@@ -16,16 +16,16 @@ local f_frag      = ProtoField.uint16("ipv8.frag_offset", "Fragment Offset", bas
 local f_ttl       = ProtoField.uint8("ipv8.ttl", "Time to Live", base.DEC)
 local f_proto     = ProtoField.uint8("ipv8.protocol", "Protocol", base.DEC)
 local f_checksum  = ProtoField.uint16("ipv8.checksum", "Header Checksum", base.HEX)
-local f_src_asn   = ProtoField.uint32("ipv8.src_asn", "Source ASN Prefix", base.DEC)
-local f_src_host  = ProtoField.ipv4("ipv8.src_host", "Source Host")
-local f_dst_asn   = ProtoField.uint32("ipv8.dst_asn", "Destination ASN Prefix", base.DEC)
-local f_dst_host  = ProtoField.ipv4("ipv8.dst_host", "Destination Host")
+local f_src_rn    = ProtoField.uint32("ipv8.src_rn", "Source RN", base.DEC)
+local f_src_la    = ProtoField.ipv4("ipv8.src_la", "Source LA")
+local f_dst_rn    = ProtoField.uint32("ipv8.dst_rn", "Destination RN", base.DEC)
+local f_dst_la    = ProtoField.ipv4("ipv8.dst_la", "Destination LA")
 local f_payload   = ProtoField.bytes("ipv8.payload", "Payload")
 
 ipv8.fields = {
     f_version, f_ihl, f_tos, f_total_len, f_ident,
     f_flags, f_frag, f_ttl, f_proto, f_checksum,
-    f_src_asn, f_src_host, f_dst_asn, f_dst_host, f_payload
+    f_src_rn, f_src_la, f_dst_rn, f_dst_la, f_payload
 }
 
 function ipv8.dissector(buffer, pinfo, tree)
@@ -50,12 +50,12 @@ function ipv8.dissector(buffer, pinfo, tree)
     subtree:add(f_proto, buffer(9, 1))
     subtree:add(f_checksum, buffer(10, 2))
 
-    local src_asn = buffer(12, 4):uint()
-    local dst_asn = buffer(20, 4):uint()
-    subtree:add(f_src_asn, buffer(12, 4))
-    subtree:add(f_src_host, buffer(16, 4))
-    subtree:add(f_dst_asn, buffer(20, 4))
-    subtree:add(f_dst_host, buffer(24, 4))
+    local src_rn = buffer(12, 4):uint()
+    local dst_rn = buffer(20, 4):uint()
+    subtree:add(f_src_rn, buffer(12, 4))
+    subtree:add(f_src_la, buffer(16, 4))
+    subtree:add(f_dst_rn, buffer(20, 4))
+    subtree:add(f_dst_la, buffer(24, 4))
 
     local total_len = buffer(2, 2):uint()
     local hdr_len = ihl * 4
@@ -66,12 +66,16 @@ function ipv8.dissector(buffer, pinfo, tree)
 
     -- Info column
     pinfo.cols.info = string.format(
-        "AS%d.%s → AS%d.%s",
-        src_asn, tostring(buffer(16, 4):ipv4()),
-        dst_asn, tostring(buffer(24, 4):ipv4())
+        "RN%d.%s → RN%d.%s",
+        src_rn, tostring(buffer(16, 4):ipv4()),
+        dst_rn, tostring(buffer(24, 4):ipv4())
     )
 end
 
--- Register for DLT_USER0 (147)
+-- Register on EtherType 0x8080 (native IPv8 frames, spec §5.2)
+local eth_table = DissectorTable.get("ethertype")
+eth_table:add(0x8080, ipv8)
+
+-- Also register for DLT_USER0 (147) for pcap captures without Ethernet header
 local wtap = DissectorTable.get("wtap_encap")
 wtap:add(147, ipv8)

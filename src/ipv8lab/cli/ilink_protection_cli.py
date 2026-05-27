@@ -43,13 +43,15 @@ def init(
 
 @app.command(name="bgp8")
 def check_bgp8(
-    prefix: str = typer.Argument(..., help="BGP8 advertised prefix"),
+    prefix: str = typer.Argument(..., help="BGP8 advertised prefix as IPv8 address (e.g. 64496-222.0.0.0 or 64496-222.0.0.0/24)."),
     interface: str = typer.Option("eth0", help="Interface"),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
     """Check a BGP8 advertisement for 222.0.0.0/8 violations."""
     f = _get_filter()
-    addr = IPv8Address.parse(prefix)
+    # Strip CIDR suffix if present (e.g. "64496-222.0.0.0/24" → "64496-222.0.0.0")
+    addr_str = prefix.split("/")[0]
+    addr = IPv8Address.parse(addr_str)
     result = f.filter_bgp8_advertisement(addr, interface)
     d = {
         "prefix": addr.full_notation,

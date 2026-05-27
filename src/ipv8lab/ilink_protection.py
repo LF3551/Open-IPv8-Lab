@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Interior Link Convention Protection per draft-thain-ipv8-02 Section 19.4.
+"""Interior Link Convention Protection per draft-thain-ipv8- Section 19.4.
 
 Border routers MUST filter received BGP8 advertisements containing
 n.n.n.n addresses in the 222.0.0.0/8 range.  NetLog8 E3 trap MUST be

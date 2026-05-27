@@ -7,9 +7,19 @@ from __future__ import annotations
 
 from ipv8lab.bgp8_selection import (
     BGP8PathSelector,
+    BGPinVRFPropagator,
+    CapabilitySet,
+    LargeCommPropagator,
+    NativeBGP8Propagator,
     PathCandidate,
+    PropagationMechanism,
+    Route8,
+    Route8RIB,
     SelectionResult,
     build_advertisement,
+    decode_rn_from_community,
+    encode_large_community,
+    negotiate_mechanism,
 )
 from ipv8lab.companions import BGP8Advertisement, BGP8Peer, BGP8State
 from ipv8lab.cost_factor import CFComponents, compute_cf
@@ -466,3 +476,217 @@ class TestRealisticScenario:
         best = sel.best_path("64496.0.0.0.0/8")
         assert best is not None
         assert best.advertisement.next_hop == "backup"
+
+
+# ===========================================================================
+# Step 10 — Inter-AS propagation mechanisms
+# ===========================================================================
+
+def _adv10(prefix="64496-0.0.0.0/8", origin=64496, as_path=(64497, 64496),
+         next_hop="64497-10.0.0.1", cf=0.0):
+    return BGP8Advertisement(
+        prefix=prefix, origin_asn=origin, as_path=as_path,
+        next_hop=next_hop, cf_accumulated=cf, prefix_length=8,
+    )
+
+
+class TestPropagationMechanism:
+    def test_three_values(self):
+        assert len(PropagationMechanism) == 3
+
+    def test_native_is_1(self):
+        assert PropagationMechanism.NATIVE_BGP8 == 1
+
+    def test_bgp_in_vrf_is_2(self):
+        assert PropagationMechanism.BGP_IN_VRF == 2
+
+    def test_large_community_is_3(self):
+        assert PropagationMechanism.LARGE_COMMUNITY == 3
+
+
+class TestCapabilityNegotiation:
+    def test_native_wins(self):
+        local = CapabilitySet(native_bgp8=True, bgp_in_vrf=True, large_community=True)
+        remote = CapabilitySet(native_bgp8=True, bgp_in_vrf=True, large_community=True)
+        assert negotiate_mechanism(local, remote) == PropagationMechanism.NATIVE_BGP8
+
+    def test_vrf_wins_when_no_native(self):
+        local = CapabilitySet(bgp_in_vrf=True, large_community=True)
+        remote = CapabilitySet(bgp_in_vrf=True, large_community=True)
+        assert negotiate_mechanism(local, remote) == PropagationMechanism.BGP_IN_VRF
+
+    def test_large_comm_fallback(self):
+        local = CapabilitySet(large_community=True)
+        remote = CapabilitySet(native_bgp8=True, large_community=True)
+        assert negotiate_mechanism(local, remote) == PropagationMechanism.LARGE_COMMUNITY
+
+    def test_no_common_returns_none(self):
+        local = CapabilitySet(native_bgp8=True)
+        remote = CapabilitySet(bgp_in_vrf=True)
+        assert negotiate_mechanism(local, remote) is None
+
+    def test_native_requires_both_sides(self):
+        local = CapabilitySet(native_bgp8=True)
+        remote = CapabilitySet(native_bgp8=False, bgp_in_vrf=True)
+        result = negotiate_mechanism(local, remote)
+        assert result != PropagationMechanism.NATIVE_BGP8
+
+
+class TestNativeBGP8Propagator:
+    def test_produces_route8(self):
+        p = NativeBGP8Propagator()
+        route = p.to_route8(_adv10(), rn=64496)
+        assert isinstance(route, Route8)
+        assert route.mechanism == PropagationMechanism.NATIVE_BGP8
+
+    def test_rn_preserved(self):
+        p = NativeBGP8Propagator()
+        route = p.to_route8(_adv10(), rn=64496)
+        assert route.rn == 64496
+
+    def test_prefix_preserved(self):
+        p = NativeBGP8Propagator()
+        route = p.to_route8(_adv10(prefix="64497-0.0.0.0/8"), rn=64497)
+        assert route.prefix == "64497-0.0.0.0/8"
+
+    def test_as_path_preserved(self):
+        p = NativeBGP8Propagator()
+        route = p.to_route8(_adv10(as_path=(64498, 64497, 64496)), rn=64496)
+        assert route.as_path == (64498, 64497, 64496)
+
+
+class TestBGPinVRFPropagator:
+    def test_produces_route8_bgp_in_vrf(self):
+        p = BGPinVRFPropagator()
+        route = p.to_route8(_adv10(), rn=64496)
+        assert route.mechanism == PropagationMechanism.BGP_IN_VRF
+
+    def test_vrf_name_set(self):
+        p = BGPinVRFPropagator()
+        route = p.to_route8(_adv10(), rn=64496)
+        assert route.vrf_name == "ipv8-asn-64496"
+
+    def test_vrf_name_uses_rn(self):
+        p = BGPinVRFPropagator()
+        route = p.to_route8(_adv10(), rn=65000)
+        assert "65000" in route.vrf_name
+
+
+class TestLargeCommPropagator:
+    def test_produces_route8_large_comm(self):
+        p = LargeCommPropagator(local_asn=64497)
+        route = p.to_route8(_adv10(), rn=64496)
+        assert route.mechanism == PropagationMechanism.LARGE_COMMUNITY
+
+    def test_community_set(self):
+        p = LargeCommPropagator(local_asn=64497)
+        route = p.to_route8(_adv10(), rn=64496)
+        assert route.large_community is not None
+        assert route.large_community == (64497, 64496, 0)
+
+    def test_rn_recoverable_from_community(self):
+        p = LargeCommPropagator(local_asn=64497)
+        route = p.to_route8(_adv10(), rn=64496)
+        assert decode_rn_from_community(route.large_community) == 64496
+
+
+class TestRoute8Equivalence:
+    """All three mechanisms must produce functionally identical Route8 entries."""
+
+    def _routes(self, rn=64496):
+        adv = _adv10(cf=0.5)
+        n = NativeBGP8Propagator().to_route8(adv, rn)
+        v = BGPinVRFPropagator().to_route8(adv, rn)
+        lc = LargeCommPropagator(64497).to_route8(adv, rn)
+        return n, v, lc
+
+    def test_native_and_vrf_equivalent(self):
+        n, v, _ = self._routes()
+        assert n.equivalent_to(v)
+
+    def test_native_and_large_comm_equivalent(self):
+        n, _, lc = self._routes()
+        assert n.equivalent_to(lc)
+
+    def test_vrf_and_large_comm_equivalent(self):
+        _, v, lc = self._routes()
+        assert v.equivalent_to(lc)
+
+    def test_different_cf_not_equivalent(self):
+        adv1 = _adv10(cf=0.1)
+        adv2 = _adv10(cf=0.9)
+        r1 = NativeBGP8Propagator().to_route8(adv1, 64496)
+        r2 = NativeBGP8Propagator().to_route8(adv2, 64496)
+        assert not r1.equivalent_to(r2)
+
+
+class TestRoute8RIB:
+    def test_install_and_lookup(self):
+        rib = Route8RIB()
+        p = NativeBGP8Propagator()
+        route = p.to_route8(_adv10(), rn=64496)
+        rib.install(route)
+        assert rib.lookup("64496-0.0.0.0/8", 64496) is not None
+
+    def test_lower_cf_replaces_existing(self):
+        rib = Route8RIB()
+        adv_high = _adv10(cf=0.9)
+        adv_low = _adv10(cf=0.1)
+        p = NativeBGP8Propagator()
+        rib.install(p.to_route8(adv_high, 64496))
+        rib.install(p.to_route8(adv_low, 64496))
+        r = rib.lookup("64496-0.0.0.0/8", 64496)
+        assert r.cf_accumulated < int(0.5 * 0xFFFFFFFF)
+
+    def test_higher_cf_does_not_replace(self):
+        rib = Route8RIB()
+        adv_low = _adv10(cf=0.1)
+        adv_high = _adv10(cf=0.9)
+        p = NativeBGP8Propagator()
+        rib.install(p.to_route8(adv_low, 64496))
+        result = rib.install(p.to_route8(adv_high, 64496))
+        assert result is False
+
+    def test_remove(self):
+        rib = Route8RIB()
+        p = NativeBGP8Propagator()
+        rib.install(p.to_route8(_adv10(), rn=64496))
+        assert rib.remove("64496-0.0.0.0/8", 64496)
+        assert rib.lookup("64496-0.0.0.0/8", 64496) is None
+
+    def test_size(self):
+        rib = Route8RIB()
+        p = NativeBGP8Propagator()
+        rib.install(p.to_route8(_adv10(prefix="64496-0.0.0.0/8"), rn=64496))
+        rib.install(p.to_route8(_adv10(prefix="64497-0.0.0.0/8"), rn=64497))
+        assert rib.size == 2
+
+    def test_prefixes(self):
+        rib = Route8RIB()
+        p = NativeBGP8Propagator()
+        rib.install(p.to_route8(_adv10(prefix="64496-0.0.0.0/8"), rn=64496))
+        rib.install(p.to_route8(_adv10(prefix="64497-0.0.0.0/8"), rn=64497))
+        assert set(rib.prefixes()) == {"64496-0.0.0.0/8", "64497-0.0.0.0/8"}
+
+    def test_all_three_mechanisms_install(self):
+        rib = Route8RIB()
+        adv = _adv10(cf=0.5)
+        rn = 64496
+        rib.install(NativeBGP8Propagator().to_route8(adv, rn))
+        # Same prefix+rn, slightly better CF from VRF mechanism
+        adv2 = _adv10(cf=0.2)
+        rib.install(BGPinVRFPropagator().to_route8(adv2, rn))
+        r = rib.lookup("64496-0.0.0.0/8", 64496)
+        assert r.mechanism == PropagationMechanism.BGP_IN_VRF
+
+
+class TestLargeCommunityHelpers:
+    def test_encode(self):
+        assert encode_large_community(64497, 64496) == (64497, 64496, 0)
+
+    def test_decode(self):
+        assert decode_rn_from_community((64497, 64496, 0)) == 64496
+
+    def test_roundtrip(self):
+        comm = encode_large_community(65000, 12345)
+        assert decode_rn_from_community(comm) == 12345

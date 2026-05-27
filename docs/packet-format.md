@@ -2,7 +2,7 @@
 
 # IPv8 Packet Header (Section 5.1)
 
-Per [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) Section 5.1.
+Per draft-thain-ipv8 Section 5.1.
 
 ## Header format
 
@@ -16,13 +16,13 @@ Per [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.ht
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |  Time to Live |    Protocol   |         Header Checksum       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Source ASN Prefix (r.r.r.r)                |
+|                   Source Routing Number (RN)                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Source Host Address (n.n.n.n)              |
+|                   Source Local Address  (LA)                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                 Destination ASN Prefix (r.r.r.r)              |
+|                 Destination Routing Number (RN)               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                 Destination Host Address (n.n.n.n)            |
+|                 Destination Local Address  (LA)               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ```
 
@@ -40,10 +40,10 @@ Per [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.ht
 | Time to Live | 1 byte | TTL hop count |
 | Protocol | 1 byte | Upper-layer protocol |
 | Header Checksum | 2 bytes | CRC32 truncated to 16 bits |
-| Source ASN Prefix | 4 bytes | r.r.r.r of source |
-| Source Host Address | 4 bytes | n.n.n.n of source |
-| Dest ASN Prefix | 4 bytes | r.r.r.r of destination |
-| Dest Host Address | 4 bytes | n.n.n.n of destination |
+| Source RN | 4 bytes | Routing Number of source (§3.1) |
+| Source LA | 4 bytes | Local Address of source (§3.1) |
+| Dest RN | 4 bytes | Routing Number of destination (§3.1) |
+| Dest LA | 4 bytes | Local Address of destination (§3.1) |
 
 **Total header size: 28 bytes** (8 octets longer than IPv4)
 

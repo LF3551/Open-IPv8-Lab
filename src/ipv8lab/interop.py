@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Inter-Company Interop and Two-XLATE8 model per draft-thain-ipv8-02 Sections 4.6–4.7.
+"""Inter-Company Interop and Two-XLATE8 model per draft-thain-ipv8- Sections 4.6–4.7.
 
 Section 4.6 — Inter-Company Interop Prefix (127.127.0.0):
   Reserved DMZ address space for two organisations to interconnect
@@ -10,12 +10,26 @@ Section 4.6 — Inter-Company Interop Prefix (127.127.0.0):
 Section 4.7 — Two-XLATE8 Interop Model:
   Company A (127.1.0.0.x) ↔ XLATE8-A ↔ 127.127.0.0.x ↔ XLATE8-B ↔ Company B (127.2.0.0.x)
   Neither company sees the other's internal addresses.
+
+.. deprecated::
+    The 127.127.0.0/16 Inter-Company Interop Prefix has been removed from the
+    spec. The two-XLATE8 model is now the recommended approach for cross-company
+    connectivity. This module is retained for backwards compatibility and will
+    be removed in a future release.
 """
 
 from __future__ import annotations
 
+import warnings
 import time
 from dataclasses import dataclass, field
+
+warnings.warn(
+    "ipv8lab.interop is deprecated: the 127.127.0.0 Inter-Company Interop Prefix "
+    "has been removed from the spec. Use the two-XLATE8 model instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 # ---------------------------------------------------------------------------

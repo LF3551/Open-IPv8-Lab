@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Standalone NetLog8 protocol per draft-thain-netlog8-00.
+"""Standalone NetLog8 protocol per draft-thain-netlog8-.
 
 NetLog8 is the unified telemetry protocol for all IPv8 network services.
 This module implements the full wire protocol layer on top of the

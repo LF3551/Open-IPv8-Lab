@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Interior Link Convention per draft-thain-ipv8-02 Section 4.10.
+"""Interior Link Convention per draft-thain-ipv8- Section 4.10.
 
 The n.n.n.n range 222.0.0.0/8 is the well-known IPv8 interior link
 address convention.  Every AS MAY use <own-asn>.222.x.x.x for

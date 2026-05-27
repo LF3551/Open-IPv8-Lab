@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Zone Server mock per draft-thain-ipv8-02 Section 1.3.
+"""Zone Server mock per draft-thain-ipv8- Section 1.3.
 
 The Zone Server is the central operational concept in IPv8 — a paired
 active/active platform that runs every service a network segment
@@ -55,6 +55,7 @@ class OAuth8Token:
     expires_at: float
     scopes: tuple[str, ...] = ()
     raw: str = ""
+    claims: dict[str, Any] = field(default_factory=dict)
 
     def is_expired(self, now: float | None = None) -> bool:
         if now is None:
@@ -115,11 +116,12 @@ class OAuth8Cache:
         self,
         key_id: str,
         subject: str,
-        issuer: str,
-        audience: str,
+        issuer: str = "",
+        audience: str = "",
         duration: int = 3600,
         scopes: tuple[str, ...] = (),
         now: float | None = None,
+        extra_claims: dict[str, Any] | None = None,
     ) -> str:
         """Issue a mock JWT token signed with the given key."""
         if key_id not in self._keys:
@@ -136,6 +138,8 @@ class OAuth8Cache:
         }
         if scopes:
             payload["scopes"] = list(scopes)
+        if extra_claims:
+            payload.update(extra_claims)
         h = _b64url_encode(json.dumps(header, separators=(",", ":")).encode())
         p = _b64url_encode(json.dumps(payload, separators=(",", ":")).encode())
         signing_input = f"{h}.{p}"
@@ -187,6 +191,7 @@ class OAuth8Cache:
             expires_at=exp,
             scopes=tuple(payload.get("scopes", ())),
             raw=raw_token,
+            claims=dict(payload),
         )
 
         if now >= exp:
@@ -373,3 +378,234 @@ def make_zone_server_pair(
     primary = ZoneServer(role=ZoneServerRole.PRIMARY, zone_prefix=zone_prefix)
     secondary = ZoneServer(role=ZoneServerRole.SECONDARY, zone_prefix=zone_prefix)
     return primary, secondary
+
+
+# ===========================================================================
+# Step 13 — Identity-Driven Access Control
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# JWT claims-based ACL8 evaluation (replaces 802.1X port state)
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True, slots=True)
+class JWTClaimsContext:
+    """Claims extracted from a validated OAuth8 JWT.
+
+    ACL8 evaluates these claims per access decision instead of relying
+    on 802.1X port state.
+    """
+
+    subject: str              # "sub" claim — device or user identity
+    roles: frozenset[str]     # "roles" claim — set of authorised roles
+    groups: frozenset[str]    # "groups" claim — zone/segment group membership
+    issuer: str = ""          # "iss" claim
+
+
+@dataclass(frozen=True, slots=True)
+class ClaimsACLRule:
+    """ACL8 rule evaluated against JWT claims."""
+
+    required_role: str = ""       # empty = any role
+    required_group: str = ""      # empty = any group
+    source_pattern: str = "*"
+    destination_pattern: str = "*"
+    action: ACL8Action = ACL8Action.PERMIT
+    description: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class ClaimsACLResult:
+    """Result of a claims-based ACL8 evaluation."""
+
+    action: ACL8Action
+    matched_rule: ClaimsACLRule | None = None
+    reason: str = ""
+
+    @property
+    def is_permitted(self) -> bool:
+        return self.action == ACL8Action.PERMIT
+
+
+class ClaimsACL8Engine:
+    """ACL8 engine that evaluates JWT claims rather than port state.
+
+    Per spec §Identity-Driven Access Control: ACL8 evaluates JWT claims
+    per access decision.  802.1X port state is NOT consulted.
+    """
+
+    def __init__(self, default_action: ACL8Action = ACL8Action.DENY) -> None:
+        self._rules: list[ClaimsACLRule] = []
+        self._default = default_action
+
+    def add_rule(self, rule: ClaimsACLRule) -> None:
+        self._rules.append(rule)
+
+    def evaluate(
+        self,
+        claims: JWTClaimsContext,
+        source: str,
+        destination: str,
+    ) -> ClaimsACLResult:
+        """Evaluate access using JWT claims.
+
+        First matching rule wins.  A rule matches when:
+        - required_role is empty OR present in claims.roles
+        - required_group is empty OR present in claims.groups
+        - source/destination pattern matches (``*`` = wildcard)
+        """
+        for rule in self._rules:
+            if rule.required_role and rule.required_role not in claims.roles:
+                continue
+            if rule.required_group and rule.required_group not in claims.groups:
+                continue
+            src_ok = rule.source_pattern in ("*", source)
+            dst_ok = rule.destination_pattern in ("*", destination)
+            if src_ok and dst_ok:
+                return ClaimsACLResult(action=rule.action, matched_rule=rule,
+                                       reason=rule.description or "claims match")
+        return ClaimsACLResult(
+            action=self._default,
+            reason="default deny" if self._default == ACL8Action.DENY else "default permit",
+        )
+
+    @property
+    def rule_count(self) -> int:
+        return len(self._rules)
+
+
+# ---------------------------------------------------------------------------
+# NetLog8 audit policy — silence on routine JWT presentations
+# ---------------------------------------------------------------------------
+
+from ipv8lab.netlog8 import NetLog8Client, NetLog8Facility
+
+
+class JWTAuditEvent(str, Enum):
+    """Events that MAY generate a NetLog8 entry."""
+
+    ISSUANCE  = "issuance"   # new session start — always logged
+    FAILURE   = "failure"    # validation failure — always logged
+    ROUTINE   = "routine"    # mid-session valid check — silenced
+
+
+@dataclass
+class OAuth8AAASubstrate:
+    """Unified OAuth8/JWT AAA substrate for a Zone Server.
+
+    Ties together JWT validation, claims-based ACL8, and NetLog8 audit
+    policy in one place.  Implements the spec rule:
+
+    *"Log only JWT issuance at session start and explicit failures.
+    Do not emit NetLog8 on a successful JWT check mid-session."*
+
+    Parameters
+    ----------
+    oauth8:
+        The OAuth8 cache used for token validation.
+    acl:
+        Claims-based ACL8 engine.
+    logger:
+        NetLog8 client to emit audit events to.
+    """
+
+    oauth8: OAuth8Cache = field(default_factory=OAuth8Cache)
+    acl: ClaimsACL8Engine = field(default_factory=ClaimsACL8Engine)
+    logger: NetLog8Client = field(
+        default_factory=lambda: NetLog8Client(source="zone-aaa", endpoint="netlog"),
+    )
+    _sessions: dict[str, JWTClaimsContext] = field(default_factory=dict, init=False)
+    _log_events: list[tuple[JWTAuditEvent, str]] = field(default_factory=list, init=False)
+
+    # ----------------------------------------------------------------
+    # Session start — JWT issuance (always logged)
+    # ----------------------------------------------------------------
+
+    def start_session(
+        self,
+        subject: str,
+        raw_token: str,
+        now: float | None = None,
+    ) -> TokenValidationResult:
+        """Validate a JWT and open a session.  Logs issuance or failure."""
+        result = self.oauth8.validate_token(raw_token, now=now)
+        if result.is_valid and result.token is not None:
+            claims = self._claims_from_token(result.token)
+            self._sessions[subject] = claims
+            self._emit(JWTAuditEvent.ISSUANCE, f"session opened: {subject}")
+        else:
+            self._emit(JWTAuditEvent.FAILURE, f"JWT validation failed: {subject}")
+        return result
+
+    # ----------------------------------------------------------------
+    # Mid-session check — SILENT on success
+    # ----------------------------------------------------------------
+
+    def check_access(
+        self,
+        subject: str,
+        source: str,
+        destination: str,
+        raw_token: str | None = None,
+        now: float | None = None,
+    ) -> ClaimsACLResult:
+        """Evaluate ACL8 for an active session.
+
+        Validates the token if provided.  On success: **no NetLog8 event**
+        (routine check).  On failure: logs the failure.
+        """
+        if raw_token is not None:
+            result = self.oauth8.validate_token(raw_token, now=now)
+            if not result.is_valid:
+                self._emit(JWTAuditEvent.FAILURE, f"JWT check failed: {subject}")
+                return ClaimsACLResult(action=ACL8Action.DENY, reason="invalid token")
+            # Success — routine presentation, NO log event
+
+        claims = self._sessions.get(subject)
+        if claims is None:
+            return ClaimsACLResult(action=ACL8Action.DENY, reason="no active session")
+        return self.acl.evaluate(claims, source, destination)
+
+    def end_session(self, subject: str) -> bool:
+        if subject in self._sessions:
+            del self._sessions[subject]
+            return True
+        return False
+
+    # ----------------------------------------------------------------
+    # Introspection
+    # ----------------------------------------------------------------
+
+    @property
+    def active_sessions(self) -> int:
+        return len(self._sessions)
+
+    @property
+    def audit_log(self) -> list[tuple[JWTAuditEvent, str]]:
+        return list(self._log_events)
+
+    def audit_events_of_type(self, event_type: JWTAuditEvent) -> list[str]:
+        return [msg for evt, msg in self._log_events if evt == event_type]
+
+    # ----------------------------------------------------------------
+    # Helpers
+    # ----------------------------------------------------------------
+
+    def _emit(self, event: JWTAuditEvent, message: str) -> None:
+        self._log_events.append((event, message))
+        if event == JWTAuditEvent.ISSUANCE:
+            self.logger.info(NetLog8Facility.GENERAL, f"[JWT ISSUANCE] {message}")
+        elif event == JWTAuditEvent.FAILURE:
+            self.logger.warning(NetLog8Facility.GENERAL, f"[JWT FAILURE] {message}")
+        # JWTAuditEvent.ROUTINE → silenced, no NetLog8 call
+
+    @staticmethod
+    def _claims_from_token(token: OAuth8Token) -> JWTClaimsContext:
+        roles = frozenset(token.claims.get("roles", []) or [])
+        groups = frozenset(token.claims.get("groups", []) or [])
+        return JWTClaimsContext(
+            subject=token.subject,
+            roles=roles,
+            groups=groups,
+            issuer=token.claims.get("iss", ""),
+        )

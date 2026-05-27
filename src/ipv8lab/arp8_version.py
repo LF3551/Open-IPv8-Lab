@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""ARP8-driven version selection per draft-thain-ipv8-02 Section 2.
+"""ARP8-driven version selection per draft-thain-ipv8- Section 2.
 
 Implements neighbor capability discovery (dual ARP8/ARP4 probe),
 per-hop version selection, and router forwarding with IPv8→IPv4 downgrade.
@@ -326,3 +326,78 @@ def _asn_part(ipv8_addr: str) -> str:
     if len(parts) == 8:
         return ".".join(parts[:4])
     return "0.0.0.0"
+
+
+# ---------------------------------------------------------------------------
+# ARP8 Primary RN Discovery (spec §3.2)
+# ---------------------------------------------------------------------------
+
+class PrimaryRNConflictSeverity(enum.Enum):
+    """Severity of a Primary RN conflict detected on a segment."""
+
+    CONFLICT = "conflict"   # Neighbour advertising a different Primary RN
+
+
+@dataclass(slots=True)
+class PrimaryRNConflict:
+    """A Primary RN conflict detected by ARP8 Primary RN Discovery."""
+
+    interface: str
+    expected_rn: int          # Our segment's Primary RN
+    observed_rn: int          # RN seen in the neighbour's announcement
+    neighbour_addr: str       # Canonical neighbour address
+    detected_at: float = 0.0
+    severity: PrimaryRNConflictSeverity = PrimaryRNConflictSeverity.CONFLICT
+
+    @property
+    def netlog8_event(self) -> str:
+        """Produce a NetLog8 SEC-ALERT event string for this conflict."""
+        return (
+            f"SEC-ALERT primary-rn-conflict iface={self.interface} "
+            f"expected_rn={self.expected_rn} observed_rn={self.observed_rn} "
+            f"neighbour={self.neighbour_addr}"
+        )
+
+
+class PrimaryRNDiscovery:
+    """ARP8 Primary RN Discovery engine for a single network interface.
+
+    Monitors neighbour Primary RN announcements and detects any that
+    differ from the segment's expected Primary RN.  On conflict:
+
+    * Records the conflict in :attr:`conflicts`.
+    * Sets :attr:`forwarding_suspended` to ``True`` (operator must
+      clear it explicitly via :meth:`clear_conflict`).
+    * The conflict can be retrieved as a NetLog8 SEC-ALERT string via
+      :attr:`~PrimaryRNConflict.netlog8_event`.
+    """
+
+    def __init__(self, interface: str, expected_rn: int) -> None:
+        self.interface = interface
+        self.expected_rn = expected_rn
+        self.forwarding_suspended: bool = False
+        self.conflicts: list[PrimaryRNConflict] = []
+
+    def observe(self, neighbour_addr: str, announced_rn: int) -> PrimaryRNConflict | None:
+        """Process a neighbour Primary RN announcement.
+
+        Returns a :class:`PrimaryRNConflict` if the announced RN
+        differs from :attr:`expected_rn`, otherwise ``None``.
+        """
+        if announced_rn == self.expected_rn:
+            return None
+        conflict = PrimaryRNConflict(
+            interface=self.interface,
+            expected_rn=self.expected_rn,
+            observed_rn=announced_rn,
+            neighbour_addr=neighbour_addr,
+            detected_at=time.monotonic(),
+        )
+        self.conflicts.append(conflict)
+        self.forwarding_suspended = True
+        return conflict
+
+    def clear_conflict(self) -> None:
+        """Clear all recorded conflicts and resume forwarding."""
+        self.conflicts.clear()
+        self.forwarding_suspended = False

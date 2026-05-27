@@ -44,7 +44,7 @@ def init(
 
 @app.command()
 def check(
-    prefix: str = typer.Argument(..., help="BGP8 advertised prefix (ASN.n.n.n.n)"),
+    prefix: str = typer.Argument(..., help="BGP8 advertised prefix (<RN>-<LA>, e.g. 64496-10.1.0.0)"),
     length: int = typer.Argument(..., help="Prefix length (e.g. 16, 24)"),
     peer_asn: int = typer.Option(0, help="Peer ASN"),
     interface: str = typer.Option("eth0", help="Interface"),

@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""PVRST per draft-thain-ipv8-02 Section 17.4.
+"""PVRST per draft-thain-ipv8- Section 17.4.
 
 Per-VLAN Rapid Spanning Tree is mandatory for all IPv8 L2 and L3 devices.
 MST is not recommended.

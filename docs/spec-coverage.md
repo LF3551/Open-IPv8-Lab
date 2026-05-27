@@ -2,25 +2,25 @@
 
 # Spec Coverage
 
-Complete mapping of [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) sections to source modules.
+Complete mapping of draft-thain-ipv8 sections to source modules.
 
-## draft-thain-ipv8-02
+## draft-thain-ipv8
 
 | Section | Topic | Module | Tests |
 |:-------:|-------|--------|:-----:|
-| 1.3 | DHCP8 lease (single-response provisioning) | `dhcp8.py` | ✅ |
+| §1.3 | DHCP8 lease (single-response provisioning) | `dhcp8.py` | ✅ |
 | 1.3 | Zone Server (OAuth8 cache, ACL8 engine) | `zoneserver.py` | ✅ |
-| 1.4 | XLATE8 north-south traffic flow | `xlate8_flow.py` | ✅ |
+| §XLATE8 | Unified 5-mode translation, north-south flow, even/odd LB | `xlate8.py` | ✅ |
 | 1.6 | Cost Factor (CF) metric | `cost_factor.py` | ✅ |
 | 2 | ARP8-driven version selection | `arp8_version.py` | ✅ |
-| 3 | Address format (64-bit, ASN prefix + host) | `address.py` | ✅ |
+| §3.1–3.5 | Address format, RN/LA terminology, canonical hyphenated notation | `address.py` | ✅ |
 | 4 | Address classes (unicast, multicast, broadcast, RINE, internal zone) | `address.py` | ✅ |
 | 4.6–4.7 | Inter-Company Interop and Two-XLATE8 model | `interop.py` | ✅ |
 | 4.10 | Interior Link Convention (222.0.0.0/8) | `interior_link.py` | ✅ |
 | 4.11 | Address Usage Model — consolidated address space table | `addr_usage.py` | ✅ |
 | 5.1 | Packet header (28-byte, version 8) | `packet.py` | ✅ |
 | 5.1 | Packet fragmentation and reassembly (DF/MF, offset) | `fragmentation.py` | ✅ |
-| 6 | ASN dot notation | `address.py` | ✅ |
+| §3.3 | Canonical hyphenated notation, legacy input forms | `address.py` | ✅ |
 | 6.2 | Socket API Compatibility (AF_INET8, sockaddr_in8) | `socket_api.py` | ✅ |
 | 7 | DNS A8 record (even/odd pair, RFC 1918 validation) | `dns_a8.py` | ✅ |
 | 8.4 | BGP8 path selection with CF metric | `bgp8_selection.py` | ✅ |
@@ -30,7 +30,7 @@ Complete mapping of [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-
 | 10–12 | Multicast, anycast, broadcast | `multicast.py` | ✅ |
 | 13.3 | 8to4 tunnelling | `tunnel.py` | ✅ |
 | 15 | CGNAT Behaviour simulation | `cgnat.py` | ✅ |
-| 15.1 | XLATE8 Even/Odd Load Balancing | `xlate8_lb.py` | ✅ |
+| §15.1 | XLATE8 Even/Odd Load Balancing | `xlate8.py` | ✅ |
 | 17 | Cloud Provider VPC simulation | `cloud_vpc.py` | ✅ |
 | 17.1–17.3 | Device compliance tiers | `compliance.py` | ✅ |
 | 17.4 | PVRST (Zone Server root election) | `pvrst.py` | ✅ |
@@ -41,19 +41,30 @@ Complete mapping of [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-
 | 19.4 | Interior Link Convention Protection (222.0.0.0/8) | `ilink_protection.py` | ✅ |
 | 19.7 | /16 Minimum Prefix Enforcement at eBGP8 | `prefix_enforce.py` | ✅ |
 
+| §Identity-Driven Access Control | JWT/OAuth8 AAA, claims-based ACL8, NetLog8 silence | `zoneserver.py` | ✅ |
+| §Trust-State Update | verify/update/rollback, 7-day staleness | `trust.py` | ✅ |
+| §Inter-AS Routing | Native BGP8 / BGP-in-VRF / Large Community (RFC 8092) | `bgp8_selection.py` | ✅ |
+| §CF Scope | CF carriage inter-AS only, IGP CF Export, slow-slew | `cost_factor.py` | ✅ |
+| §DNS ZS Record | ZS RRset, 3-step lookup order | `dns_a8.py` | ✅ |
+| §Wire Format | EtherType 0x8080, Lua dissector field renames | `pcap_export.py` | ✅ |
+| §VRF Naming | `ipv8-asn-<RN>`, RD `<RN>:65535`, `bind_rn()` | `vrf.py` | ✅ |
+| §Per-Segment RN | Single Primary RN invariant, conflict detection | `compliance.py`, `arp8_version.py` | ✅ |
+| §Interface Mode | NORMAL / STRICT / PNP / GUEST, DHCP8 opts 222/223 | `dhcp8.py` | ✅ |
+| §Socket API | AF_INET8=46, `sin8_rn` rename | `socket_api.py` | ✅ |
+
 ## Companion drafts
 
 | Draft | Topic | Module | Tests |
 |-------|-------|--------|:-----:|
-| draft-thain-whois8-00 | Standalone WHOIS8 protocol | `whois8_proto.py` | ✅ |
-| draft-thain-netlog8-00 | Standalone NetLog8 protocol | `netlog8_proto.py` | ✅ |
-| draft-thain-routing-protocols-00 | BGP8, IBGP8, OSPF8, IS-IS8 | `companions.py` | ✅ |
-| draft-thain-rine-00 | RINE peering fabric | `companions.py` | ✅ |
-| draft-thain-support8-00 | ARP8 with gratuitous announce | `companions.py` | ✅ |
-| draft-thain-zoneserver-00 | XLATE8 translation table | `companions.py` | ✅ |
-| draft-thain-update8-00 | Update8 and NIC certification | `companions.py` | ✅ |
-| draft-thain-wifi8-00 | WiFi8 protocol | `companions.py` | ✅ |
-| draft-thain-ipv8-mib-00 | SNMPv8 MIB | `companions.py` | ✅ |
+| draft-thain-whois8 | Standalone WHOIS8 protocol | `whois8_proto.py` | ✅ |
+| draft-thain-netlog8 | Standalone NetLog8 protocol | `netlog8_proto.py` | ✅ |
+| draft-thain-routing-protocols | BGP8, IBGP8, OSPF8, IS-IS8 | `companions.py` | ✅ |
+| draft-thain-rine | RINE peering fabric | `companions.py` | ✅ |
+| draft-thain-support8 | ARP8 with gratuitous announce | `companions.py` | ✅ |
+| draft-thain-zoneserver | XLATE8 translation table | `companions.py` | ✅ |
+| draft-thain-update8 | Update8 and NIC certification | `companions.py` | ✅ |
+| draft-thain-wifi8 | WiFi8 protocol | `companions.py` | ✅ |
+| draft-thain-ipv8-mib | SNMPv8 MIB | `companions.py` | ✅ |
 
 ## Infrastructure modules
 

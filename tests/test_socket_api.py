@@ -33,7 +33,7 @@ class TestConstants:
         assert AF_INET == 2
 
     def test_af_inet8(self) -> None:
-        assert AF_INET8 == 30
+        assert AF_INET8 == 46
 
     def test_socket_types(self) -> None:
         assert SocketType.SOCK_STREAM == 1
@@ -49,35 +49,39 @@ class TestSockaddrIn8:
         sa = SockaddrIn8()
         assert sa.sin8_family == AF_INET8
         assert sa.sin8_port == 0
-        assert sa.sin8_asn == 0
+        assert sa.sin8_rn == 0
         assert sa.sin8_addr == "0.0.0.0"
+
+    def test_sin8_asn_alias(self) -> None:
+        sa = SockaddrIn8(sin8_rn=64496)
+        assert sa.sin8_asn == 64496  # backwards-compat alias
 
     def test_from_ipv8_address(self) -> None:
         addr = IPv8Address.parse("64496.192.0.2.1")
         sa = SockaddrIn8.from_ipv8_address(addr, port=443)
         assert sa.sin8_family == AF_INET8
         assert sa.sin8_port == 443
-        assert sa.sin8_asn == addr.asn
+        assert sa.sin8_rn == addr.rn
         assert sa.sin8_addr == "192.0.2.1"
 
     def test_from_ipv4_tuple(self) -> None:
         sa = SockaddrIn8.from_ipv4_tuple(("10.0.0.1", 80), asn=64497)
         assert sa.sin8_port == 80
-        assert sa.sin8_asn == 64497
+        assert sa.sin8_rn == 64497
         assert sa.sin8_addr == "10.0.0.1"
 
     def test_to_ipv8_address(self) -> None:
-        sa = SockaddrIn8(sin8_asn=64496, sin8_addr="192.0.2.1", sin8_port=443)
+        sa = SockaddrIn8(sin8_rn=64496, sin8_addr="192.0.2.1", sin8_port=443)
         addr = sa.to_ipv8_address()
-        assert addr.asn == 64496
+        assert addr.rn == 64496
         assert addr.host_str == "192.0.2.1"
 
     def test_to_dict(self) -> None:
-        sa = SockaddrIn8(sin8_asn=64496, sin8_addr="10.0.0.1", sin8_port=80)
+        sa = SockaddrIn8(sin8_rn=64496, sin8_addr="10.0.0.1", sin8_port=80)
         d = sa.to_dict()
         assert d["sin8_family"] == AF_INET8
         assert d["sin8_port"] == 80
-        assert d["sin8_asn"] == 64496
+        assert d["sin8_rn"] == 64496
         assert d["sin8_addr"] == "10.0.0.1"
 
     def test_frozen(self) -> None:
@@ -127,7 +131,7 @@ class TestCompatLayer:
 
     def test_downgrade_to_ipv4(self) -> None:
         compat = CompatLayer()
-        sa8 = SockaddrIn8(sin8_asn=64496, sin8_addr="10.0.0.1", sin8_port=80)
+        sa8 = SockaddrIn8(sin8_rn=64496, sin8_addr="10.0.0.1", sin8_port=80)
         sa4 = compat.downgrade_to_ipv4(sa8)
         assert sa4.sin_family == AF_INET
         assert sa4.sin_addr == "10.0.0.1"
@@ -145,13 +149,13 @@ class TestIPv8Socket:
 
     def test_bind(self) -> None:
         sock = create_socket(default_asn=64496)
-        sa = SockaddrIn8(sin8_asn=64496, sin8_addr="10.0.0.1", sin8_port=8080)
+        sa = SockaddrIn8(sin8_rn=64496, sin8_addr="10.0.0.1", sin8_port=8080)
         sock.bind(sa)
         assert sock.local_address == sa
 
     def test_connect(self) -> None:
         sock = create_socket(default_asn=64496)
-        sa = SockaddrIn8(sin8_asn=64497, sin8_addr="10.0.0.2", sin8_port=443)
+        sa = SockaddrIn8(sin8_rn=64497, sin8_addr="10.0.0.2", sin8_port=443)
         sock.connect(sa)
         assert sock.remote_address == sa
 
@@ -214,7 +218,7 @@ class TestSocketAPICLI:
         result = runner.invoke(app, ["info", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["AF_INET8"] == 30
+        assert data["AF_INET8"] == 46
         assert len(data["sockaddr_in8_fields"]) == 4
 
     def test_info_text(self) -> None:
@@ -227,20 +231,20 @@ class TestSocketAPICLI:
         result = runner.invoke(app, ["create", "64496.10.0.0.1", "--port", "443", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["sin8_asn"] == 64496
+        assert data["sin8_rn"] == 64496
         assert data["sin8_addr"] == "10.0.0.1"
         assert data["sin8_port"] == 443
 
     def test_create_text(self) -> None:
         result = runner.invoke(app, ["create", "64496.10.0.0.1"])
         assert result.exit_code == 0
-        assert "sin8_asn" in result.output
+        assert "sin8_rn" in result.output
 
     def test_upgrade_json(self) -> None:
         result = runner.invoke(app, ["upgrade", "10.0.0.1", "--port", "80", "--asn", "64496", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["sin8_asn"] == 64496
+        assert data["sin8_rn"] == 64496
         assert data["sin8_addr"] == "10.0.0.1"
 
     def test_upgrade_text(self) -> None:
@@ -270,7 +274,7 @@ class TestSocketAPICLI:
         result = runner.invoke(app, ["status", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["AF_INET8"] == 30
+        assert data["AF_INET8"] == 46
 
     def test_no_args_help(self) -> None:
         result = runner.invoke(app, [])

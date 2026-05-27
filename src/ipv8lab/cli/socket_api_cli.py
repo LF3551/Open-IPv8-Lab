@@ -30,7 +30,7 @@ def info(
     fields = [
         {"name": "sin8_family", "type": "sa_family_t", "description": "AF_INET8"},
         {"name": "sin8_port", "type": "in_port_t", "description": "port number"},
-        {"name": "sin8_asn", "type": "uint32_t", "description": "r.r.r.r ASN prefix"},
+        {"name": "sin8_rn", "type": "uint32_t", "description": "Routing Number (RN)"},
         {"name": "sin8_addr", "type": "struct in_addr", "description": "n.n.n.n host address"},
     ]
     data: dict[str, object] = {
@@ -64,7 +64,7 @@ def create(
     else:
         typer.echo(f"sin8_family = {sa8.sin8_family} (AF_INET8)")
         typer.echo(f"sin8_port   = {sa8.sin8_port}")
-        typer.echo(f"sin8_asn    = {sa8.sin8_asn}")
+        typer.echo(f"sin8_rn     = {sa8.sin8_rn}")
         typer.echo(f"sin8_addr   = {sa8.sin8_addr}")
 
 
@@ -82,7 +82,7 @@ def upgrade(
         typer.echo(json.dumps(sa8.to_dict()))
     else:
         typer.echo(f"Legacy:   ({host}, {port})")
-        typer.echo(f"Upgraded: sin8_asn={sa8.sin8_asn} sin8_addr={sa8.sin8_addr} sin8_port={sa8.sin8_port}")
+        typer.echo(f"Upgraded: sin8_rn={sa8.sin8_rn} sin8_addr={sa8.sin8_addr} sin8_port={sa8.sin8_port}")
 
 
 @app.command()
@@ -121,7 +121,7 @@ def simulate(
         for e in sock.events:
             addr_s = ""
             if e.address and isinstance(e.address, SockaddrIn8):
-                addr_s = f" → {e.address.sin8_asn}.{e.address.sin8_addr}:{e.address.sin8_port}"
+                addr_s = f" → {e.address.sin8_rn}.{e.address.sin8_addr}:{e.address.sin8_port}"
             typer.echo(f"  {e.action:<10}{addr_s}")
 
 
@@ -132,7 +132,7 @@ def status(
     """Show Socket API module status."""
     data = {
         "module": "socket_api",
-        "spec": "draft-thain-ipv8-02 Section 6.2",
+        "spec": "draft-thain-ipv8 Section 6",
         "AF_INET8": AF_INET8,
         "sock_types": [t.name for t in SocketType],
     }

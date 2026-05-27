@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""CLI for Address Usage Model per draft-thain-ipv8-02 Section 4.11."""
+"""CLI for Address Usage Model per draft-thain-ipv8- Section 4.11."""
 
 from __future__ import annotations
 

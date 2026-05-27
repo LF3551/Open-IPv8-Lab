@@ -21,6 +21,7 @@ This module integrates:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import IntEnum
 
 from ipv8lab.companions import BGP8Advertisement, BGP8Peer
 from ipv8lab.cost_factor import (
@@ -242,3 +243,229 @@ def build_advertisement(
         prefix_length=prefix_length,
     )
     return adv, cf_value
+
+
+# ===========================================================================
+# Inter-AS routing propagation mechanisms (spec §Inter-AS Routing Mechanisms)
+# ===========================================================================
+
+class PropagationMechanism(IntEnum):
+    """Three inter-AS routing propagation mechanisms.
+
+    All three produce functionally identical :class:`Route8` RIB entries.
+    """
+
+    NATIVE_BGP8     = 1  # MP-BGP NLRI with IPv8 AFI, full 64-bit <RN>-<LA>
+    BGP_IN_VRF      = 2  # VPNv4 [RFC 4364] inside ipv8-asn-<RN> VRF
+    LARGE_COMMUNITY = 3  # 32-bit IPv4 NLRI + BGP large community [RFC 8092] carrying RN
+
+
+# ---------------------------------------------------------------------------
+# Capability negotiation
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True, slots=True)
+class CapabilitySet:
+    """BGP8 session capability advertisement.
+
+    Advertised during OPEN; used by :class:`BGP8SessionNegotiator` to pick
+    the best shared mechanism.
+    """
+
+    native_bgp8: bool = False
+    bgp_in_vrf: bool = False
+    large_community: bool = False
+
+
+def negotiate_mechanism(
+    local: CapabilitySet,
+    remote: CapabilitySet,
+) -> PropagationMechanism | None:
+    """Choose the best shared propagation mechanism.
+
+    Priority: NATIVE_BGP8 > BGP_IN_VRF > LARGE_COMMUNITY.
+    Returns None if no common mechanism is available.
+    """
+    if local.native_bgp8 and remote.native_bgp8:
+        return PropagationMechanism.NATIVE_BGP8
+    if local.bgp_in_vrf and remote.bgp_in_vrf:
+        return PropagationMechanism.BGP_IN_VRF
+    if local.large_community and remote.large_community:
+        return PropagationMechanism.LARGE_COMMUNITY
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Canonical RIB entry
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True, slots=True)
+class Route8:
+    """Canonical IPv8 RIB entry produced by all three propagation mechanisms.
+
+    The *mechanism* field records how the route arrived; the routing
+    semantics (prefix, rn, next_hop, as_path, cf) are mechanism-agnostic.
+    """
+
+    prefix: str                          # e.g. "64496-0.0.0.0/8"
+    rn: int                              # Routing Number
+    next_hop: str                        # IPv8 or IPv4 next-hop address
+    origin_asn: int
+    as_path: tuple[int, ...]
+    cf_accumulated: int                  # integer CF (0–0xFFFFFFFF)
+    mechanism: PropagationMechanism
+    vrf_name: str = ""                   # populated for BGP_IN_VRF
+    large_community: tuple[int, int, int] | None = None  # populated for LARGE_COMMUNITY
+
+    def equivalent_to(self, other: "Route8") -> bool:
+        """True if routing semantics match regardless of mechanism."""
+        return (
+            self.prefix == other.prefix
+            and self.rn == other.rn
+            and self.next_hop == other.next_hop
+            and self.origin_asn == other.origin_asn
+            and self.as_path == other.as_path
+            and self.cf_accumulated == other.cf_accumulated
+        )
+
+
+# ---------------------------------------------------------------------------
+# Large community encoding (RFC 8092)
+# ---------------------------------------------------------------------------
+
+# BGP large community: 12 bytes = (Global-Administrator 4B) + (LD1 4B) + (LD2 4B)
+# IPv8 uses: GA = local AS, LD1 = RN, LD2 = 0 (reserved)
+
+def encode_large_community(local_asn: int, rn: int) -> tuple[int, int, int]:
+    """Encode an IPv8 RN as a BGP large community (RFC 8092)."""
+    return (local_asn, rn, 0)
+
+
+def decode_rn_from_community(community: tuple[int, int, int]) -> int:
+    """Extract the RN from an IPv8 BGP large community."""
+    return community[1]
+
+
+# ---------------------------------------------------------------------------
+# Propagators
+# ---------------------------------------------------------------------------
+
+def _adv_cf_int(adv: BGP8Advertisement) -> int:
+    """Convert the float CF ratio in BGP8Advertisement to integer CF value."""
+    return int(adv.cf_accumulated * 0xFFFFFFFF)
+
+
+class NativeBGP8Propagator:
+    """Mechanism 1: native BGP8 with MP-BGP NLRI (IPv8 AFI).
+
+    The full 64-bit ``<RN>-<LA>`` prefix is carried directly in the NLRI.
+    """
+
+    def to_route8(self, adv: BGP8Advertisement, rn: int) -> Route8:
+        """Convert a BGP8Advertisement to a Route8 RIB entry."""
+        return Route8(
+            prefix=adv.prefix,
+            rn=rn,
+            next_hop=adv.next_hop,
+            origin_asn=adv.origin_asn,
+            as_path=adv.as_path,
+            cf_accumulated=_adv_cf_int(adv),
+            mechanism=PropagationMechanism.NATIVE_BGP8,
+        )
+
+
+class BGPinVRFPropagator:
+    """Mechanism 2: BGP-in-VRF (VPNv4 [RFC 4364]) inside ``ipv8-asn-<RN>``.
+
+    The advertisement travels inside a VRF named ``ipv8-asn-<RN>`` with
+    route distinguisher ``<RN>:65535``.  Receivers reconstruct the full
+    IPv8 prefix from the VRF context.
+    """
+
+    def to_route8(self, adv: BGP8Advertisement, rn: int) -> Route8:
+        from ipv8lab.vrf import ipv8_vrf_name
+        vrf = ipv8_vrf_name(rn)
+        return Route8(
+            prefix=adv.prefix,
+            rn=rn,
+            next_hop=adv.next_hop,
+            origin_asn=adv.origin_asn,
+            as_path=adv.as_path,
+            cf_accumulated=_adv_cf_int(adv),
+            mechanism=PropagationMechanism.BGP_IN_VRF,
+            vrf_name=vrf,
+        )
+
+
+class LargeCommPropagator:
+    """Mechanism 3: IPv4 NLRI + BGP large community [RFC 8092] carrying RN.
+
+    The advertisement uses a 32-bit IPv4 NLRI (the LA portion of the
+    address).  The RN is encoded in a large community
+    ``(local_asn, RN, 0)``.  Receivers reconstruct the full 64-bit
+    IPv8 prefix.
+    """
+
+    def __init__(self, local_asn: int) -> None:
+        self._local_asn = local_asn
+
+    def to_route8(self, adv: BGP8Advertisement, rn: int) -> Route8:
+        community = encode_large_community(self._local_asn, rn)
+        return Route8(
+            prefix=adv.prefix,
+            rn=rn,
+            next_hop=adv.next_hop,
+            origin_asn=adv.origin_asn,
+            as_path=adv.as_path,
+            cf_accumulated=_adv_cf_int(adv),
+            mechanism=PropagationMechanism.LARGE_COMMUNITY,
+            large_community=community,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Unified Route8 RIB
+# ---------------------------------------------------------------------------
+
+class Route8RIB:
+    """Unified RIB that accepts Route8 entries from all three mechanisms.
+
+    Entries from different mechanisms are merged by (prefix, rn) key;
+    the entry with the lowest cf_accumulated wins, matching the same
+    BGP8PathSelector tie-breaking logic.
+    """
+
+    def __init__(self) -> None:
+        self._entries: dict[tuple[str, int], Route8] = {}
+
+    def install(self, route: Route8) -> bool:
+        """Install a route; replaces existing only if CF is lower.
+
+        Returns True if the entry was installed (new or better CF).
+        """
+        key = (route.prefix, route.rn)
+        existing = self._entries.get(key)
+        if existing is None or route.cf_accumulated < existing.cf_accumulated:
+            self._entries[key] = route
+            return True
+        return False
+
+    def lookup(self, prefix: str, rn: int) -> Route8 | None:
+        return self._entries.get((prefix, rn))
+
+    def remove(self, prefix: str, rn: int) -> bool:
+        key = (prefix, rn)
+        if key in self._entries:
+            del self._entries[key]
+            return True
+        return False
+
+    @property
+    def size(self) -> int:
+        return len(self._entries)
+
+    def entries(self) -> list[Route8]:
+        return list(self._entries.values())
+
+    def prefixes(self) -> list[str]:
+        return sorted({prefix for prefix, _ in self._entries})

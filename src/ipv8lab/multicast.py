@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Multicast and broadcast handling per draft-thain-ipv8-02 Sections 10-12.
+"""Multicast and broadcast handling per draft-thain-ipv8- Sections 10-12.
 
 Cross-ASN multicast prefixes (ff.ff.xx.xx):
   ff.ff.00.00  General cross-ASN multicast

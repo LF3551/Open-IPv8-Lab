@@ -8,7 +8,7 @@ from __future__ import annotations
 from ipv8lab.address import IPv8Address
 from ipv8lab.dns_a8 import A8Record
 from ipv8lab.packet import IPv8Packet
-from ipv8lab.xlate8_flow import DNS8Resolver, FlowEvent, NorthSouthFlow
+from ipv8lab.xlate8 import DNS8Resolver, FlowEvent, NorthSouthFlow
 
 
 class _FakeClock:

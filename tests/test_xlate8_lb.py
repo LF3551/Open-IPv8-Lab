@@ -10,7 +10,7 @@ import json
 from typer.testing import CliRunner
 
 from ipv8lab.address import IPv8Address
-from ipv8lab.xlate8_lb import (
+from ipv8lab.xlate8 import (
     EvenOddLB,
     LBStrategy,
     Parity,

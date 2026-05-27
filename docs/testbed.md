@@ -8,11 +8,11 @@ The default demo creates two autonomous systems:
 
 ```
 ASN 64496
-  node-a: 64496.192.0.2.1
+  node-a: 64496-192.0.2.1
   router-a
 
 ASN 64497
-  node-b: 64497.198.51.100.7
+  node-b: 64497-198.51.100.7
   router-b
 ```
 
@@ -100,13 +100,13 @@ Unified telemetry format with structured entries:
 
 Stub modules for all companion specifications:
 
-- **BGP8/IBGP8/OSPF8/IS-IS8** — routing protocol data structures (draft-thain-routing-protocols-00)
-- **RINE** — peering fabric (draft-thain-rine-00)
-- **ARP8** — cache table with gratuitous announce (draft-thain-support8-00)
-- **XLATE8** — DNS-validated translation table (draft-thain-zoneserver-00)
-- **Update8** — firmware updates from DNS-named sources only (draft-thain-update8-00)
-- **WiFi8** — access points with Zone Server integration (draft-thain-wifi8-00)
-- **SNMPv8** — MIB tree (draft-thain-ipv8-mib-00)
+- **BGP8/IBGP8/OSPF8/IS-IS8** — routing protocol data structures (draft-thain-routing-protocols)
+- **RINE** — peering fabric (draft-thain-rine)
+- **ARP8** — cache table with gratuitous announce (draft-thain-support8)
+- **XLATE8** — DNS-validated translation table (draft-thain-zoneserver)
+- **Update8** — firmware updates from DNS-named sources only (draft-thain-update8)
+- **WiFi8** — access points with Zone Server integration (draft-thain-wifi8)
+- **SNMPv8** — MIB tree (draft-thain-ipv8-mib)
 
 ## Integration scenarios (v0.10)
 
@@ -191,7 +191,7 @@ ipv8lab pcap export trace.iv8cap trace.pcap
 ipv8lab pcap inspect demo.pcap
 
 # Write packets directly to .pcap
-ipv8lab pcap write test.pcap --src 64496.10.0.1.1 --dst 64497.10.0.1.100 -n 10
+ipv8lab pcap write test.pcap --src 64496-10.0.1.1 --dst 64497-10.0.1.100 -n 10
 
 # Generate Wireshark Lua dissector
 ipv8lab pcap dissector -o ipv8_dissector.lua

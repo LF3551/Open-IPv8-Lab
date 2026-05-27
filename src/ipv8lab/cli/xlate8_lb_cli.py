@@ -9,7 +9,7 @@ import json
 
 import typer
 
-from ipv8lab.xlate8_lb import (
+from ipv8lab.xlate8 import (
     EvenOddLB,
     LBStrategy,
     make_a8_pair,

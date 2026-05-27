@@ -1,17 +1,20 @@
 # IPv8 Address Examples
 #
-# ASN dot notation
-64496.192.0.2.1
-64497.198.51.100.7
+# Canonical hyphenated form: <RN>-<LA>  (emit default per spec §3.3)
+# Legacy forms are accepted on input for backwards compatibility.
 
-# Full 8-octet notation
+# Canonical hyphenated notation
+64496-192.0.2.1
+64497-198.51.100.7
+
+# Full 8-octet notation (legacy input)
 0.0.251.240.192.0.2.1
 0.0.251.241.198.51.100.7
 
-# IPv4-compatible (prefix = 0.0.0.0)
-0.0.0.0.8.8.8.8
-0.0.0.0.1.1.1.1
+# IPv4-compatible (RN=0)
+0-8.8.8.8
+0-1.1.1.1
 
-# Internal zone (prefix starts with 127)
-127.2.0.0.10.0.0.5
-127.0.0.1.192.168.1.1
+# Internal zone (RN leading octet 127)
+127.2.0.0-10.0.0.5
+127.0.0.1-192.168.1.1

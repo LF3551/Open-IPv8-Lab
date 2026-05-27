@@ -153,10 +153,10 @@ def verify_cert(
 
 @app.command("handshake")
 def do_handshake(
-    device: str = typer.Argument(help="Client device name."),
+    device: str = typer.Argument(help="Client device name (auto-issued cert; handshakes against zone server)."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
 ) -> None:
-    """Perform full mTLS handshake simulation."""
+    """Perform full mTLS handshake simulation (client device vs. zone server)."""
     ca, mtls_server, server_key = _ensure_setup()
     now = time.time()
     client_cert, client_key = issue_client_certificate(ca, device, now=now)

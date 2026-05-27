@@ -78,7 +78,7 @@ def add_peer(
 
 @app.command("advertise")
 def advertise(
-    prefix: str = typer.Argument(help="Prefix (e.g. 64496.0.0.0.0/8)."),
+    prefix: str = typer.Argument(help="Prefix as IPv8 address (e.g. 64496-10.0.0.0)."),
     origin_asn: int = typer.Argument(help="Origin ASN."),
     as_path: str = typer.Option("", "--as-path", help="Comma-separated AS path (e.g. 64497,64498)."),
     next_hop: str = typer.Option("", "--next-hop", help="Next hop address."),

@@ -2,11 +2,11 @@
 
 # Overview
 
-Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification.
+Open-IPv8-Lab is an experimental userspace toolkit implementing [draft-thain-ipv8](https://www.ietf.org/archive/id/draft-thain-ipv8.html) — the Internet Protocol Version 8 specification.
 
 ## Why IPv8? — Comparison with IPv4 and IPv6
 
-IPv8 is **not** a successor to IPv6. It is an independent experimental protocol described in draft-thain-ipv8-02, designed around a fundamentally different addressing and routing philosophy.
+IPv8 is **not** a successor to IPv6. It is an independent experimental protocol described in draft-thain-ipv8, designed around a fundamentally different addressing and routing philosophy.
 
 | | IPv4 | IPv6 | IPv8 |
 |---|------|------|------|
@@ -22,7 +22,7 @@ IPv8 is **not** a successor to IPv6. It is an independent experimental protocol 
 | **Transition** | — | 6to4, NAT64, DS-Lite | **8to4 tunnelling** — IPv8 inside IPv4 for legacy transit |
 | **Management** | SNMP, NetFlow | Same | **SNMPv8 MIB**, **NetLog8** (SEC-ALERT, E3 traps), **NetFlow8** |
 | **Address exhaustion** | ~4.3 billion (exhausted) | ~3.4 × 10³⁸ | ~4.3 billion hosts per ASN × ~4.3 billion ASNs |
-| **IETF status** | Standard (RFC 791) | Standard (RFC 8200) | **Experimental** (draft-thain-ipv8-02) |
+| **IETF status** | Standard (RFC 791) | Standard (RFC 8200) | **Experimental** (draft-thain-ipv8) |
 
 ### Key architectural differences
 
@@ -82,8 +82,8 @@ IPv8 is **not** a successor to IPv6. It is an independent experimental protocol 
 - RINE Prefix Protection (100.x.x.x filtering) per Section 19.3 (`ipv8lab rineprot`)
 - Interior Link Convention Protection (222.0.0.0/8 BGP8 filtering) per Section 19.4 (`ipv8lab ilinkprot`)
 - /16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7 (`ipv8lab prefixenf`)
-- Standalone WHOIS8 protocol (draft-thain-whois8-00): server, client with cache, record signing (`ipv8lab whois8`)
-- Standalone NetLog8 protocol (draft-thain-netlog8-00): wire framing, collector, relay, rate limiting (`ipv8lab netlog8proto`)
+- Standalone WHOIS8 protocol (draft-thain-whois8): server, client with cache, record signing (`ipv8lab whois8`)
+- Standalone NetLog8 protocol (draft-thain-netlog8): wire framing, collector, relay, rate limiting (`ipv8lab netlog8proto`)
 - Mesh network simulation, packet capture/replay, web dashboard, benchmarks, plugin system
 
 ## What it does NOT do
@@ -95,7 +95,7 @@ IPv8 is **not** a successor to IPv6. It is an independent experimental protocol 
 
 ## Design principles
 
-1. **Spec-driven** — every module maps to a section in draft-thain-ipv8-02
+1. **Spec-driven** — every module maps to a section in draft-thain-ipv8
 2. **Userspace only** — everything runs as a normal user process
 3. **Tested** — 1827 tests covering all implemented sections
 4. **Extensible** — plugin system for custom protocol experiments

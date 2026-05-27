@@ -1,18 +1,18 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Companion spec module stubs per draft-thain-ipv8-02.
+"""Companion spec module stubs per draft-thain-ipv8-.
 
 Models data structures and basic behaviours from companion
 specifications referenced in the core IPv8 spec:
 
-- draft-thain-routing-protocols-00: BGP8, IBGP8, OSPF8, IS-IS8
-- draft-thain-rine-00: Regional Inter-Network Exchange
-- draft-thain-support8-00: ARP8, Route8
-- draft-thain-zoneserver-00: XLATE8 translation
-- draft-thain-update8-00: Update8 and NIC certification
-- draft-thain-wifi8-00: WiFi8 protocol
-- draft-thain-ipv8-mib-00: SNMPv8 MIB
+- draft-thain-routing-protocols-: BGP8, IBGP8, OSPF8, IS-IS8
+- draft-thain-rine-: Regional Inter-Network Exchange
+- draft-thain-support8-: ARP8, Route8
+- draft-thain-zoneserver-: XLATE8 translation
+- draft-thain-update8-: Update8 and NIC certification
+- draft-thain-wifi8-: WiFi8 protocol
+- draft-thain-ipv8-mib-: SNMPv8 MIB
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from enum import Enum, auto
 
 
 # ===================================================================
-# draft-thain-routing-protocols-00 — BGP8, IBGP8, OSPF8, IS-IS8
+# draft-thain-routing-protocols- — BGP8, IBGP8, OSPF8, IS-IS8
 # ===================================================================
 
 class BGP8State(Enum):
@@ -155,7 +155,7 @@ class ISIS8Adjacency:
 
 
 # ===================================================================
-# draft-thain-rine-00 — Regional Inter-Network Exchange
+# draft-thain-rine- — Regional Inter-Network Exchange
 # ===================================================================
 
 @dataclass(frozen=True, slots=True)
@@ -202,7 +202,7 @@ class RINEFabric:
 
 
 # ===================================================================
-# draft-thain-support8-00 — ARP8, Route8
+# draft-thain-support8- — ARP8, Route8
 # ===================================================================
 
 @dataclass(slots=True)
@@ -263,7 +263,7 @@ class ARP8Table:
 
 
 # ===================================================================
-# draft-thain-zoneserver-00 — XLATE8 translation
+# draft-thain-zoneserver- — XLATE8 translation
 # ===================================================================
 
 @dataclass(frozen=True, slots=True)
@@ -316,7 +316,7 @@ class XLATE8Table:
 
 
 # ===================================================================
-# draft-thain-update8-00 — Update8 and NIC certification
+# draft-thain-update8- — Update8 and NIC certification
 # ===================================================================
 
 class Update8Status(Enum):
@@ -378,7 +378,7 @@ class NICCertification:
 
 
 # ===================================================================
-# draft-thain-wifi8-00 — WiFi8 Protocol
+# draft-thain-wifi8- — WiFi8 Protocol
 # ===================================================================
 
 class WiFi8Band(Enum):
@@ -402,7 +402,7 @@ class WiFi8AccessPoint:
 
 
 # ===================================================================
-# draft-thain-ipv8-mib-00 — SNMPv8 MIB
+# draft-thain-ipv8-mib- — SNMPv8 MIB
 # ===================================================================
 
 @dataclass(frozen=True, slots=True)

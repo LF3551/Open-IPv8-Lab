@@ -80,8 +80,8 @@ app.add_typer(cgnat_app, name="cgnat", help="CGNAT Behaviour simulation per Sect
 app.add_typer(cloud_vpc_app, name="vpc", help="Cloud Provider VPC simulation per Section 17.")
 app.add_typer(rine_prot_app, name="rineprot", help="RINE Prefix Protection per Section 19.3.")
 app.add_typer(prefix_enforce_app, name="prefixenf", help="/16 Minimum Prefix Enforcement at eBGP8 boundaries per Section 19.7.")
-app.add_typer(whois8_proto_app, name="whois8", help="Standalone WHOIS8 protocol (draft-thain-whois8-00).")
-app.add_typer(netlog8_proto_app, name="netlog8proto", help="Standalone NetLog8 protocol (draft-thain-netlog8-00).")
+app.add_typer(whois8_proto_app, name="whois8", help="Standalone WHOIS8 protocol (draft-thain-whois8).")
+app.add_typer(netlog8_proto_app, name="netlog8proto", help="Standalone NetLog8 protocol (draft-thain-netlog8).")
 
 if __name__ == "__main__":
     app()

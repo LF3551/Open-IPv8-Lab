@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""IPv8 prefix validation rules per draft-thain-ipv8-02.
+"""IPv8 prefix validation rules per draft-thain-ipv8-.
 
 Implements routing-scope validation for reserved prefix ranges:
 - 127.x.x.x  Internal Zone (Section 3.5) — MUST NOT be routed externally

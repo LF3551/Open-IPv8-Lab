@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""WHOIS8 mock resolver per draft-thain-ipv8-02.
+"""WHOIS8 mock resolver per draft-thain-ipv8-.
 
 WHOIS8 validates that ASN holders legitimately own their advertised
 prefixes. BGP8 route advertisements are validated against WHOIS8

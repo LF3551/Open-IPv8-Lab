@@ -157,3 +157,161 @@ class TestCFPath:
         p2 = CFPath(path_id="fast", hops=[100, 100])
         paths = {p1.path_id: p1.accumulated_cf, p2.path_id: p2.accumulated_cf}
         assert select_best_path(paths) == "fast"
+
+
+# ===========================================================================
+# Step 11 — CF scope, IGP export interface, slow-slew
+# ===========================================================================
+
+from ipv8lab.cost_factor import (
+    CFScope,
+    CFScopeViolation,
+    CFSlew,
+    IGPCFExporter,
+    IGPMetric,
+    assert_inter_as,
+)
+
+
+class TestCFScope:
+    def test_inter_as_value(self):
+        assert CFScope.INTER_AS == 1
+
+    def test_intra_as_value(self):
+        assert CFScope.INTRA_AS == 2
+
+    def test_assert_inter_as_ok(self):
+        assert_inter_as(CFScope.INTER_AS)  # no exception
+
+    def test_assert_inter_as_raises_on_intra(self):
+        import pytest
+        with pytest.raises(CFScopeViolation):
+            assert_inter_as(CFScope.INTRA_AS)
+
+    def test_assert_inter_as_includes_context(self):
+        import pytest
+        with pytest.raises(CFScopeViolation, match="test-context"):
+            assert_inter_as(CFScope.INTRA_AS, context="test-context")
+
+
+class TestIGPMetric:
+    def test_defaults(self):
+        m = IGPMetric()
+        assert m.cost == 1
+        assert m.utilization == 0.0
+
+    def test_invalid_utilization(self):
+        import pytest
+        with pytest.raises(ValueError):
+            IGPMetric(utilization=1.5)
+
+    def test_invalid_bandwidth(self):
+        import pytest
+        with pytest.raises(ValueError):
+            IGPMetric(bandwidth_mbps=0)
+
+    def test_to_cf_input_zero_utilization(self):
+        m = IGPMetric(cost=0, utilization=0.0)
+        cf = m.to_cf_input()
+        assert cf.capacity == 0.0
+        assert cf.economic == 0.0
+
+    def test_to_cf_input_full_utilization(self):
+        m = IGPMetric(cost=1000, utilization=1.0)
+        cf = m.to_cf_input(max_cost=1000)
+        assert cf.capacity == 1.0
+        assert cf.economic == 1.0
+
+    def test_to_cf_input_no_igp_on_rtt(self):
+        m = IGPMetric(cost=500, utilization=0.5)
+        cf = m.to_cf_input()
+        assert cf.rtt == 0.0
+        assert cf.packet_loss == 0.0
+
+
+class TestIGPCFExporter:
+    def test_empty_returns_none(self):
+        exp = IGPCFExporter()
+        assert exp.export_cf() is None
+
+    def test_single_interface(self):
+        exp = IGPCFExporter()
+        exp.update("eth0", IGPMetric(cost=100, utilization=0.3))
+        cf = exp.export_cf(max_cost=1000)
+        assert cf is not None
+        assert abs(cf.capacity - 0.3) < 1e-9
+        assert abs(cf.economic - 0.1) < 1e-9
+
+    def test_worst_case_aggregation(self):
+        exp = IGPCFExporter()
+        exp.update("eth0", IGPMetric(cost=100, utilization=0.2))
+        exp.update("eth1", IGPMetric(cost=900, utilization=0.8))
+        cf = exp.export_cf(max_cost=1000)
+        assert cf.capacity == 0.8
+        assert abs(cf.economic - 0.9) < 1e-9
+
+    def test_remove_interface(self):
+        exp = IGPCFExporter()
+        exp.update("eth0", IGPMetric())
+        assert exp.remove("eth0")
+        assert exp.export_cf() is None
+
+    def test_interface_count(self):
+        exp = IGPCFExporter()
+        exp.update("eth0", IGPMetric())
+        exp.update("eth1", IGPMetric())
+        assert exp.interface_count == 2
+
+    def test_igp_cf_does_not_carry_rtt(self):
+        exp = IGPCFExporter()
+        exp.update("eth0", IGPMetric(cost=500, utilization=0.5))
+        cf = exp.export_cf()
+        assert cf.rtt == 0.0
+        assert cf.geographic == 0.0
+
+
+class TestCFSlew:
+    def test_degradation_capped_by_max_step(self):
+        slew = CFSlew(max_step=100)
+        result = slew.step(current=0, target=1000)
+        assert result == 100
+
+    def test_degradation_reaches_target_in_steps(self):
+        slew = CFSlew(max_step=100)
+        val = 0
+        for _ in range(15):
+            val = slew.step(val, 1000)
+        assert val == 1000
+
+    def test_improvement_applies_decay(self):
+        slew = CFSlew(decay=0.5)
+        result = slew.step(current=1000, target=0)
+        assert result == 500
+
+    def test_improvement_eventually_converges(self):
+        slew = CFSlew(decay=0.5)
+        val = 0xFFFFFFFF
+        for _ in range(100):
+            val = slew.step(val, 0)
+        assert val == 0
+
+    def test_no_change_returns_same(self):
+        slew = CFSlew()
+        assert slew.step(500, 500) == 500
+
+    def test_converged_exact(self):
+        slew = CFSlew()
+        assert slew.converged(100, 100)
+
+    def test_converged_with_tolerance(self):
+        slew = CFSlew()
+        assert slew.converged(100, 105, tolerance=10)
+
+    def test_not_converged_outside_tolerance(self):
+        slew = CFSlew()
+        assert not slew.converged(100, 200, tolerance=10)
+
+    def test_invalid_decay(self):
+        import pytest
+        with pytest.raises(ValueError):
+            CFSlew(decay=0.0)

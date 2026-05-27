@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import struct
 from dataclasses import dataclass
+from enum import IntEnum
 from pathlib import Path
 
 from ipv8lab.capture import CapturedPacket, PacketCapture
@@ -36,6 +37,15 @@ PCAP_VERSION_MAJOR = 2
 PCAP_VERSION_MINOR = 4
 PCAP_SNAPLEN = 65535
 DLT_USER0 = 147                  # user-defined link type
+DLT_EN10MB = 1                   # Ethernet (used for ETH_P_IPV8 captures)
+
+# EtherType values
+ETH_P_IP    = 0x0800             # IPv4
+ETH_P_IPV8  = 0x8080             # IPv8 native frames (spec §5.2)
+
+# Fake source/destination MAC used when building synthetic Ethernet frames
+_BCAST_MAC = b"\xff\xff\xff\xff\xff\xff"
+_ZERO_MAC  = b"\x00\x00\x00\x00\x00\x00"
 
 # Global header: magic(4) + ver_major(2) + ver_minor(2) + thiszone(4) +
 #                sigfigs(4) + snaplen(4) + linktype(4) = 24 bytes
@@ -59,6 +69,51 @@ def _build_global_header(link_type: int = DLT_USER0) -> bytes:
         PCAP_SNAPLEN,
         link_type,
     )
+
+
+# ---------------------------------------------------------------------------
+# Wire encapsulation selection (spec §5.2)
+# ---------------------------------------------------------------------------
+
+class WireEncap(IntEnum):
+    """On-wire framing type for an IPv8 packet.
+
+    Spec §5.2 rules:
+
+    * **ETH_P_IP** (``0x0800``) — destination is reached at the segment's
+      Primary RN.  Covers Primary↔Primary and all IPv4-only↔IPv4-only
+      traffic.
+    * **ETH_P_IPV8** (``0x8080``) — destination RN differs from the
+      segment's Primary RN (cross-RN or peer's Secondary RN on the same
+      segment).
+    * **DLT_USER0** — lab-internal / pcap-only framing (no Ethernet
+      header), for captures that don't represent real Ethernet frames.
+    """
+
+    ETH_P_IP    = ETH_P_IP
+    ETH_P_IPV8  = ETH_P_IPV8
+    DLT_USER0   = DLT_USER0
+
+
+def select_encap(
+    src_rn: int,
+    dst_rn: int,
+    segment_primary_rn: int,
+) -> WireEncap:
+    """Choose the correct wire encapsulation per spec §5.2.
+
+    Returns :attr:`WireEncap.ETH_P_IPV8` when the destination RN differs
+    from the segment Primary RN; :attr:`WireEncap.ETH_P_IP` otherwise.
+    """
+    if dst_rn != segment_primary_rn or src_rn != segment_primary_rn:
+        return WireEncap.ETH_P_IPV8
+    return WireEncap.ETH_P_IP
+
+
+def _build_eth_frame(raw_ipv8: bytes, ethertype: int) -> bytes:
+    """Wrap raw IPv8 bytes in a minimal Ethernet II frame."""
+    eth_header = _ZERO_MAC + _BCAST_MAC + struct.pack("!H", ethertype)
+    return eth_header + raw_ipv8
 
 
 def _build_packet_record(
@@ -108,9 +163,23 @@ class PcapWriter:
         self,
         packet: IPv8Packet,
         timestamp_ns: int = 0,
+        encap: WireEncap = WireEncap.DLT_USER0,
     ) -> None:
-        """Add a packet with a nanosecond timestamp."""
+        """Add a packet with a nanosecond timestamp.
+
+        *encap* controls the on-wire framing:
+
+        * ``DLT_USER0`` — raw IPv8 bytes only (default, backwards-compat).
+        * ``ETH_P_IP`` or ``ETH_P_IPV8`` — wrap in an Ethernet II frame
+          with the corresponding EtherType.  The writer's ``link_type``
+          is automatically promoted to ``DLT_EN10MB`` on the first
+          Ethernet-framed packet.
+        """
         raw = packet.to_bytes()
+        if encap in (WireEncap.ETH_P_IP, WireEncap.ETH_P_IPV8):
+            raw = _build_eth_frame(raw, int(encap))
+            if self._link_type == DLT_USER0:
+                self._link_type = DLT_EN10MB
         ts_sec = timestamp_ns // 1_000_000_000
         ts_usec = (timestamp_ns % 1_000_000_000) // 1_000
         self._records.append((ts_sec, ts_usec, raw))
@@ -245,7 +314,7 @@ _LUA_DISSECTOR = '''\
 -- or ~/Library/Application Support/Wireshark/plugins/ (macOS)
 -- or %APPDATA%\\Wireshark\\plugins\\ (Windows)
 
-local ipv8 = Proto("ipv8", "IPv8 Protocol (draft-thain-ipv8-02)")
+local ipv8 = Proto("ipv8", "IPv8 Protocol (draft-thain-ipv8)")
 
 -- Header fields
 local f_version   = ProtoField.uint8("ipv8.version", "Version", base.DEC, nil, 0xF0)
@@ -258,16 +327,16 @@ local f_frag      = ProtoField.uint16("ipv8.frag_offset", "Fragment Offset", bas
 local f_ttl       = ProtoField.uint8("ipv8.ttl", "Time to Live", base.DEC)
 local f_proto     = ProtoField.uint8("ipv8.protocol", "Protocol", base.DEC)
 local f_checksum  = ProtoField.uint16("ipv8.checksum", "Header Checksum", base.HEX)
-local f_src_asn   = ProtoField.uint32("ipv8.src_asn", "Source ASN Prefix", base.DEC)
-local f_src_host  = ProtoField.ipv4("ipv8.src_host", "Source Host")
-local f_dst_asn   = ProtoField.uint32("ipv8.dst_asn", "Destination ASN Prefix", base.DEC)
-local f_dst_host  = ProtoField.ipv4("ipv8.dst_host", "Destination Host")
+local f_src_rn    = ProtoField.uint32("ipv8.src_rn", "Source RN", base.DEC)
+local f_src_la    = ProtoField.ipv4("ipv8.src_la", "Source LA")
+local f_dst_rn    = ProtoField.uint32("ipv8.dst_rn", "Destination RN", base.DEC)
+local f_dst_la    = ProtoField.ipv4("ipv8.dst_la", "Destination LA")
 local f_payload   = ProtoField.bytes("ipv8.payload", "Payload")
 
 ipv8.fields = {
     f_version, f_ihl, f_tos, f_total_len, f_ident,
     f_flags, f_frag, f_ttl, f_proto, f_checksum,
-    f_src_asn, f_src_host, f_dst_asn, f_dst_host, f_payload
+    f_src_rn, f_src_la, f_dst_rn, f_dst_la, f_payload
 }
 
 function ipv8.dissector(buffer, pinfo, tree)
@@ -292,12 +361,12 @@ function ipv8.dissector(buffer, pinfo, tree)
     subtree:add(f_proto, buffer(9, 1))
     subtree:add(f_checksum, buffer(10, 2))
 
-    local src_asn = buffer(12, 4):uint()
-    local dst_asn = buffer(20, 4):uint()
-    subtree:add(f_src_asn, buffer(12, 4))
-    subtree:add(f_src_host, buffer(16, 4))
-    subtree:add(f_dst_asn, buffer(20, 4))
-    subtree:add(f_dst_host, buffer(24, 4))
+    local src_rn = buffer(12, 4):uint()
+    local dst_rn = buffer(20, 4):uint()
+    subtree:add(f_src_rn, buffer(12, 4))
+    subtree:add(f_src_la, buffer(16, 4))
+    subtree:add(f_dst_rn, buffer(20, 4))
+    subtree:add(f_dst_la, buffer(24, 4))
 
     local total_len = buffer(2, 2):uint()
     local hdr_len = ihl * 4
@@ -308,13 +377,17 @@ function ipv8.dissector(buffer, pinfo, tree)
 
     -- Info column
     pinfo.cols.info = string.format(
-        "AS%d.%s → AS%d.%s",
-        src_asn, tostring(buffer(16, 4):ipv4()),
-        dst_asn, tostring(buffer(24, 4):ipv4())
+        "RN%d.%s → RN%d.%s",
+        src_rn, tostring(buffer(16, 4):ipv4()),
+        dst_rn, tostring(buffer(24, 4):ipv4())
     )
 end
 
--- Register for DLT_USER0 (147)
+-- Register on EtherType 0x8080 (native IPv8 frames, spec §5.2)
+local eth_table = DissectorTable.get("ethertype")
+eth_table:add(0x8080, ipv8)
+
+-- Also register for DLT_USER0 (147) for pcap captures without Ethernet header
 local wtap = DissectorTable.get("wtap_encap")
 wtap:add(147, ipv8)
 '''

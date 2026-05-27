@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""CLI for standalone NetLog8 protocol per draft-thain-netlog8-00."""
+"""CLI for standalone NetLog8 protocol per draft-thain-netlog8-."""
 
 from __future__ import annotations
 

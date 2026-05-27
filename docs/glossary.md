@@ -2,16 +2,16 @@
 
 # Glossary
 
-Key terms and abbreviations used in Open-IPv8-Lab and [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html).
+Key terms and abbreviations used in Open-IPv8-Lab and [draft-thain-ipv8](https://www.ietf.org/archive/id/draft-thain-ipv8.html).
 
 ## Addressing
 
 | Term | Definition |
 |------|-----------|
-| **IPv8** | Internet Protocol Version 8 — experimental 64-bit addressing protocol defined in draft-thain-ipv8-02 |
+| **IPv8** | Internet Protocol Version 8 — experimental 64-bit addressing protocol defined in draft-thain-ipv8 |
 | **ASN** | Autonomous System Number — 32-bit routing prefix identifying a network operator (upper half of an IPv8 address) |
 | **Host part** | Lower 32 bits of an IPv8 address, analogous to host portion in IPv4 |
-| **ASN dot notation** | Human-readable format: `ASN.a.b.c.d` (e.g. `64496.192.0.2.1`) |
+| **ASN dot notation** | Legacy human-readable format: `ASN.a.b.c.d` (e.g. `64496.192.0.2.1`) — accepted on input, canonical form is hyphenated |
 | **Full notation** | 8-octet format: `p1.p2.p3.p4.h1.h2.h3.h4` (e.g. `0.0.251.240.192.0.2.1`) |
 | **Routing prefix** | 4-octet representation of ASN used in routing tables |
 | **Address class** | Classification per §4: unicast, multicast, broadcast, RINE, internal zone, interop |
@@ -53,7 +53,7 @@ Key terms and abbreviations used in Open-IPv8-Lab and [draft-thain-ipv8-02](http
 
 | Term | Definition |
 |------|-----------|
-| **RINE** | Regional Internet Network Exchange — peering fabric between ASNs (draft-thain-rine-00) |
+| **RINE** | Regional Internet Network Exchange — peering fabric between ASNs (draft-thain-rine) |
 | **Interop prefix** | `127.127.0.0` — Inter-Company Interop address and Two-XLATE8 model (§4.6–4.7) |
 | **Private Interop ASN** | ASN 65534/65533 — reserved for private peering (§4.8) |
 | **Interior Link** | `222.0.0.0/8` — convention address range for point-to-point links (§4.10) |
@@ -75,12 +75,12 @@ Key terms and abbreviations used in Open-IPv8-Lab and [draft-thain-ipv8-02](http
 
 | Term | Definition |
 |------|-----------|
-| **WHOIS8** | Registry protocol — ASN registration, route validation, HMAC record signing (draft-thain-whois8-00) |
-| **NetLog8** | Telemetry protocol — structured logging with SEC-ALERT and E3 traps, wire framing, collector, relay (draft-thain-netlog8-00) |
-| **ARP8** | Address Resolution Protocol for IPv8 — gratuitous announce, version selection (§2, draft-thain-support8-00) |
-| **Update8** | Firmware/software update protocol with NIC certification (draft-thain-update8-00) |
-| **WiFi8** | Wireless protocol adaptation for IPv8 (draft-thain-wifi8-00) |
-| **SNMPv8** | Simple Network Management Protocol for IPv8 — MIB definitions (draft-thain-ipv8-mib-00) |
+| **WHOIS8** | Registry protocol — ASN registration, route validation, HMAC record signing (draft-thain-whois8) |
+| **NetLog8** | Telemetry protocol — structured logging with SEC-ALERT and E3 traps, wire framing, collector, relay (draft-thain-netlog8) |
+| **ARP8** | Address Resolution Protocol for IPv8 — gratuitous announce, version selection (§2, draft-thain-support8) |
+| **Update8** | Firmware/software update protocol with NIC certification (draft-thain-update8) |
+| **WiFi8** | Wireless protocol adaptation for IPv8 (draft-thain-wifi8) |
+| **SNMPv8** | Simple Network Management Protocol for IPv8 — MIB definitions (draft-thain-ipv8-mib) |
 | **NetFlow8** | Flow monitoring and telemetry export in `.nf8` binary format |
 
 ## Operations & Tooling

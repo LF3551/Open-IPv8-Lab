@@ -34,7 +34,7 @@ pip install -e ".[dev]"
 from ipv8lab.address import IPv8Address, asn_to_prefix, prefix_to_asn
 
 # Parse from ASN dot notation or full 8-octet format
-addr = IPv8Address.parse("64496.192.0.2.1")
+addr = IPv8Address.parse("64496-192.0.2.1")
 addr2 = IPv8Address.parse("0.0.251.240.192.0.2.1")
 
 # Properties
@@ -44,7 +44,7 @@ addr.host_part        # (192, 0, 2, 1)
 addr.prefix_str       # "0.0.251.240"
 addr.host_str         # "192.0.2.1"
 addr.full_notation    # "0.0.251.240.192.0.2.1"
-addr.asn_notation     # "64496.192.0.2.1"
+addr.asn_notation     # "64496-192.0.2.1"
 addr.address_class    # "asn-unicast"
 
 # Classification
@@ -75,8 +75,8 @@ from ipv8lab.packet import IPv8Packet, PROTO_UDP, PROTO_TCP
 
 # Build a packet
 pkt = IPv8Packet(
-    src=IPv8Address.parse("64496.192.0.2.1"),
-    dst=IPv8Address.parse("64497.198.51.100.7"),
+    src=IPv8Address.parse("64496-192.0.2.1"),
+    dst=IPv8Address.parse("64497-198.51.100.7"),
     payload=b"hello",
     ttl=64,
     protocol=PROTO_UDP,
@@ -89,7 +89,7 @@ len(raw)  # 33 (28 header + 5 payload)
 
 # Parse from bytes
 pkt2 = IPv8Packet.from_bytes(raw)
-pkt2.src.asn_notation   # "64496.192.0.2.1"
+pkt2.src.asn_notation   # "64496-192.0.2.1"
 pkt2.payload            # b"hello"
 pkt2.checksum           # CRC32 (read-only)
 
@@ -119,7 +119,7 @@ rt2 = RouteTable.load_from_yaml("examples/two_asn_demo.yaml")
 # Two-tier routing (§8.7)
 tt = TwoTierRouteTable()
 tt.tier1.add_route(Route(destination_prefix="0.0.251.241", next_hop="border-r", interface="wan0"))
-route = tt.find_route("64497.198.51.100.7")
+route = tt.find_route("64497-198.51.100.7")
 ```
 
 ---
@@ -133,7 +133,7 @@ from ipv8lab.simulator import NetworkSimulator
 sim = NetworkSimulator.load_config("examples/two_asn_demo.yaml")
 
 # Send a packet and get trace
-trace = sim.send("node-a", "64497.198.51.100.7", "hello")
+trace = sim.send("node-a", "64497-198.51.100.7", "hello")
 for hop in trace:
     print(hop)
 # node-a → router-a → router-b → node-b
@@ -176,13 +176,13 @@ result.token.subject  # "device-42"
 
 # ACL8 — east-west access control
 primary.acl8_engine.add_rule(ACL8Rule(
-    source="64496.10.0.1.1",
-    destination="64496.10.0.1.2",
+    source="64496-10.0.1.1",
+    destination="64496-10.0.1.2",
     action=ACL8Action.PERMIT,
     description="Allow host-to-host",
 ))
 
-check = primary.authorize_traffic("64496.10.0.1.1", "64496.10.0.1.2")
+check = primary.authorize_traffic("64496-10.0.1.1", "64496-10.0.1.2")
 check.is_permitted  # True
 ```
 
@@ -264,7 +264,7 @@ best = select_best_path({"path-a": 25, "path-b": 42, "path-c": 18})  # "path-c"
 
 ```python
 from ipv8lab.address import IPv8Address
-from ipv8lab.xlate8_flow import NorthSouthFlow
+from ipv8lab.xlate8 import NorthSouthFlow
 from ipv8lab.dns_a8 import A8Record
 
 # Set up a north-south flow
@@ -273,11 +273,11 @@ flow = NorthSouthFlow(zone_prefix="127.1.0.0", external_asn=64496)
 # Register DNS A8 record
 flow.dns.add_record(A8Record(
     name="example.v8",
-    address=IPv8Address.parse("64496.198.51.100.1"),
+    address=IPv8Address.parse("64496-198.51.100.1"),
 ))
 
 # Full egress flow: DNS lookup → XLATE8 entry → translate
-internal = IPv8Address.parse("64496.10.0.1.5")
+internal = IPv8Address.parse("64496-10.0.1.5")
 egress_pkt = flow.egress_flow("example.v8", internal)
 
 # Full round-trip
@@ -299,8 +299,8 @@ from ipv8lab.icmpv8 import (
     ICMPv8Type, UnreachableCode,
 )
 
-src = IPv8Address.parse("64496.10.0.1.1")
-dst = IPv8Address.parse("64497.10.0.2.1")
+src = IPv8Address.parse("64496-10.0.1.1")
+dst = IPv8Address.parse("64497-10.0.2.1")
 
 # Ping
 req = echo_request(src, dst, identifier=1, sequence=1, payload=b"ping")
@@ -330,8 +330,8 @@ from ipv8lab.fragmentation import (
 )
 
 pkt = IPv8Packet(
-    src=IPv8Address.parse("64496.10.0.1.1"),
-    dst=IPv8Address.parse("64497.10.0.2.1"),
+    src=IPv8Address.parse("64496-10.0.1.1"),
+    dst=IPv8Address.parse("64497-10.0.2.1"),
     payload=b"A" * 2000,
 )
 
@@ -371,8 +371,8 @@ cap.start()
 # Capture packets
 for i in range(5):
     pkt = IPv8Packet(
-        src=IPv8Address.parse("64496.10.0.1.1"),
-        dst=IPv8Address.parse("64497.10.0.2.1"),
+        src=IPv8Address.parse("64496-10.0.1.1"),
+        dst=IPv8Address.parse("64497-10.0.2.1"),
         payload=f"msg-{i}".encode(),
     )
     cap.capture(pkt)
@@ -425,8 +425,8 @@ filt = IngressFilter(peer_asn=64497, is_external=True)
 
 # Check a packet — source claims ASN 64496 but arrives from 64497 peer
 pkt = IPv8Packet(
-    src=IPv8Address.parse("64496.10.0.1.1"),  # Spoofed!
-    dst=IPv8Address.parse("64497.10.0.2.1"),
+    src=IPv8Address.parse("64496-10.0.1.1"),  # Spoofed!
+    dst=IPv8Address.parse("64497-10.0.2.1"),
 )
 
 violations = filt.check(pkt)

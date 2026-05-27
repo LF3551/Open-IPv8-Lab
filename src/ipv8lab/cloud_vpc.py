@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Cloud Provider VPC simulation per draft-thain-ipv8-02 Section 17.
+"""Cloud Provider VPC simulation per draft-thain-ipv8- Section 17.
 
 IPv8 resolves VPC address overlap, VPC peering complexity, and
 multi-cloud routing through ASN-based disambiguation.  The 127.x.x.x

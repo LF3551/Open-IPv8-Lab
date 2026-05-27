@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""ICMPv8 protocol per draft-thain-ipv8-02 Section 9.
+"""ICMPv8 protocol per draft-thain-ipv8- Section 9.
 
 ICMPv8 extends ICMP to support 64-bit IPv8 addresses.
 Supported message types:

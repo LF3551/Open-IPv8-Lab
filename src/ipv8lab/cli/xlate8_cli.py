@@ -13,7 +13,7 @@ from rich.table import Table
 
 from ipv8lab.address import IPv8Address
 from ipv8lab.dns_a8 import A8Record
-from ipv8lab.xlate8_flow import NorthSouthFlow
+from ipv8lab.xlate8 import NorthSouthFlow
 
 app = typer.Typer(no_args_is_help=True)
 console = Console()

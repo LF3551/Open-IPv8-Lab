@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""CGNAT Behaviour simulation per draft-thain-ipv8-02 Section 15.
+"""CGNAT Behaviour simulation per draft-thain-ipv8- Section 15.
 
 Key rules:
 - IPv8-aware CGNAT MUST NOT modify the r.r.r.r field during translation.

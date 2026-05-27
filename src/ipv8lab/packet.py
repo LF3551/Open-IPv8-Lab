@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""IPv8 Packet Format per draft-thain-ipv8-02 Section 5.1.
+"""IPv8 Packet Format per draft-thain-ipv8- Section 5.1.
 
 Header layout (32 bytes):
 
@@ -71,7 +71,7 @@ PROTO_EXPERIMENTAL = 253
 
 @dataclass(slots=True)
 class IPv8Packet:
-    """IPv8 packet per draft-thain-ipv8-02 Section 5.1."""
+    """IPv8 packet per draft-thain-ipv8- Section 5.1."""
 
     src: IPv8Address
     dst: IPv8Address

@@ -12,6 +12,11 @@ from ipv8lab.dhcp8 import (
     DHCP8Server,
     DHCP8ServiceEndpoints,
 )
+from ipv8lab.interface_mode import (
+    DHCP8_OPT_IFACE_MODE,
+    DHCP8_OPT_PRIMARY_RN,
+    InterfaceMode,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -238,3 +243,135 @@ class _FakeClock:
 
     def __call__(self) -> float:
         return self.now
+
+
+# ---------------------------------------------------------------------------
+# InterfaceMode (spec §7.7.1)
+# ---------------------------------------------------------------------------
+
+class TestInterfaceMode:
+    def test_all_values(self):
+        assert InterfaceMode.NORMAL == 0
+        assert InterfaceMode.STRICT == 1
+        assert InterfaceMode.PNP == 2
+        assert InterfaceMode.GUEST == 3
+
+    def test_printer_alias_is_pnp(self):
+        assert InterfaceMode.PRINTER == InterfaceMode.PNP  # type: ignore[attr-defined]
+
+    def test_to_wire(self):
+        assert InterfaceMode.NORMAL.to_wire() == 0
+        assert InterfaceMode.STRICT.to_wire() == 1
+        assert InterfaceMode.PNP.to_wire() == 2
+        assert InterfaceMode.GUEST.to_wire() == 3
+
+    def test_from_wire(self):
+        assert InterfaceMode.from_wire(0) is InterfaceMode.NORMAL
+        assert InterfaceMode.from_wire(1) is InterfaceMode.STRICT
+        assert InterfaceMode.from_wire(2) is InterfaceMode.PNP
+        assert InterfaceMode.from_wire(3) is InterfaceMode.GUEST
+
+    def test_from_wire_unknown(self):
+        import pytest
+        with pytest.raises(ValueError, match="Unknown InterfaceMode"):
+            InterfaceMode.from_wire(99)
+
+    def test_roundtrip(self):
+        for mode in (InterfaceMode.NORMAL, InterfaceMode.STRICT,
+                     InterfaceMode.PNP, InterfaceMode.GUEST):
+            assert InterfaceMode.from_wire(mode.to_wire()) is mode
+
+    def test_opt_constants(self):
+        assert DHCP8_OPT_PRIMARY_RN == 222
+        assert DHCP8_OPT_IFACE_MODE == 223
+
+
+# ---------------------------------------------------------------------------
+# DHCP8 options 222 / 223 in lease and server
+# ---------------------------------------------------------------------------
+
+class TestDHCP8LeaseOptions:
+    def _make_lease(self, primary_rn=0, mode=InterfaceMode.NORMAL):
+        from ipv8lab.address import IPv8Address
+        addr = IPv8Address.parse("64496-192.0.2.10")
+        gw = IPv8Address.parse("64496-192.0.2.254")
+        return DHCP8Lease(
+            address=addr, gateway_even=gw, gateway_odd=gw,
+            primary_rn=primary_rn, interface_mode=mode,
+        )
+
+    def test_default_primary_rn(self):
+        lease = self._make_lease()
+        assert lease.primary_rn == 0
+
+    def test_default_interface_mode(self):
+        lease = self._make_lease()
+        assert lease.interface_mode is InterfaceMode.NORMAL
+
+    def test_custom_primary_rn(self):
+        lease = self._make_lease(primary_rn=64496)
+        assert lease.primary_rn == 64496
+
+    def test_custom_interface_mode_strict(self):
+        lease = self._make_lease(mode=InterfaceMode.STRICT)
+        assert lease.interface_mode is InterfaceMode.STRICT
+
+    def test_custom_interface_mode_pnp(self):
+        lease = self._make_lease(mode=InterfaceMode.PNP)
+        assert lease.interface_mode is InterfaceMode.PNP
+
+    def test_custom_interface_mode_guest(self):
+        lease = self._make_lease(mode=InterfaceMode.GUEST)
+        assert lease.interface_mode is InterfaceMode.GUEST
+
+
+class TestDHCP8ServerOptions:
+    def _make_server(self, primary_rn=64496, mode=InterfaceMode.STRICT):
+        pool = DHCP8Pool(
+            zone_prefix=(0, 0, 251, 240),
+            network_prefix=(192, 0, 2),
+        )
+        return DHCP8Server(
+            pool=pool,
+            primary_rn=primary_rn,
+            interface_mode=mode,
+            _clock=_FakeClock(0.0),
+        )
+
+    def test_server_delivers_primary_rn(self):
+        server = self._make_server(primary_rn=64496)
+        lease = server.discover("c1")
+        assert lease is not None
+        assert lease.primary_rn == 64496
+
+    def test_server_delivers_interface_mode(self):
+        server = self._make_server(mode=InterfaceMode.STRICT)
+        lease = server.discover("c1")
+        assert lease is not None
+        assert lease.interface_mode is InterfaceMode.STRICT
+
+    def test_server_delivers_guest_mode(self):
+        server = self._make_server(mode=InterfaceMode.GUEST)
+        lease = server.discover("c1")
+        assert lease is not None
+        assert lease.interface_mode is InterfaceMode.GUEST
+
+    def test_server_default_mode_is_normal(self):
+        pool = DHCP8Pool(
+            zone_prefix=(0, 0, 251, 240),
+            network_prefix=(10, 0, 0),
+        )
+        server = DHCP8Server(pool=pool, _clock=_FakeClock(0.0))
+        lease = server.discover("c1")
+        assert lease is not None
+        assert lease.interface_mode is InterfaceMode.NORMAL
+        assert lease.primary_rn == 0
+
+    def test_renewed_lease_retains_options(self):
+        server = self._make_server(primary_rn=64496, mode=InterfaceMode.PNP)
+        l1 = server.discover("c1")
+        l2 = server.discover("c1")
+        assert l1 is l2  # same lease, not expired
+        assert l2 is not None
+        assert l2.primary_rn == 64496
+        assert l2.interface_mode is InterfaceMode.PNP

@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Standalone WHOIS8 protocol per draft-thain-whois8-00.
+"""Standalone WHOIS8 protocol per draft-thain-whois8-.
 
 WHOIS8 is a critical infrastructure service for the IPv8 global
 routing system.  It provides route ownership validation, ASN

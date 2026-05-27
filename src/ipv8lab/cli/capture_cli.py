@@ -19,16 +19,21 @@ console = Console()
 
 @app.command("read")
 def read_capture(
-    file: str = typer.Argument(help="Path to a .iv8cap capture file."),
+    file: str = typer.Argument(help="Path to a .iv8cap text capture file (use 'pcap inspect' for binary .pcap)."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
 ) -> None:
-    """Read and display packets from a capture file."""
+    """Read and display packets from an .iv8cap text capture file."""
     path = Path(file)
     if not path.exists():
         console.print(f"[red]Error:[/red] File not found: {file}")
         raise typer.Exit(1)
 
-    cap = PacketCapture.load(path)
+    try:
+        cap = PacketCapture.load(path)
+    except UnicodeDecodeError:
+        console.print(f"[red]Error:[/red] {file} appears to be a binary file.")
+        console.print("  Use [bold]pcap inspect[/bold] to read binary .pcap files.")
+        raise typer.Exit(1)
 
     if as_json:
         items = []
@@ -63,15 +68,20 @@ def read_capture(
 
 @app.command("info")
 def capture_info(
-    file: str = typer.Argument(help="Path to a .iv8cap capture file."),
+    file: str = typer.Argument(help="Path to a .iv8cap text capture file (use 'pcap inspect' for binary .pcap)."),
 ) -> None:
-    """Show summary info about a capture file."""
+    """Show summary info about an .iv8cap text capture file."""
     path = Path(file)
     if not path.exists():
         console.print(f"[red]Error:[/red] File not found: {file}")
         raise typer.Exit(1)
 
-    cap = PacketCapture.load(path)
+    try:
+        cap = PacketCapture.load(path)
+    except UnicodeDecodeError:
+        console.print(f"[red]Error:[/red] {file} appears to be a binary file.")
+        console.print("  Use [bold]pcap inspect[/bold] to read binary .pcap files.")
+        raise typer.Exit(1)
     packets = cap.replay()
 
     table = Table(show_header=False, box=None, pad_edge=False)

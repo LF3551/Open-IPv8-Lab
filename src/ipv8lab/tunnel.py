@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""8to4 tunnelling per draft-thain-ipv8-02 Section 13.3.
+"""8to4 tunnelling per draft-thain-ipv8- Section 13.3.
 
 Encapsulates IPv8 packets inside IPv4-compatible frames for transit
 across IPv4-only networks.

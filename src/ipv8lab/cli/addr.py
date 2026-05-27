@@ -33,8 +33,13 @@ def parse_address(
         console.print(json.dumps(address_summary(address), indent=2))
         return
 
-    parts = address.strip().split(".")
-    fmt = "ASN dot notation" if len(parts) == 5 else "Full 8-octet notation"
+    raw = address.strip()
+    if "-" in raw:
+        fmt = "canonical hyphenated"
+    elif len(raw.split(".")) == 5:
+        fmt = "ASN dot notation (legacy)"
+    else:
+        fmt = "full 8-octet (legacy)"
 
     table = Table(show_header=False, box=None, pad_edge=False)
     table.add_column(style="bold cyan", min_width=20)
@@ -42,9 +47,10 @@ def parse_address(
 
     table.add_row("Input", address)
     table.add_row("Format", fmt)
-    table.add_row("ASN", str(addr.asn))
+    table.add_row("RN", str(addr.rn))
     table.add_row("Routing prefix", addr.prefix_str)
-    table.add_row("Host part", addr.host_str)
+    table.add_row("Local address (LA)", addr.host_str)
+    table.add_row("Canonical", addr.canonical if hasattr(addr, "canonical") else f"{addr.rn}-{addr.host_str}")
     table.add_row("Full notation", addr.full_notation)
 
     if addr.is_ipv4_compatible():

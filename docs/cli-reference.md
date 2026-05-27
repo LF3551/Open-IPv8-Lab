@@ -52,7 +52,7 @@ Parse, validate, and convert IPv8 addresses.
 
 ```bash
 # Parse an address (ASN dot notation)
-ipv8lab addr parse 64496.192.0.2.1
+ipv8lab addr parse 64496-192.0.2.1
 
 # Parse full 8-octet notation
 ipv8lab addr parse 0.0.251.240.192.0.2.1
@@ -64,13 +64,13 @@ ipv8lab addr encode-asn 64496
 ipv8lab addr decode-prefix 0.0.251.240
 
 # Classify address type
-ipv8lab addr classify 64496.192.0.2.1
+ipv8lab addr classify 64496-192.0.2.1
 
 # Validate address
-ipv8lab addr validate 64496.192.0.2.1
+ipv8lab addr validate 64496-192.0.2.1
 
 # JSON output
-ipv8lab addr parse 64496.192.0.2.1 --json
+ipv8lab addr parse 64496-192.0.2.1 --json
 ```
 
 ## packet
@@ -79,7 +79,7 @@ Build, parse, and inspect IPv8 packets.
 
 ```bash
 # Build a packet
-ipv8lab packet build --src 64496.192.0.2.1 --dst 64497.198.51.100.7 --payload "hello"
+ipv8lab packet build --src 64496-192.0.2.1 --dst 64497-198.51.100.7 --payload "hello"
 
 # Parse a packet from binary file
 ipv8lab packet parse packet.bin
@@ -139,13 +139,13 @@ BGP8 path selection with Cost Factor metric.
 ipv8lab bgp8 init --asn 64496
 
 # Advertise prefix (positional: PREFIX ORIGIN_ASN)
-ipv8lab bgp8 advertise 64496.0.0.0.0/8 64496 --next-hop 0.0.251.241
+ipv8lab bgp8 advertise 64496-0.0.0.0/8 64496 --next-hop 0.0.251.241
 
 # Show RIB
 ipv8lab bgp8 rib
 
 # Path selection (positional: PREFIX)
-ipv8lab bgp8 select 64496.0.0.0.0/8
+ipv8lab bgp8 select 64496-0.0.0.0/8
 
 # Run demo
 ipv8lab bgp8 demo --json
@@ -202,7 +202,7 @@ IPv8 packet fragmentation and reassembly.
 
 ```bash
 # Fragment a large payload (all options)
-ipv8lab frag fragment --src 64496.10.0.1.1 --dst 64497.10.0.1.100 --size 256 --mtu 64
+ipv8lab frag fragment --src 64496-10.0.1.1 --dst 64497-10.0.1.100 --size 256 --mtu 64
 
 # Fragment & reassemble round-trip
 ipv8lab frag reassemble --size 3000 --mtu 1500 --json
@@ -220,7 +220,7 @@ Traceroute8 diagnostic utility.
 
 ```bash
 # Trace route (positional: SRC DST)
-ipv8lab traceroute run 64496.10.0.0.1 64497.10.0.0.1 --hops 5
+ipv8lab traceroute run 64496-10.0.0.1 64497-10.0.0.1 --hops 5
 
 # Diamond topology demo
 ipv8lab traceroute diamond --json
@@ -238,10 +238,10 @@ NAT8 address translation gateway.
 ipv8lab nat8 init --mode dynamic
 
 # Add static mapping (positional: INTERNAL EXTERNAL)
-ipv8lab nat8 add-static 10.0.0.1 64496.10.0.0.1
+ipv8lab nat8 add-static 10.0.0.1 64496-10.0.0.1
 
 # Translate a packet
-ipv8lab nat8 translate --src 10.0.0.1 --dst 64497.10.0.0.1
+ipv8lab nat8 translate --src 10.0.0.1 --dst 64497-10.0.0.1
 
 # Show mappings
 ipv8lab nat8 mappings
@@ -289,7 +289,7 @@ QoS traffic shaping based on TOS field.
 ipv8lab qos init
 
 # Classify packet
-ipv8lab qos classify --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --tos 46
+ipv8lab qos classify --src 64496-10.0.0.1 --dst 64497-10.0.0.2 --tos 46
 
 # Show queues
 ipv8lab qos queues
@@ -424,7 +424,7 @@ ipv8lab usage table
 ipv8lab usage table --json
 
 # Classify an address
-ipv8lab usage classify 64496.192.0.2.1
+ipv8lab usage classify 64496-192.0.2.1
 ```
 
 ## arp8
@@ -433,10 +433,10 @@ ARP8-driven version selection per Section 2.
 
 ```bash
 # Discover neighbour (positional: TARGET)
-ipv8lab arp8 discover 64496.10.0.0.1
+ipv8lab arp8 discover 64496-10.0.0.1
 
 # Show version selection (positional: SRC DST)
-ipv8lab arp8 select 64496.10.0.0.1 64497.10.0.0.2
+ipv8lab arp8 select 64496-10.0.0.1 64497-10.0.0.2
 
 # Show ARP8 cache
 ipv8lab arp8 cache --json
@@ -469,7 +469,7 @@ Interior Link Convention (222.0.0.0/8) per Section 4.10.
 ipv8lab ilink generate 64496
 
 # Validate address
-ipv8lab ilink validate 64496.222.0.0.1
+ipv8lab ilink validate 64496-222.0.0.1
 
 # Summary
 ipv8lab ilink summary 64496 --json
@@ -484,7 +484,7 @@ Socket API Compatibility mock (AF_INET8) per Section 6.2.
 ipv8lab socket info --json
 
 # Create sockaddr_in8 (positional: ADDRESS)
-ipv8lab socket create 64496.10.0.0.1 --json
+ipv8lab socket create 64496-10.0.0.1 --json
 
 # Status
 ipv8lab socket status --json
@@ -499,10 +499,10 @@ CGNAT Behaviour simulation per Section 15.
 ipv8lab cgnat init
 
 # Translate (positional: ADDRESS)
-ipv8lab cgnat translate 64496.10.0.0.1
+ipv8lab cgnat translate 64496-10.0.0.1
 
 # Validate translation preserved r.r.r.r (positional: ORIGINAL TRANSLATED)
-ipv8lab cgnat validate 64496.10.0.0.1 64496.10.0.0.1
+ipv8lab cgnat validate 64496-10.0.0.1 64496-10.0.0.1
 
 # Show bindings
 ipv8lab cgnat bindings
@@ -535,10 +535,10 @@ RINE Prefix Protection per Section 19.3.
 ipv8lab rineprot init
 
 # Check BGP8 advertisement (positional: PREFIX)
-ipv8lab rineprot bgp8 64496.100.0.0.1
+ipv8lab rineprot bgp8 64496-100.0.0.1
 
 # Check packet (positional: ADDRESS)
-ipv8lab rineprot check 64496.100.0.0.1
+ipv8lab rineprot check 64496-100.0.0.1
 
 # Show alerts
 ipv8lab rineprot alerts --json
@@ -556,10 +556,10 @@ Interior Link Convention Protection per Section 19.4.
 ipv8lab ilinkprot init
 
 # Check BGP8 advertisement (positional: PREFIX)
-ipv8lab ilinkprot bgp8 64496.222.0.0.1
+ipv8lab ilinkprot bgp8 64496-222.0.0.1
 
 # Check egress packet (positional: ADDRESS)
-ipv8lab ilinkprot packet 64496.222.0.0.1
+ipv8lab ilinkprot packet 64496-222.0.0.1
 
 # Show traps
 ipv8lab ilinkprot traps --json
@@ -577,7 +577,7 @@ ipv8lab ilinkprot status --json
 ipv8lab prefixenf init
 
 # Check advertisement (positional: PREFIX LENGTH)
-ipv8lab prefixenf check 64496.10.1.0.0 24 --peer-asn 64497
+ipv8lab prefixenf check 64496-10.1.0.0 24 --peer-asn 64497
 
 # Show alerts
 ipv8lab prefixenf alerts --json
@@ -588,7 +588,7 @@ ipv8lab prefixenf status --json
 
 ## whois8
 
-Standalone WHOIS8 protocol (draft-thain-whois8-00).
+Standalone WHOIS8 protocol (draft-thain-whois8).
 
 ```bash
 # Initialize WHOIS8 server
@@ -624,7 +624,7 @@ ipv8lab whois8 status --json
 
 ## netlog8proto
 
-Standalone NetLog8 protocol (draft-thain-netlog8-00).
+Standalone NetLog8 protocol (draft-thain-netlog8).
 
 ```bash
 # Initialize collector

@@ -1,7 +1,25 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""IPv8 address parsing, conversion, and validation."""
+"""IPv8 address parsing, conversion, and validation.
+
+Canonical textual form per draft-thain-ipv8 §3.5 is the hyphenated
+locator ``<RN>-<LA>``:
+
+* leading RN octet == 0 (low ASNs) → RN rendered as an unsigned integer
+  (``64500-192.0.2.1``)
+* leading RN octet != 0 → RN rendered as dotted quad
+  (``127.10.60.10-10.0.0.1``)
+
+Legacy notations ``r.r.r.r.n.n.n.n`` (full 8-octet) and ``ASN.n.n.n.n``
+(legacy dot-ASN) remain accepted as input. The emit/str/repr default is
+the hyphenated canonical form.
+
+The module-level flag :data:`ASN_SIMPLIFICATION` controls integer-RN
+rendering. When ``False``, the RN portion is always emitted as a dotted
+quad regardless of leading octet (spec §3.5). Wire/JSON encoding is
+unaffected by this flag.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +27,11 @@ from dataclasses import dataclass
 
 from ipv8lab.errors import InvalidAddressError, InvalidASNError, InvalidOctetError
 
-MAX_ASN = 4_294_967_295  # 2^32 - 1
+MAX_ASN = 4_294_967_295 # 2^32 - 1
+
+#: When True (default), RNs with leading octet 0 are rendered as integers
+#: in :pyattr:`IPv8Address.canonical`. Set False to force dotted-quad RN.
+ASN_SIMPLIFICATION = True
 
 
 def validate_octet(value: int, *, label: str = "octet") -> int:
@@ -49,7 +71,7 @@ def prefix_str_to_asn(prefix_str: str) -> int:
     if len(parts) != 4:
         raise InvalidAddressError(f"Routing prefix must have 4 octets, got {len(parts)}")
     octets = tuple(int(p) for p in parts)
-    return prefix_to_asn(octets)  # type: ignore[arg-type]
+    return prefix_to_asn(octets) # type: ignore[arg-type]
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,6 +87,21 @@ class IPv8Address:
     def asn(self) -> int:
         return prefix_to_asn(self.routing_prefix)
 
+    #: Spec alias for :pyattr:`asn` — Routing Number.
+    @property
+    def rn(self) -> int:
+        return self.asn
+
+    #: Spec alias for :pyattr:`routing_prefix` — RN as 4 octets.
+    @property
+    def rn_octets(self) -> tuple[int, int, int, int]:
+        return self.routing_prefix
+
+    #: Spec alias for :pyattr:`host_part` — Local Address (LA).
+    @property
+    def la_octets(self) -> tuple[int, int, int, int]:
+        return self.host_part
+
     @property
     def prefix_str(self) -> str:
         return ".".join(str(o) for o in self.routing_prefix)
@@ -74,14 +111,40 @@ class IPv8Address:
         return ".".join(str(o) for o in self.host_part)
 
     @property
+    def la_str(self) -> str:
+        """Spec alias for :pyattr:`host_str` — LA dotted quad."""
+        return self.host_str
+
+    @property
+    def rn_str(self) -> str:
+        """RN as dotted quad (always 4 octets, regardless of leading value)."""
+        return self.prefix_str
+
+    @property
     def full_notation(self) -> str:
-        """Full 8-octet dotted notation: r.r.r.r.n.n.n.n"""
+        """Full 8-octet dotted notation: ``r.r.r.r.n.n.n.n`` (legacy)."""
         return f"{self.prefix_str}.{self.host_str}"
 
     @property
+    def dotted_notation(self) -> str:
+        """Spec alias for :pyattr:`full_notation`."""
+        return self.full_notation
+
+    @property
     def asn_notation(self) -> str:
-        """ASN dot notation: ASN.n.n.n.n"""
+        """Legacy ASN dot notation: ``ASN.n.n.n.n``."""
         return f"{self.asn}.{self.host_str}"
+
+    @property
+    def canonical(self) -> str:
+        """Spec canonical hyphenated form ``<RN>-<LA>``.
+
+        Uses integer RN when the leading RN octet is 0 and
+        :data:`ASN_SIMPLIFICATION` is True; otherwise dotted-quad RN.
+        """
+        if ASN_SIMPLIFICATION and self.routing_prefix[0] == 0:
+            return f"{self.asn}-{self.host_str}"
+        return f"{self.prefix_str}-{self.host_str}"
 
     # --- address class classification (Section 4) ----------------------------
 
@@ -135,6 +198,65 @@ class IPv8Address:
         """True if ASN 65533 — documentation and testing (Section 3.8)."""
         return self.asn == 65533
 
+    # --- spec reserved-block table (leading-RN-octet categories) ------------
+
+    def is_super_scalar(self) -> bool:
+        """True if leading RN octet is 1–32 — super-scalar RN pool."""
+        return 1 <= self.routing_prefix[0] <= 32
+
+    def is_rir_sub_rn(self) -> bool:
+        """True if leading RN octet is 110–119 — RIR-delegated sub-RN range."""
+        return 110 <= self.routing_prefix[0] <= 119
+
+    @property
+    def rir(self) -> str | None:
+        """RIR name for RIR sub-RN addresses, or None if not applicable.
+
+        Mapping: 110=ARIN, 111=RIPE, 112=APNIC, 113=LACNIC, 114=AFRINIC.
+        115–119 reserved for future RIR assignments.
+        """
+        _map = {110: "ARIN", 111: "RIPE", 112: "APNIC", 113: "LACNIC", 114: "AFRINIC"}
+        return _map.get(self.routing_prefix[0])
+
+    def is_cellular_carrier(self) -> bool:
+        """True if leading RN octet is 128–130 — cellular carrier RN range."""
+        return 128 <= self.routing_prefix[0] <= 130
+
+    def is_iana_reserved(self) -> bool:
+        """True if leading RN octet falls in a gap reserved by IANA.
+
+        Gaps: 33–99, 101–109, 120–126, 131–221, 223–254.
+        (0=IPv4-compat pool, 100=RINE, 127=internal zone,
+         222=interior link, 255=broadcast/multicast anchor — handled elsewhere.)
+        """
+        o = self.routing_prefix[0]
+        return (
+            33 <= o <= 99
+            or 101 <= o <= 109
+            or 120 <= o <= 126
+            or 131 <= o <= 221
+            or 223 <= o <= 254
+        )
+
+    def is_interop_prefix(self) -> bool:
+        """True if RN is 127.127.0.0 — legacy inter-company interop DMZ.
+
+        .. deprecated::
+            The 127.127.0.0/16 Inter-Company Interop Prefix has been removed
+            from the spec. Use the two-XLATE8 model instead. This method is
+            retained for backwards compatibility and will be removed in a
+            future release.
+        """
+        import warnings
+        warnings.warn(
+            "is_interop_prefix() is deprecated: the 127.127.0.0 Inter-Company "
+            "Interop Prefix has been removed from the spec. "
+            "Use the two-XLATE8 model (interop.py) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.routing_prefix == (127, 127, 0, 0)
+
     @property
     def address_class(self) -> str:
         """Return the address class name per Section 4."""
@@ -169,8 +291,8 @@ class IPv8Address:
             value >>= 8
         octets.reverse()
         return IPv8Address(
-            routing_prefix=tuple(octets[:4]),  # type: ignore[arg-type]
-            host_part=tuple(octets[4:]),  # type: ignore[arg-type]
+            routing_prefix=tuple(octets[:4]), # type: ignore[arg-type]
+            host_part=tuple(octets[4:]), # type: ignore[arg-type]
         )
 
     # --- parsing --------------------------------------------------------------
@@ -179,17 +301,77 @@ class IPv8Address:
     def parse(cls, text: str) -> "IPv8Address":
         """Parse an IPv8 address from a string.
 
-        Supported formats:
-        - Full 8-octet: ``r.r.r.r.n.n.n.n``
-        - ASN dot notation: ``ASN.n.n.n.n``
+        Supported input formats (spec draft-thain-ipv8 §3.5):
+
+        * Canonical hyphenated: ``<RN>-<LA>``
+          (``64496-192.0.2.1`` or ``127.10.60.10-10.0.0.1``)
+        * Legacy full 8-octet: ``r.r.r.r.n.n.n.n``
+        * Legacy dot-ASN: ``ASN.n.n.n.n``
+
+        Emit/`str` always returns the hyphenated canonical form.
         """
-        parts = text.strip().split(".")
+        text = text.strip()
+        if "-" in text:
+            return cls._parse_hyphenated(text)
+        parts = text.split(".")
         if len(parts) == 8:
             return cls._parse_full(parts)
         if len(parts) == 5:
             return cls._parse_asn_notation(parts)
         raise InvalidAddressError(
-            f"Expected 5 parts (ASN notation) or 8 parts (full notation), got {len(parts)}: {text}"
+            "Expected hyphenated ``<RN>-<LA>``, 5-part ASN notation, or "
+            f"8-part full notation, got {len(parts)} dot-parts: {text!r}"
+        )
+
+    @classmethod
+    def _parse_hyphenated(cls, text: str) -> "IPv8Address":
+        if text.count("-") != 1:
+            raise InvalidAddressError(
+                f"Hyphenated locator must contain exactly one '-': {text!r}"
+            )
+        rn_str, la_str = text.split("-", 1)
+        rn_str = rn_str.strip()
+        la_str = la_str.strip()
+        if not rn_str or not la_str:
+            raise InvalidAddressError(
+                f"Empty RN or LA component in hyphenated locator: {text!r}"
+            )
+        # RN part: integer or dotted quad
+        if "." in rn_str:
+            rn_parts = rn_str.split(".")
+            if len(rn_parts) != 4:
+                raise InvalidAddressError(
+                    f"RN dotted quad must have 4 octets, got {len(rn_parts)}: {rn_str!r}"
+                )
+            try:
+                rn_octets = tuple(int(p) for p in rn_parts)
+            except ValueError as exc:
+                raise InvalidAddressError(f"Non-integer RN octet: {exc}") from exc
+            for i, o in enumerate(rn_octets):
+                validate_octet(o, label=f"RN octet {i}")
+        else:
+            try:
+                rn_int = int(rn_str)
+            except ValueError as exc:
+                raise InvalidAddressError(f"Invalid RN integer: {exc}") from exc
+            if not 0 <= rn_int <= MAX_ASN:
+                raise InvalidASNError(f"RN must be 0-{MAX_ASN}, got {rn_int}")
+            rn_octets = asn_to_prefix(rn_int)
+        # LA part: dotted quad
+        la_parts = la_str.split(".")
+        if len(la_parts) != 4:
+            raise InvalidAddressError(
+                f"LA must be a 4-octet dotted quad, got {len(la_parts)} parts: {la_str!r}"
+            )
+        try:
+            la_octets = tuple(int(p) for p in la_parts)
+        except ValueError as exc:
+            raise InvalidAddressError(f"Non-integer LA octet: {exc}") from exc
+        for i, o in enumerate(la_octets):
+            validate_octet(o, label=f"LA octet {i}")
+        return cls(
+            routing_prefix=rn_octets, # type: ignore[arg-type]
+            host_part=la_octets, # type: ignore[arg-type]
         )
 
     @classmethod
@@ -201,8 +383,8 @@ class IPv8Address:
         for i, o in enumerate(octets):
             validate_octet(o, label=f"octet {i}")
         return cls(
-            routing_prefix=tuple(octets[:4]),  # type: ignore[arg-type]
-            host_part=tuple(octets[4:]),  # type: ignore[arg-type]
+            routing_prefix=tuple(octets[:4]), # type: ignore[arg-type]
+            host_part=tuple(octets[4:]), # type: ignore[arg-type]
         )
 
     @classmethod
@@ -220,12 +402,12 @@ class IPv8Address:
             raise InvalidAddressError(f"Non-integer octet in host part: {exc}") from exc
         for i, o in enumerate(host):
             validate_octet(o, label=f"host octet {i}")
-        return cls(routing_prefix=prefix, host_part=host)  # type: ignore[arg-type]
+        return cls(routing_prefix=prefix, host_part=host) # type: ignore[arg-type]
 
     # --- dunder ---------------------------------------------------------------
 
     def __str__(self) -> str:
-        return self.full_notation
+        return self.canonical
 
     def __repr__(self) -> str:
-        return f"IPv8Address({self.full_notation})"
+        return f"IPv8Address({self.canonical})"

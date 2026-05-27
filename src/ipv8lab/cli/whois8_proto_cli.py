@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""CLI for standalone WHOIS8 protocol per draft-thain-whois8-00."""
+"""CLI for standalone WHOIS8 protocol per draft-thain-whois8-."""
 
 from __future__ import annotations
 

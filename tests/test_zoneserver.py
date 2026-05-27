@@ -10,6 +10,11 @@ from ipv8lab.zoneserver import (
     ACL8Engine,
     ACL8Layer,
     ACL8Rule,
+    ClaimsACL8Engine,
+    ClaimsACLRule,
+    JWTAuditEvent,
+    JWTClaimsContext,
+    OAuth8AAASubstrate,
     OAuth8Cache,
     TokenStatus,
     ZoneServer,
@@ -284,3 +289,168 @@ class TestMakeZoneServerPair:
         p.acl8_engine.add_rule(ACL8Rule(source="a", destination="b"))
         assert p.acl8_engine.rule_count == 1
         assert s.acl8_engine.rule_count == 0
+
+
+# ===========================================================================
+# Step 13 — Identity-Driven Access Control
+# ===========================================================================
+
+def _make_aaa() -> tuple[OAuth8AAASubstrate, OAuth8Cache]:
+    """Return an AAA substrate with a pre-registered key."""
+    cache = OAuth8Cache()
+    cache.register_key("k1", b"secret")
+    aaa = OAuth8AAASubstrate(oauth8=cache)
+    return aaa, cache
+
+
+class TestClaimsACL8Engine:
+    """ACL8 evaluates JWT claims, not port state."""
+
+    def test_permit_matching_role(self):
+        eng = ClaimsACL8Engine()
+        eng.add_rule(ClaimsACLRule(required_role="admin", action=ACL8Action.PERMIT))
+        claims = JWTClaimsContext("dev1", frozenset({"admin"}), frozenset())
+        result = eng.evaluate(claims, "src", "dst")
+        assert result.is_permitted
+
+    def test_deny_missing_role(self):
+        eng = ClaimsACL8Engine()
+        eng.add_rule(ClaimsACLRule(required_role="admin", action=ACL8Action.PERMIT))
+        claims = JWTClaimsContext("dev1", frozenset({"user"}), frozenset())
+        result = eng.evaluate(claims, "src", "dst")
+        assert not result.is_permitted
+
+    def test_permit_matching_group(self):
+        eng = ClaimsACL8Engine()
+        eng.add_rule(ClaimsACLRule(required_group="zone-a", action=ACL8Action.PERMIT))
+        claims = JWTClaimsContext("dev1", frozenset(), frozenset({"zone-a"}))
+        assert eng.evaluate(claims, "*", "*").is_permitted
+
+    def test_default_deny_no_rules(self):
+        eng = ClaimsACL8Engine()
+        claims = JWTClaimsContext("dev1", frozenset({"admin"}), frozenset())
+        assert not eng.evaluate(claims, "src", "dst").is_permitted
+
+    def test_explicit_deny_rule(self):
+        eng = ClaimsACL8Engine(default_action=ACL8Action.PERMIT)
+        eng.add_rule(ClaimsACLRule(source_pattern="bad", action=ACL8Action.DENY))
+        claims = JWTClaimsContext("bad-dev", frozenset(), frozenset())
+        assert not eng.evaluate(claims, "bad", "dst").is_permitted
+
+    def test_rule_count(self):
+        eng = ClaimsACL8Engine()
+        assert eng.rule_count == 0
+        eng.add_rule(ClaimsACLRule())
+        assert eng.rule_count == 1
+
+    def test_no_role_or_group_required_matches_any(self):
+        eng = ClaimsACL8Engine()
+        eng.add_rule(ClaimsACLRule(action=ACL8Action.PERMIT))
+        claims = JWTClaimsContext("dev1", frozenset(), frozenset())
+        assert eng.evaluate(claims, "src", "dst").is_permitted
+
+
+class TestOAuth8AAASubstrate:
+    """OAuth8AAASubstrate — session lifecycle and NetLog8 audit policy."""
+
+    def test_start_session_valid_token(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=3600)
+        result = aaa.start_session("dev1", token)
+        assert result.is_valid
+        assert aaa.active_sessions == 1
+
+    def test_start_session_invalid_token_logged_as_failure(self):
+        aaa, _ = _make_aaa()
+        aaa.start_session("dev1", "bad.token.here")
+        assert len(aaa.audit_events_of_type(JWTAuditEvent.FAILURE)) == 1
+
+    def test_issuance_logged_on_valid_session(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=3600)
+        aaa.start_session("dev1", token)
+        assert len(aaa.audit_events_of_type(JWTAuditEvent.ISSUANCE)) == 1
+
+    # ------------------------------------------------------------------
+    # KEY REGRESSION: NetLog8 MUST be silent on a successful JWT check
+    # ------------------------------------------------------------------
+
+    def test_routine_check_does_not_emit_netlog8(self):
+        """NetLog8 MUST NOT emit on a successful mid-session JWT check.
+
+        This is the regression test required by Step 13: routine JWT
+        presentations are silenced.  Only issuance and failures are logged.
+        """
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=3600)
+        aaa.start_session("dev1", token)
+
+        aaa.acl.add_rule(ClaimsACLRule(action=ACL8Action.PERMIT))
+        # Perform 5 successful mid-session checks
+        for _ in range(5):
+            aaa.check_access("dev1", "src", "dst", raw_token=token)
+
+        # Only the single ISSUANCE event must exist — zero ROUTINE events
+        routine_events = aaa.audit_events_of_type(JWTAuditEvent.ROUTINE)
+        assert len(routine_events) == 0, (
+            "NetLog8 must NOT emit on routine JWT presentations"
+        )
+        assert len(aaa.audit_events_of_type(JWTAuditEvent.ISSUANCE)) == 1
+
+    def test_check_access_denied_on_expired_token(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=1, now=0.0)
+        aaa.start_session("dev1", token, now=0.0)
+        result = aaa.check_access("dev1", "src", "dst", raw_token=token, now=9999.0)
+        assert not result.is_permitted
+
+    def test_failure_logged_on_expired_token_check(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=1, now=0.0)
+        aaa.start_session("dev1", token, now=0.0)
+        aaa.check_access("dev1", "src", "dst", raw_token=token, now=9999.0)
+        assert len(aaa.audit_events_of_type(JWTAuditEvent.FAILURE)) >= 1
+
+    def test_check_access_no_active_session(self):
+        aaa, _ = _make_aaa()
+        result = aaa.check_access("ghost", "src", "dst")
+        assert not result.is_permitted
+
+    def test_end_session_removes_session(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=3600)
+        aaa.start_session("dev1", token)
+        assert aaa.end_session("dev1")
+        assert aaa.active_sessions == 0
+
+    def test_end_session_nonexistent_returns_false(self):
+        aaa, _ = _make_aaa()
+        assert not aaa.end_session("ghost")
+
+    def test_claims_roles_from_token(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=3600,
+                                  extra_claims={"roles": ["admin", "viewer"]})
+        aaa.start_session("dev1", token)
+        aaa.acl.add_rule(ClaimsACLRule(required_role="admin", action=ACL8Action.PERMIT))
+        result = aaa.check_access("dev1", "src", "dst")
+        assert result.is_permitted
+
+    def test_claims_groups_from_token(self):
+        aaa, cache = _make_aaa()
+        token = cache.issue_token("k1", "dev1", duration=3600,
+                                  extra_claims={"groups": ["zone-prod"]})
+        aaa.start_session("dev1", token)
+        aaa.acl.add_rule(ClaimsACLRule(required_group="zone-prod", action=ACL8Action.PERMIT))
+        result = aaa.check_access("dev1", "src", "dst")
+        assert result.is_permitted
+
+    def test_multiple_sessions_independent(self):
+        aaa, cache = _make_aaa()
+        t1 = cache.issue_token("k1", "dev1", duration=3600)
+        t2 = cache.issue_token("k1", "dev2", duration=3600)
+        aaa.start_session("dev1", t1)
+        aaa.start_session("dev2", t2)
+        assert aaa.active_sessions == 2
+        aaa.end_session("dev1")
+        assert aaa.active_sessions == 1

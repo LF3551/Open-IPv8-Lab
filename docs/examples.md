@@ -25,8 +25,8 @@ IPv8 addresses are 64 bits: a 32-bit ASN routing prefix + a 32-bit host part.
 
 ```bash
 # ASN dot notation → full 8-octet notation
-$ ipv8lab addr parse 64496.192.0.2.1
-Input                64496.192.0.2.1
+$ ipv8lab addr parse 64496-192.0.2.1
+Input                64496-192.0.2.1
 Format               ASN dot notation
 ASN                  64496
 Routing prefix       0.0.251.240
@@ -51,20 +51,20 @@ $ ipv8lab addr decode-prefix 0.0.251.240
 64496
 
 # Classify address type
-$ ipv8lab addr classify 64496.192.0.2.1
+$ ipv8lab addr classify 64496-192.0.2.1
 Type: unicast
 
 # Classify multicast
-$ ipv8lab addr classify 64496.224.0.0.1
+$ ipv8lab addr classify 64496-224.0.0.1
 Type: multicast
 
 # Classify RINE
-$ ipv8lab addr classify 64496.100.0.0.1
+$ ipv8lab addr classify 64496-100.0.0.1
 Type: rine_prefix
 
 # JSON output (all commands)
-$ ipv8lab addr parse 64496.192.0.2.1 --json
-{"input": "64496.192.0.2.1", "format": "asn_dot", "asn": 64496, ...}
+$ ipv8lab addr parse 64496-192.0.2.1 --json
+{"input": "64496-192.0.2.1", "format": "asn_dot", "asn": 64496, ...}
 ```
 
 ### Address Usage Model
@@ -82,13 +82,13 @@ $ ipv8lab usage table
 
 ```bash
 # Build a packet with payload
-$ ipv8lab packet build --src 64496.192.0.2.1 --dst 64497.198.51.100.7 --payload "hello"
+$ ipv8lab packet build --src 64496-192.0.2.1 --dst 64497-198.51.100.7 --payload "hello"
 
 # Hex dump of a binary packet file
 $ ipv8lab packet dump packet.bin
 
 # Fragment a large packet (MTU = 64 bytes)
-$ ipv8lab frag fragment --src 64496.10.0.0.1 --dst 64497.10.0.0.2 --size 256 --mtu 64
+$ ipv8lab frag fragment --src 64496-10.0.0.1 --dst 64497-10.0.0.2 --size 256 --mtu 64
 
 # Packet fuzzer — test header robustness
 $ ipv8lab fuzz run --count 100 --json
@@ -105,7 +105,7 @@ Two-tier routing: Tier 1 (ASN prefix) → Tier 2 (host n.n.n.n).
 $ ipv8lab route simulate --config examples/two_asn_demo.yaml
 
 # Traceroute diagnostic
-$ ipv8lab traceroute run 64496.10.0.0.1 64497.10.0.0.1 --hops 8 --json
+$ ipv8lab traceroute run 64496-10.0.0.1 64497-10.0.0.1 --hops 8 --json
 ```
 
 ### Cost Factor metric
@@ -193,9 +193,9 @@ Per-prefix RIB with CF metric, anomaly detection, failover.
 ```bash
 # BGP8 path selection (positional: PREFIX ORIGIN_ASN)
 $ ipv8lab bgp8 init --asn 64496
-$ ipv8lab bgp8 advertise 64496.0.0.0.0/8 64496 --next-hop 0.0.251.241
+$ ipv8lab bgp8 advertise 64496-0.0.0.0/8 64496 --next-hop 0.0.251.241
 $ ipv8lab bgp8 rib
-$ ipv8lab bgp8 select 64496.0.0.0.0/8 --json
+$ ipv8lab bgp8 select 64496-0.0.0.0/8 --json
 ```
 
 ### XLATE8 traffic flow
@@ -219,7 +219,7 @@ $ ipv8lab xlate8lb status --json
 
 ```bash
 $ ipv8lab rineprot init
-$ ipv8lab rineprot bgp8 64496.100.0.0.1
+$ ipv8lab rineprot bgp8 64496-100.0.0.1
 $ ipv8lab rineprot alerts --json
 ```
 
@@ -227,8 +227,8 @@ $ ipv8lab rineprot alerts --json
 
 ```bash
 $ ipv8lab ilinkprot init
-$ ipv8lab ilinkprot bgp8 64496.222.0.0.1
-$ ipv8lab ilinkprot packet 64496.222.0.0.1
+$ ipv8lab ilinkprot bgp8 64496-222.0.0.1
+$ ipv8lab ilinkprot packet 64496-222.0.0.1
 $ ipv8lab ilinkprot traps --json
 ```
 
@@ -236,7 +236,7 @@ $ ipv8lab ilinkprot traps --json
 
 ```bash
 $ ipv8lab prefixenf init
-$ ipv8lab prefixenf check 64496.10.1.0.0 24 --peer-asn 64497
+$ ipv8lab prefixenf check 64496-10.1.0.0 24 --peer-asn 64497
 $ ipv8lab prefixenf alerts --json
 ```
 
@@ -244,7 +244,7 @@ $ ipv8lab prefixenf alerts --json
 
 ```bash
 $ ipv8lab cgnat init
-$ ipv8lab cgnat translate 64496.10.0.0.1
+$ ipv8lab cgnat translate 64496-10.0.0.1
 $ ipv8lab cgnat status --json
 ```
 
@@ -252,7 +252,7 @@ $ ipv8lab cgnat status --json
 
 ## 8. WHOIS8 Registry
 
-Standalone WHOIS8 protocol per draft-thain-whois8-00.
+Standalone WHOIS8 protocol per draft-thain-whois8.
 
 ```bash
 # Initialize server
@@ -284,7 +284,7 @@ $ ipv8lab whois8 list --json
 
 ## 9. NetLog8 Monitoring
 
-Standalone NetLog8 protocol per draft-thain-netlog8-00.
+Standalone NetLog8 protocol per draft-thain-netlog8.
 
 ```bash
 # Initialize collector

@@ -63,7 +63,7 @@ def translate(
     else:
         typer.echo(f"Original:   {d['original']}")
         typer.echo(f"Translated: {d['translated']}")
-        typer.echo(f"r.r.r.r preserved: {d['prefix_preserved']}")
+        typer.echo(f"RN preserved: {d['prefix_preserved']}")
         if result.violation != CGNATViolation.NONE:
             typer.echo(f"VIOLATION: {result.violation.value} — {result.note}")
 
@@ -74,7 +74,7 @@ def validate(
     translated: str = typer.Argument(..., help="Translated address"),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """Validate that a translation preserved r.r.r.r."""
+    """Validate that a translation preserved the RN (Routing Number)."""
     engine = _get_engine()
     orig = IPv8Address.parse(original)
     trans = IPv8Address.parse(translated)
@@ -84,7 +84,7 @@ def validate(
         typer.echo(json.dumps(d))
     else:
         if v == CGNATViolation.NONE:
-            typer.echo("OK — r.r.r.r preserved")
+            typer.echo("OK — RN preserved")
         else:
             typer.echo(f"VIOLATION: {v.value}")
 

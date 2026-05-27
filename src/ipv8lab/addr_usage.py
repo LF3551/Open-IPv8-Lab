@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Address Usage Model per draft-thain-ipv8-02 Section 4.11.
+"""Address Usage Model per draft-thain-ipv8- Section 4.11.
 
 Consolidated address space table mapping every r.r.r.r / n.n.n.n
 combination to its usage category and external routing disposition.

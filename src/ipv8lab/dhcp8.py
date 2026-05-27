@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""DHCP8 lease simulation per draft-thain-ipv8-02 Section 1.3.
+"""DHCP8 lease simulation per draft-thain-ipv8- Section 1.3.
 
 A device connecting to an IPv8 network sends one DHCP8 Discover and
 receives one response containing every service endpoint it requires.
@@ -26,6 +26,11 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from ipv8lab.address import IPv8Address
+from ipv8lab.interface_mode import (
+    DHCP8_OPT_IFACE_MODE,
+    DHCP8_OPT_PRIMARY_RN,
+    InterfaceMode,
+)
 
 
 class DHCP8MessageType(Enum):
@@ -64,6 +69,11 @@ class DHCP8Lease:
     oob_vlan: int = 4091
     services: DHCP8ServiceEndpoints = field(default_factory=DHCP8ServiceEndpoints)
     issued_at: float = 0.0
+    # --- spec options 222 / 223 ---
+    primary_rn: int = 0
+    """DHCP8 option 222 — segment Primary RN (4-byte big-endian on wire)."""
+    interface_mode: InterfaceMode = InterfaceMode.NORMAL
+    """DHCP8 option 223 — per-interface operating mode (1 byte on wire)."""
 
     @property
     def expires_at(self) -> float:
@@ -121,6 +131,10 @@ class DHCP8Server:
     pool: DHCP8Pool
     services: DHCP8ServiceEndpoints = field(default_factory=DHCP8ServiceEndpoints)
     lease_duration: int = 86400
+    primary_rn: int = 0
+    """Primary RN advertised to clients via DHCP8 option 222."""
+    interface_mode: InterfaceMode = InterfaceMode.NORMAL
+    """Interface mode delivered to clients via DHCP8 option 223."""
     _leases: dict[str, DHCP8Lease] = field(default_factory=dict)
     _clock: object = field(default=None)
 
@@ -160,6 +174,8 @@ class DHCP8Server:
             lease_duration=self.lease_duration,
             services=self.services,
             issued_at=now,
+            primary_rn=self.primary_rn,
+            interface_mode=self.interface_mode,
         )
         self._leases[client_id] = lease
         return lease

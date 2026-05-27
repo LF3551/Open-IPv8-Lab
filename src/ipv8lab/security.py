@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""Border router security checks per draft-thain-ipv8-02 Section 18.
+"""Border router security checks per draft-thain-ipv8- Section 18.
 
 Implements ingress/egress filtering rules for IPv8 border routers:
 - 18.1: ASN prefix spoofing — source r.r.r.r must match peer ASN

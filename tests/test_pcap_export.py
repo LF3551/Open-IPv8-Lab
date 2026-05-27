@@ -13,14 +13,20 @@ from ipv8lab.capture import CapturedPacket, PacketCapture
 from ipv8lab.packet import IPv8Packet
 from ipv8lab.pcap_export import (
     PCAP_MAGIC,
+    DLT_EN10MB,
     DLT_USER0,
+    ETH_P_IP,
+    ETH_P_IPV8,
     PcapReader,
     PcapStats,
     PcapWriter,
+    WireEncap,
+    _build_eth_frame,
     generate_lua_dissector,
     iv8cap_to_pcap,
     pcap_to_capture,
     save_lua_dissector,
+    select_encap,
     _PCAP_GLOBAL_FMT,
     _PCAP_GLOBAL_SIZE,
 )
@@ -221,3 +227,128 @@ class TestLuaDissector:
         assert path.exists()
         content = path.read_text()
         assert "Proto(" in content
+
+
+# ---------------------------------------------------------------------------
+# EtherType / WireEncap (Step 7)
+# ---------------------------------------------------------------------------
+
+class TestEtherTypeConstants:
+    def test_eth_p_ipv8_value(self) -> None:
+        assert ETH_P_IPV8 == 0x8080
+
+    def test_eth_p_ip_value(self) -> None:
+        assert ETH_P_IP == 0x0800
+
+    def test_dlt_en10mb_value(self) -> None:
+        assert DLT_EN10MB == 1
+
+    def test_wire_encap_values(self) -> None:
+        assert WireEncap.ETH_P_IP == ETH_P_IP
+        assert WireEncap.ETH_P_IPV8 == ETH_P_IPV8
+        assert WireEncap.DLT_USER0 == DLT_USER0
+
+
+class TestSelectEncap:
+    def test_same_rn_returns_eth_p_ip(self) -> None:
+        # src and dst both equal the segment primary → ETH_P_IP
+        result = select_encap(src_rn=64496, dst_rn=64496, segment_primary_rn=64496)
+        assert result == WireEncap.ETH_P_IP
+
+    def test_different_dst_rn_returns_eth_p_ipv8(self) -> None:
+        result = select_encap(src_rn=64496, dst_rn=64497, segment_primary_rn=64496)
+        assert result == WireEncap.ETH_P_IPV8
+
+    def test_different_src_rn_returns_eth_p_ipv8(self) -> None:
+        result = select_encap(src_rn=64497, dst_rn=64496, segment_primary_rn=64496)
+        assert result == WireEncap.ETH_P_IPV8
+
+    def test_both_different_returns_eth_p_ipv8(self) -> None:
+        result = select_encap(src_rn=64497, dst_rn=64498, segment_primary_rn=64496)
+        assert result == WireEncap.ETH_P_IPV8
+
+
+class TestBuildEthFrame:
+    def test_eth_frame_length(self) -> None:
+        payload = b"\x45" * 28
+        frame = _build_eth_frame(payload, ETH_P_IPV8)
+        # 6 (dst mac) + 6 (src mac) + 2 (ethertype) + 28 (payload) = 42
+        assert len(frame) == 42
+
+    def test_eth_frame_ethertype_ipv8(self) -> None:
+        payload = b"\x00" * 28
+        frame = _build_eth_frame(payload, ETH_P_IPV8)
+        ethertype = struct.unpack("!H", frame[12:14])[0]
+        assert ethertype == ETH_P_IPV8
+
+    def test_eth_frame_ethertype_ip(self) -> None:
+        payload = b"\x00" * 28
+        frame = _build_eth_frame(payload, ETH_P_IP)
+        ethertype = struct.unpack("!H", frame[12:14])[0]
+        assert ethertype == ETH_P_IP
+
+    def test_payload_preserved(self) -> None:
+        payload = b"\xAB\xCD" * 14
+        frame = _build_eth_frame(payload, ETH_P_IPV8)
+        assert frame[14:] == payload
+
+
+class TestPcapWriterEncap:
+    def test_default_encap_is_dlt_user0(self) -> None:
+        w = PcapWriter()
+        pkt = _make_pkt()
+        w.add_packet(pkt)
+        data = w.to_bytes()
+        _, _, _, _, _, _, link_type = struct.unpack(_PCAP_GLOBAL_FMT, data[:_PCAP_GLOBAL_SIZE])
+        assert link_type == DLT_USER0
+
+    def test_eth_encap_upgrades_link_type(self) -> None:
+        w = PcapWriter()
+        pkt = _make_pkt()
+        w.add_packet(pkt, encap=WireEncap.ETH_P_IPV8)
+        data = w.to_bytes()
+        _, _, _, _, _, _, link_type = struct.unpack(_PCAP_GLOBAL_FMT, data[:_PCAP_GLOBAL_SIZE])
+        assert link_type == DLT_EN10MB
+
+    def test_eth_encap_adds_ethernet_header(self) -> None:
+        w = PcapWriter()
+        pkt = _make_pkt()
+        raw_ipv8 = pkt.to_bytes()
+        w.add_packet(pkt, encap=WireEncap.ETH_P_IPV8)
+        data = w.to_bytes()
+        # skip global header (24) + packet record header (16)
+        frame = data[_PCAP_GLOBAL_SIZE + 16:]
+        assert len(frame) == 14 + len(raw_ipv8)
+        ethertype = struct.unpack("!H", frame[12:14])[0]
+        assert ethertype == ETH_P_IPV8
+
+    def test_eth_p_ip_encap(self) -> None:
+        w = PcapWriter()
+        pkt = _make_pkt()
+        w.add_packet(pkt, encap=WireEncap.ETH_P_IP)
+        data = w.to_bytes()
+        frame = data[_PCAP_GLOBAL_SIZE + 16:]
+        ethertype = struct.unpack("!H", frame[12:14])[0]
+        assert ethertype == ETH_P_IP
+
+
+class TestLuaDissectorStep7:
+    def test_ethertype_registration(self) -> None:
+        lua = generate_lua_dissector()
+        assert "ethertype" in lua
+        assert "0x8080" in lua
+
+    def test_field_names_use_rn(self) -> None:
+        lua = generate_lua_dissector()
+        assert "src_rn" in lua
+        assert "dst_rn" in lua
+
+    def test_no_old_asn_fields(self) -> None:
+        lua = generate_lua_dissector()
+        assert "src_asn" not in lua
+        assert "dst_asn" not in lua
+
+    def test_both_wtap_and_ethertype(self) -> None:
+        lua = generate_lua_dissector()
+        assert "wtap_encap" in lua
+        assert "ethertype" in lua

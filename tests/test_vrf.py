@@ -15,6 +15,8 @@ from ipv8lab.vrf import (
     OOB_VRF_NAME,
     VRF,
     VRFManager,
+    ipv8_vrf_name,
+    ipv8_vrf_rd,
 )
 
 
@@ -121,3 +123,93 @@ class TestVRFRouting:
         mgr.default.add_route(route)
         addr = IPv8Address.parse("0.0.0.0.192.168.1.1")
         assert mgr.default.lookup(addr) is not None
+
+
+# ---------------------------------------------------------------------------
+# RN VRF naming convention (spec §3.2)
+# ---------------------------------------------------------------------------
+
+class TestIPv8VRFHelpers:
+    def test_vrf_name_format(self):
+        assert ipv8_vrf_name(64496) == "ipv8-asn-64496"
+        assert ipv8_vrf_name(0) == "ipv8-asn-0"
+        assert ipv8_vrf_name(4294967295) == "ipv8-asn-4294967295"
+
+    def test_vrf_rd_format(self):
+        assert ipv8_vrf_rd(64496) == "64496:65535"
+        assert ipv8_vrf_rd(0) == "0:65535"
+
+
+class TestBindRN:
+    def test_bind_rn_creates_vrf(self):
+        mgr = VRFManager()
+        vrf = mgr.bind_rn(64496)
+        assert vrf.name == "ipv8-asn-64496"
+        assert vrf.route_distinguisher == "64496:65535"
+        assert vrf.bound_rn == 64496
+
+    def test_bind_rn_idempotent(self):
+        mgr = VRFManager()
+        v1 = mgr.bind_rn(64496)
+        v2 = mgr.bind_rn(64496)
+        assert v1 is v2
+
+    def test_bind_rn_multiple(self):
+        mgr = VRFManager()
+        mgr.bind_rn(64496)
+        mgr.bind_rn(64497)
+        mgr.bind_rn(100)
+        assert "ipv8-asn-64496" in mgr.list_vrfs()
+        assert "ipv8-asn-64497" in mgr.list_vrfs()
+        assert "ipv8-asn-100" in mgr.list_vrfs()
+
+    def test_get_rn_vrf(self):
+        mgr = VRFManager()
+        mgr.bind_rn(64496)
+        vrf = mgr.get_rn_vrf(64496)
+        assert vrf is not None
+        assert vrf.bound_rn == 64496
+
+    def test_get_rn_vrf_not_bound_returns_none(self):
+        mgr = VRFManager()
+        assert mgr.get_rn_vrf(64496) is None
+
+    def test_has_forwarding_context_true(self):
+        mgr = VRFManager()
+        mgr.bind_rn(64496)
+        assert mgr.has_forwarding_context(64496)
+
+    def test_has_forwarding_context_false_for_transit(self):
+        mgr = VRFManager()
+        # 64497 not bound — transit-only
+        assert not mgr.has_forwarding_context(64497)
+
+    def test_bound_rns_sorted(self):
+        mgr = VRFManager()
+        mgr.bind_rn(64498)
+        mgr.bind_rn(64496)
+        mgr.bind_rn(64497)
+        assert mgr.bound_rns() == [64496, 64497, 64498]
+
+    def test_bind_rn_custom_description(self):
+        mgr = VRFManager()
+        vrf = mgr.bind_rn(64496, description="corp uplink")
+        assert vrf.description == "corp uplink"
+
+    def test_bind_rn_default_description(self):
+        mgr = VRFManager()
+        vrf = mgr.bind_rn(64496)
+        assert "64496" in vrf.description
+
+    def test_rn_vrf_isolated_from_management(self):
+        mgr = VRFManager()
+        mgr.bind_rn(64496)
+        assert mgr.is_isolated("ipv8-asn-64496", MGMT_VRF_NAME)
+
+    def test_rn_vrf_has_routing_table(self):
+        mgr = VRFManager()
+        vrf = mgr.bind_rn(64496)
+        route = Route(destination_prefix="0.0.0.0", next_hop="10.0.0.1", interface="eth0")
+        vrf.add_route(route)
+        addr = IPv8Address.parse("0-10.1.2.3")
+        assert vrf.lookup(addr) is not None

@@ -1,7 +1,7 @@
 # Copyright 2026 Aleksei Aleinikov
 # SPDX-License-Identifier: Apache-2.0
 
-"""CLI for ARP8-driven version selection per draft-thain-ipv8-02 Section 2."""
+"""CLI for ARP8-driven version selection per draft-thain-ipv8- Section 2."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def _frame_dict(f: TransmittedFrame) -> dict[str, object]:
 
 @app.command()
 def discover(
-    target: str = typer.Argument(..., help="Neighbor IP (r.r.r.r.n.n.n.n)"),
+    target: str = typer.Argument(..., help="Neighbor IPv8 address (<RN>-<LA>)"),
     ipv8_capable: bool = typer.Option(True, "--ipv8/--ipv4", help="Simulate neighbor as IPv8 or IPv4-only."),
     mac: str = typer.Option("aa:bb:cc:dd:ee:ff", help="MAC address"),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON"),
@@ -64,8 +64,8 @@ def discover(
 
 @app.command()
 def select(
-    src: str = typer.Argument(..., help="Source address (r.r.r.r.n.n.n.n)"),
-    dst: str = typer.Argument(..., help="Destination address (r.r.r.r.n.n.n.n)"),
+    src: str = typer.Argument(..., help="Source address (<RN>-<LA>)"),
+    dst: str = typer.Argument(..., help="Destination address (<RN>-<LA>)"),
     neighbor: str = typer.Option("", help="Neighbor IP to look up in cache (defaults to dst)."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:

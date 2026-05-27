@@ -10,7 +10,7 @@
 [![PyPI](https://img.shields.io/pypi/v/open-ipv8-lab.svg)](https://pypi.org/project/open-ipv8-lab/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20201237.svg)](https://doi.org/10.5281/zenodo.20201237)
 
-Experimental userspace toolkit implementing [draft-thain-ipv8-02](https://www.ietf.org/archive/id/draft-thain-ipv8-02.html) — the Internet Protocol Version 8 specification.
+Experimental userspace toolkit implementing [draft-thain-ipv8](https://www.ietf.org/archive/id/draft-thain-ipv8.html) — the Internet Protocol Version 8 specification.
 
 !!! note "Educational project"
     Not an official IPv8 implementation, not production networking software.
@@ -25,10 +25,10 @@ Created and maintained by **Aleksei Aleinikov** ([@LF3551](https://github.com/LF
 pip install open-ipv8-lab
 
 # Parse an IPv8 address
-ipv8lab addr parse 64496.192.0.2.1
+ipv8lab addr parse 64496-192.0.2.1
 
 # Build a packet
-ipv8lab packet build --src 64496.192.0.2.1 --dst 64497.198.51.100.7 --payload "hello"
+ipv8lab packet build --src 64496-192.0.2.1 --dst 64497-198.51.100.7 --payload "hello"
 
 # Routing simulation
 ipv8lab route simulate --config examples/two_asn_demo.yaml
