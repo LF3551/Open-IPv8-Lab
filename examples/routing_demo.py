@@ -15,7 +15,7 @@ print(f"Network: {sim.name}")
 print(f"Nodes:   {', '.join(sim.nodes)}")
 print()
 
-trace = sim.send("node-a", "64497.198.51.100.7", "hello")
+trace = sim.send("node-a", "64497-198.51.100.7", "hello")
 print("Trace:")
 for line in trace:
     print(f"  {line}")

@@ -29,7 +29,7 @@ async def main() -> None:
     try:
         trace = await net.send_and_wait(
             "node-a",
-            "64497.198.51.100.7",
+            "64497-198.51.100.7",
             "hello via UDP!",
         )
         print("Trace:")
