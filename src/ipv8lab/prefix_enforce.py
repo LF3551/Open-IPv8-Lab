@@ -84,7 +84,7 @@ class BGP8PrefixAd:
 
     @property
     def cidr(self) -> str:
-        return f"{self.prefix.full_notation}/{self.prefix_length}"
+        return f"{self.prefix.canonical}/{self.prefix_length}"
 
     def is_too_specific(self) -> bool:
         """True if the prefix is more specific than /16."""

@@ -27,7 +27,7 @@ runner = CliRunner()
 class TestBGP8PrefixAd:
     def test_cidr(self) -> None:
         ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=16)
-        assert ad.cidr == "0.0.251.240.10.0.0.0/16"
+        assert ad.cidr == "64496-10.0.0.0/16"
 
     def test_is_too_specific_true(self) -> None:
         ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24)

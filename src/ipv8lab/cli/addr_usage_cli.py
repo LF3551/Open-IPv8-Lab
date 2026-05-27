@@ -52,7 +52,7 @@ def classify(
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"Address:  {d['address']}")
+        typer.echo(f"Address:  {addr.canonical}")
         typer.echo(f"Pattern:  {d['pattern']}")
         typer.echo(f"Usage:    {d['usage']}")
         typer.echo(f"Routing:  {d['external_routing']}")
@@ -70,5 +70,6 @@ def batch(
         typer.echo(json.dumps(results))
     else:
         for d in results:
-            entry = classify_address(IPv8Address.parse(d["address"]))
-            typer.echo(f"{d['address']:<35} {entry.usage:<35} {entry.external_routing.value}")
+            addr = IPv8Address.parse(d["address"])
+            entry = classify_address(addr)
+            typer.echo(f"{addr.canonical:<35} {entry.usage:<35} {entry.external_routing.value}")
