@@ -28,48 +28,48 @@ from ipv8lab.traceroute8 import (
 class TestTopology:
     def test_add_router(self) -> None:
         topo = Topology()
-        r = topo.add_router("R0", "64496.10.0.0.1")
+        r = topo.add_router("R0", "64496-10.0.0.1")
         assert r.name == "R0"
         assert topo.router_count == 1
 
     def test_add_router_with_routes(self) -> None:
         topo = Topology()
-        r = topo.add_router("R0", "64496.10.0.0.1", {"*": "R1"})
-        assert r.lookup(IPv8Address.parse("64497.10.0.0.1")) == "R1"
+        r = topo.add_router("R0", "64496-10.0.0.1", {"*": "R1"})
+        assert r.lookup(IPv8Address.parse("64497-10.0.0.1")) == "R1"
 
     def test_get_router(self) -> None:
         topo = Topology()
-        topo.add_router("R0", "64496.10.0.0.1")
+        topo.add_router("R0", "64496-10.0.0.1")
         assert topo.get_router("R0") is not None
         assert topo.get_router("R999") is None
 
     def test_router_count(self) -> None:
         topo = Topology()
         assert topo.router_count == 0
-        topo.add_router("R0", "64496.10.0.0.1")
-        topo.add_router("R1", "64497.10.0.0.1")
+        topo.add_router("R0", "64496-10.0.0.1")
+        topo.add_router("R1", "64497-10.0.0.1")
         assert topo.router_count == 2
 
 
 class TestRouter:
     def test_lookup_exact(self) -> None:
-        prefix = IPv8Address.parse("64497.10.0.0.1").prefix_str
-        r = Router("R0", IPv8Address.parse("64496.10.0.0.1"), {prefix: "R1"})
-        assert r.lookup(IPv8Address.parse("64497.10.0.0.1")) == "R1"
+        prefix = IPv8Address.parse("64497-10.0.0.1").prefix_str
+        r = Router("R0", IPv8Address.parse("64496-10.0.0.1"), {prefix: "R1"})
+        assert r.lookup(IPv8Address.parse("64497-10.0.0.1")) == "R1"
 
     def test_lookup_default(self) -> None:
-        r = Router("R0", IPv8Address.parse("64496.10.0.0.1"), {"*": "R1"})
-        assert r.lookup(IPv8Address.parse("64500.10.0.0.1")) == "R1"
+        r = Router("R0", IPv8Address.parse("64496-10.0.0.1"), {"*": "R1"})
+        assert r.lookup(IPv8Address.parse("64500-10.0.0.1")) == "R1"
 
     def test_lookup_none(self) -> None:
-        r = Router("R0", IPv8Address.parse("64496.10.0.0.1"))
-        assert r.lookup(IPv8Address.parse("64500.10.0.0.1")) is None
+        r = Router("R0", IPv8Address.parse("64496-10.0.0.1"))
+        assert r.lookup(IPv8Address.parse("64500-10.0.0.1")) is None
 
     def test_lookup_specific_over_default(self) -> None:
-        prefix = IPv8Address.parse("64497.10.0.0.1").prefix_str
-        r = Router("R0", IPv8Address.parse("64496.10.0.0.1"), {prefix: "R2", "*": "R1"})
-        assert r.lookup(IPv8Address.parse("64497.10.0.0.1")) == "R2"
-        assert r.lookup(IPv8Address.parse("64500.10.0.0.1")) == "R1"
+        prefix = IPv8Address.parse("64497-10.0.0.1").prefix_str
+        r = Router("R0", IPv8Address.parse("64496-10.0.0.1"), {prefix: "R2", "*": "R1"})
+        assert r.lookup(IPv8Address.parse("64497-10.0.0.1")) == "R2"
+        assert r.lookup(IPv8Address.parse("64500-10.0.0.1")) == "R1"
 
 
 # ---------------------------------------------------------------------------
@@ -79,12 +79,12 @@ class TestRouter:
 class TestTracerouteResult:
     def test_to_dict(self) -> None:
         result = TracerouteResult(
-            src=IPv8Address.parse("64496.10.0.0.1"),
-            dst=IPv8Address.parse("64497.10.0.0.1"),
+            src=IPv8Address.parse("64496-10.0.0.1"),
+            dst=IPv8Address.parse("64497-10.0.0.1"),
             completed=True,
         )
         result.hops.append(Hop(
-            ttl=1, address=IPv8Address.parse("64497.10.0.0.1"),
+            ttl=1, address=IPv8Address.parse("64497-10.0.0.1"),
             router_name="R1", rtt_ms=1.5,
             icmp_type=ICMPv8Type.ECHO_REPLY, reached=True,
         ))
@@ -95,16 +95,16 @@ class TestTracerouteResult:
 
     def test_path_addresses(self) -> None:
         result = TracerouteResult(
-            src=IPv8Address.parse("64496.10.0.0.1"),
-            dst=IPv8Address.parse("64498.10.0.0.1"),
+            src=IPv8Address.parse("64496-10.0.0.1"),
+            dst=IPv8Address.parse("64498-10.0.0.1"),
         )
         result.hops.append(Hop(
-            ttl=1, address=IPv8Address.parse("64497.10.0.0.1"),
+            ttl=1, address=IPv8Address.parse("64497-10.0.0.1"),
             router_name="R1", rtt_ms=1.0,
             icmp_type=ICMPv8Type.TIME_EXCEEDED,
         ))
         result.hops.append(Hop(
-            ttl=2, address=IPv8Address.parse("64498.10.0.0.1"),
+            ttl=2, address=IPv8Address.parse("64498-10.0.0.1"),
             router_name="R2", rtt_ms=2.0,
             icmp_type=ICMPv8Type.ECHO_REPLY, reached=True,
         ))
@@ -244,7 +244,7 @@ class TestTracerouteMultiPath:
 class TestEdgeCases:
     def test_src_is_dst(self) -> None:
         topo = Topology()
-        topo.add_router("R0", "64496.10.0.0.1")
+        topo.add_router("R0", "64496-10.0.0.1")
         addr = topo.routers["R0"].address
         result = traceroute(topo, addr, addr)
         assert result.completed
@@ -258,23 +258,23 @@ class TestEdgeCases:
 
     def test_empty_topology(self) -> None:
         topo = Topology()
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.1")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.1")
         result = traceroute(topo, src, dst)
         assert not result.completed
         assert result.error is not None
 
     def test_no_route_at_router(self) -> None:
         topo = Topology()
-        topo.add_router("R0", "64496.10.0.0.1")  # no routes
+        topo.add_router("R0", "64496-10.0.0.1")  # no routes
         src = topo.routers["R0"].address
-        dst = IPv8Address.parse("64500.10.0.0.1")
+        dst = IPv8Address.parse("64500-10.0.0.1")
         result = traceroute(topo, src, dst)
         assert not result.completed
 
     def test_string_addresses(self) -> None:
         topo, _, _ = build_linear_topology(3)
-        result = traceroute(topo, "64496.10.0.0.1", "64498.10.0.0.1")
+        result = traceroute(topo, "64496-10.0.0.1", "64498-10.0.0.1")
         assert result.completed
 
     def test_start_ttl(self) -> None:

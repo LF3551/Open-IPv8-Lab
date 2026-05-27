@@ -33,8 +33,8 @@ from ipv8lab.pcap_export import (
 
 
 def _make_pkt(
-    src: str = "64496.10.0.1.1",
-    dst: str = "64497.10.0.1.100",
+    src: str = "64496-10.0.1.1",
+    dst: str = "64497-10.0.1.100",
     payload: bytes = b"test",
 ) -> IPv8Packet:
     return IPv8Packet(

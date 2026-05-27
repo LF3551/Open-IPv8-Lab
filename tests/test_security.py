@@ -18,12 +18,12 @@ def _pkt(src: str, dst: str) -> IPv8Packet:
 class TestIngressFilter:
     def test_valid_packet_no_violations(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("64496.192.0.2.1", "64497.198.51.100.7")
+        pkt = _pkt("64496-192.0.2.1", "64497-198.51.100.7")
         assert filt.check(pkt) == []
 
     def test_asn_spoofing(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("64497.192.0.2.1", "64496.10.0.0.1")  # src ASN != peer
+        pkt = _pkt("64497-192.0.2.1", "64496-10.0.0.1")  # src ASN != peer
         violations = filt.check(pkt)
         assert len(violations) == 1
         assert violations[0].section == "18.1"
@@ -31,57 +31,57 @@ class TestIngressFilter:
 
     def test_ipv4_compat_bypasses_asn_check(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("0.0.0.0.192.168.1.1", "64496.10.0.0.1")
+        pkt = _pkt("0.0.0.0.192.168.1.1", "64496-10.0.0.1")
         violations = filt.check(pkt)
         assert not any(v.section == "18.1" for v in violations)
 
     def test_internal_zone_source(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("127.1.0.0.10.0.0.1", "64496.10.0.0.1")
+        pkt = _pkt("127.1.0.0.10.0.0.1", "64496-10.0.0.1")
         violations = filt.check(pkt)
         assert any(v.section == "18.2" for v in violations)
 
     def test_internal_zone_destination(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("64496.10.0.0.1", "127.2.0.0.10.0.0.1")
+        pkt = _pkt("64496-10.0.0.1", "127.2.0.0.10.0.0.1")
         violations = filt.check(pkt)
         assert any(v.section == "18.2" for v in violations)
 
     def test_rine_source(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("100.0.0.1.10.0.0.1", "64496.10.0.0.1")
+        pkt = _pkt("100.0.0.1.10.0.0.1", "64496-10.0.0.1")
         violations = filt.check(pkt)
         assert any(v.section == "18.3" for v in violations)
 
     def test_rine_destination(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("64496.10.0.0.1", "100.0.0.2.10.0.0.1")
+        pkt = _pkt("64496-10.0.0.1", "100.0.0.2.10.0.0.1")
         violations = filt.check(pkt)
         assert any(v.section == "18.3" for v in violations)
 
     def test_interior_link_source(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("64496.222.0.0.1", "64497.10.0.0.1")
+        pkt = _pkt("64496-222.0.0.1", "64497-10.0.0.1")
         violations = filt.check(pkt)
         assert any(v.section == "18.4" for v in violations)
 
     def test_interior_link_destination(self):
         filt = IngressFilter(peer_asn=64496)
-        pkt = _pkt("64496.10.0.0.1", "64497.222.0.0.1")
+        pkt = _pkt("64496-10.0.0.1", "64497-222.0.0.1")
         violations = filt.check(pkt)
         assert any(v.section == "18.4" for v in violations)
 
     def test_multicast_protocol_filtering(self):
         filt = IngressFilter(peer_asn=64496)
         # OSPF8 multicast prefix ff.ff.00.01
-        pkt = _pkt("64496.10.0.0.1", "255.255.0.1.224.0.0.5")
+        pkt = _pkt("64496-10.0.0.1", "255.255.0.1.224.0.0.5")
         violations = filt.check(pkt)
         assert any(v.section == "18.6" for v in violations)
 
     def test_general_multicast_not_filtered(self):
         filt = IngressFilter(peer_asn=64496)
         # General cross-ASN multicast ff.ff.00.00 — NOT in filtered set
-        pkt = _pkt("64496.10.0.0.1", "255.255.0.0.224.0.0.1")
+        pkt = _pkt("64496-10.0.0.1", "255.255.0.0.224.0.0.1")
         violations = filt.check(pkt)
         assert not any(v.section == "18.6" for v in violations)
 
@@ -94,7 +94,7 @@ class TestIngressFilter:
     def test_multiple_violations(self):
         filt = IngressFilter(peer_asn=64496)
         # src: wrong ASN + interior link; dst: internal zone
-        pkt = _pkt("64497.222.0.0.1", "127.1.0.0.10.0.0.1")
+        pkt = _pkt("64497-222.0.0.1", "127.1.0.0.10.0.0.1")
         violations = filt.check(pkt)
         sections = {v.section for v in violations}
         assert "18.1" in sections  # ASN spoofing

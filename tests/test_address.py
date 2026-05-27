@@ -72,7 +72,7 @@ class TestASNConversion:
 
 class TestIPv8AddressParse:
     def test_asn_notation(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         assert addr.asn == 64496
         assert addr.routing_prefix == (0, 0, 251, 240)
         assert addr.host_part == (192, 0, 2, 1)
@@ -85,7 +85,7 @@ class TestIPv8AddressParse:
         assert addr.host_part == (192, 0, 2, 1)
 
     def test_asn_notation_equals_full(self):
-        a = IPv8Address.parse("64496.192.0.2.1")
+        a = IPv8Address.parse("64496-192.0.2.1")
         b = IPv8Address.parse("0.0.251.240.192.0.2.1")
         assert a == b
 
@@ -100,7 +100,7 @@ class TestIPv8AddressParse:
         assert not addr.is_ipv4_compatible()
 
     def test_asn_notation_64497(self):
-        addr = IPv8Address.parse("64497.198.51.100.7")
+        addr = IPv8Address.parse("64497-198.51.100.7")
         assert addr.asn == 64497
         assert addr.full_notation == "0.0.251.241.198.51.100.7"
 
@@ -117,7 +117,7 @@ class TestIPv8AddressParse:
             IPv8Address.parse("0.0.0.0.abc.0.0.0")
 
     def test_whitespace_stripped(self):
-        addr = IPv8Address.parse(" 64496.192.0.2.1 ")
+        addr = IPv8Address.parse(" 64496-192.0.2.1 ")
         assert addr.asn == 64496
 
 
@@ -129,12 +129,12 @@ class TestIPv8AddressProperties:
         assert addr.asn_notation == "64496.192.0.2.1"
 
     def test_str(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         # Spec canonical hyphenated form (leading RN octet 0 → integer RN).
         assert str(addr) == "64496-192.0.2.1"
 
     def test_repr(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         assert repr(addr) == "IPv8Address(64496-192.0.2.1)"
 
 
@@ -142,7 +142,7 @@ class TestIPv8AddressProperties:
 
 class TestIPv8AddressInt:
     def test_to_int_and_back(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         val = addr.to_int()
         restored = IPv8Address.from_int(val)
         assert restored == addr
@@ -161,7 +161,7 @@ class TestAddressClasses:
         assert addr.is_ipv4_compatible()
 
     def test_asn_unicast(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         assert addr.address_class == "asn-unicast"
         assert addr.is_unicast()
 
@@ -184,7 +184,7 @@ class TestAddressClasses:
         assert not addr.is_unicast()
 
     def test_interior_link(self):
-        addr = IPv8Address.parse("64496.222.0.0.1")
+        addr = IPv8Address.parse("64496-222.0.0.1")
         assert addr.is_interior_link()
 
     def test_broadcast(self):
@@ -234,7 +234,7 @@ class TestAddressClasses:
 
 class TestCanonicalHyphenated:
     def test_integer_rn_when_leading_octet_zero(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         assert addr.canonical == "64496-192.0.2.1"
 
     def test_dotted_rn_when_leading_octet_nonzero(self):
@@ -266,7 +266,7 @@ class TestCanonicalHyphenated:
 
     def test_three_forms_roundtrip_to_canonical(self):
         a = IPv8Address.parse("64496-192.0.2.1")
-        b = IPv8Address.parse("64496.192.0.2.1")
+        b = IPv8Address.parse("64496-192.0.2.1")
         c = IPv8Address.parse("0.0.251.240.192.0.2.1")
         assert a == b == c
         assert a.canonical == b.canonical == c.canonical == "64496-192.0.2.1"

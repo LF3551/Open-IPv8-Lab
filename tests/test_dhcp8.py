@@ -98,9 +98,9 @@ class TestDHCP8Lease:
     def test_expires_at(self):
         from ipv8lab.address import IPv8Address
 
-        addr = IPv8Address.parse("64496.192.0.2.10")
-        gw_e = IPv8Address.parse("64496.192.0.2.254")
-        gw_o = IPv8Address.parse("64496.192.0.2.253")
+        addr = IPv8Address.parse("64496-192.0.2.10")
+        gw_e = IPv8Address.parse("64496-192.0.2.254")
+        gw_o = IPv8Address.parse("64496-192.0.2.253")
         lease = DHCP8Lease(
             address=addr,
             gateway_even=gw_e,
@@ -115,8 +115,8 @@ class TestDHCP8Lease:
     def test_mgmt_oob_defaults(self):
         from ipv8lab.address import IPv8Address
 
-        addr = IPv8Address.parse("64496.192.0.2.10")
-        gw = IPv8Address.parse("64496.192.0.2.254")
+        addr = IPv8Address.parse("64496-192.0.2.10")
+        gw = IPv8Address.parse("64496-192.0.2.254")
         lease = DHCP8Lease(address=addr, gateway_even=gw, gateway_odd=gw)
         assert lease.mgmt_vlan == 4090
         assert lease.oob_vlan == 4091

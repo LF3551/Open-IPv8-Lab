@@ -12,8 +12,8 @@ route table, and optional services (router, NAT, flow collector, etc.).
 Usage::
 
     tb = Testbed(name="demo")
-    tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-    tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10", role=NodeRole.HOST,
+    tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+    tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10", role=NodeRole.HOST,
                          gateway="r1"))
     tb.add_link("r1", "h1", network="10.0.1.0/24")
     compose = tb.generate_compose()

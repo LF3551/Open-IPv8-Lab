@@ -24,8 +24,8 @@ from ipv8lab.packet import IPv8Packet
 
 
 def _pkt(
-    src: str = "64496.10.0.1.10",
-    dst: str = "64497.10.0.1.1",
+    src: str = "64496-10.0.1.10",
+    dst: str = "64497-10.0.1.1",
     proto: int = 253,
     tos: int = 0,
     ttl: int = 64,
@@ -48,8 +48,8 @@ def _pkt(
 class TestFlowKey:
     def test_create(self) -> None:
         k = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
             src_port=12345,
             dst_port=80,
@@ -59,8 +59,8 @@ class TestFlowKey:
 
     def test_to_dict(self) -> None:
         k = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
         )
         d = k.to_dict()
@@ -69,8 +69,8 @@ class TestFlowKey:
 
     def test_reverse(self) -> None:
         k = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
             src_port=12345,
             dst_port=80,
@@ -83,8 +83,8 @@ class TestFlowKey:
 
     def test_frozen(self) -> None:
         k = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
         )
         # Should be hashable (frozen)
@@ -92,15 +92,15 @@ class TestFlowKey:
 
     def test_equality(self) -> None:
         k1 = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
             src_port=80,
             dst_port=443,
         )
         k2 = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
             src_port=80,
             dst_port=443,
@@ -116,8 +116,8 @@ class TestFlowKey:
 class TestFlowRecord:
     def test_duration(self) -> None:
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
         )
         rec = FlowRecord(key=key, first_ts=100.0, last_ts=110.5)
@@ -125,8 +125,8 @@ class TestFlowRecord:
 
     def test_duration_zero(self) -> None:
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
         )
         rec = FlowRecord(key=key, first_ts=100.0, last_ts=100.0)
@@ -134,8 +134,8 @@ class TestFlowRecord:
 
     def test_to_dict(self) -> None:
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
         )
         rec = FlowRecord(key=key, packets=42, octets=1234, first_ts=1.0, last_ts=2.0)
@@ -153,8 +153,8 @@ class TestFlowRecord:
 class TestBinaryEncoding:
     def test_roundtrip(self) -> None:
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
             src_port=12345,
             dst_port=80,
@@ -179,8 +179,8 @@ class TestBinaryEncoding:
 
     def test_encode_size(self) -> None:
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=253,
         )
         rec = FlowRecord(key=key)
@@ -195,8 +195,8 @@ class TestBinaryEncoding:
 class TestNF8File:
     def test_write_read_roundtrip(self) -> None:
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.10"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.10"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=6,
             src_port=80,
             dst_port=443,
@@ -276,9 +276,9 @@ class TestCollectorObserve:
 
     def test_different_flows(self) -> None:
         col = FlowCollector()
-        col.observe(_pkt(src="64496.10.0.1.10"))
-        col.observe(_pkt(src="64496.10.0.1.20"))
-        col.observe(_pkt(src="64496.10.0.1.30"))
+        col.observe(_pkt(src="64496-10.0.1.10"))
+        col.observe(_pkt(src="64496-10.0.1.20"))
+        col.observe(_pkt(src="64496-10.0.1.30"))
         assert col.active_count == 3
 
     def test_ports_distinguish_flows(self) -> None:
@@ -307,8 +307,8 @@ class TestCollectorObserve:
         col.observe(_pkt(ttl=128))
         rec = col.get_flow(
             FlowKey(
-                src_addr=IPv8Address.parse("64496.10.0.1.10"),
-                dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+                src_addr=IPv8Address.parse("64496-10.0.1.10"),
+                dst_addr=IPv8Address.parse("64497-10.0.1.1"),
                 protocol=253,
             )
         )
@@ -321,8 +321,8 @@ class TestCollectorObserve:
         col.observe(_pkt(tos=4))
         rec = col.get_flow(
             FlowKey(
-                src_addr=IPv8Address.parse("64496.10.0.1.10"),
-                dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+                src_addr=IPv8Address.parse("64496-10.0.1.10"),
+                dst_addr=IPv8Address.parse("64497-10.0.1.1"),
                 protocol=253,
             )
         )
@@ -411,10 +411,10 @@ class TestAnalytics:
         col = FlowCollector()
         # Flow A: 10 packets
         for _ in range(10):
-            col.observe(_pkt(src="64496.10.0.1.10"))
+            col.observe(_pkt(src="64496-10.0.1.10"))
         # Flow B: 20 packets
         for _ in range(20):
-            col.observe(_pkt(src="64496.10.0.1.20"))
+            col.observe(_pkt(src="64496-10.0.1.20"))
         top = col.top_talkers(2)
         assert len(top) == 2
         assert top[0].packets == 20  # highest first
@@ -423,9 +423,9 @@ class TestAnalytics:
     def test_top_by_octets(self) -> None:
         col = FlowCollector()
         for _ in range(5):
-            col.observe(_pkt(src="64496.10.0.1.10"))
+            col.observe(_pkt(src="64496-10.0.1.10"))
         for _ in range(15):
-            col.observe(_pkt(src="64496.10.0.1.20"))
+            col.observe(_pkt(src="64496-10.0.1.20"))
         top = col.top_by_octets(1)
         assert len(top) == 1
         assert top[0].octets == 15 * 37
@@ -467,8 +467,8 @@ class TestQueries:
     def test_get_flow_nonexistent(self) -> None:
         col = FlowCollector()
         key = FlowKey(
-            src_addr=IPv8Address.parse("64496.10.0.1.99"),
-            dst_addr=IPv8Address.parse("64497.10.0.1.1"),
+            src_addr=IPv8Address.parse("64496-10.0.1.99"),
+            dst_addr=IPv8Address.parse("64497-10.0.1.1"),
             protocol=253,
         )
         assert col.get_flow(key) is None
@@ -476,7 +476,7 @@ class TestQueries:
     def test_stats(self) -> None:
         col = FlowCollector()
         col.observe(_pkt())
-        col.observe(_pkt(src="64496.10.0.1.20"))
+        col.observe(_pkt(src="64496-10.0.1.20"))
         s = col.stats()
         assert isinstance(s, CollectorStats)
         assert s.active_flows == 2

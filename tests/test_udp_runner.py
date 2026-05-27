@@ -16,11 +16,11 @@ DEMO_CONFIG = textwrap.dedent("""\
 
     nodes:
       - name: node-a
-        address: 64496.192.0.2.1
+        address: 64496-192.0.2.1
         type: host
 
       - name: node-b
-        address: 64497.198.51.100.7
+        address: 64497-198.51.100.7
         type: host
 
     routers:
@@ -67,7 +67,7 @@ class TestUDPNetwork:
         await net.start_all()
         try:
             trace = await net.send_and_wait(
-                "node-a", "64497.198.51.100.7", "udp-hello", wait=0.5
+                "node-a", "64497-198.51.100.7", "udp-hello", wait=0.5
             )
             assert any("Sending" in line for line in trace)
             assert any("Received" in line and "udp-hello" in line for line in trace)

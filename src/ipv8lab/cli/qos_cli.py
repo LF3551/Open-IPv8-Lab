@@ -247,10 +247,10 @@ def cmd_demo(
     # --- Priority Queuing ---
     shaper_pq = TrafficShaper(policy=QoSPolicy.PRIORITY)
     packets_pq = [
-        ("64496.10.0.1.10", "64497.10.0.1.1", 0),    # BE (TOS=0)
-        ("64496.10.0.1.20", "64497.10.0.1.1", 184),   # EF (DSCP 46 << 2 = 184)
-        ("64496.10.0.1.30", "64497.10.0.1.1", 72),    # AF31 (DSCP 26... wait no, 18<<2=72 → AF21)
-        ("64496.10.0.1.10", "64497.10.0.1.1", 104),   # AF31 (DSCP 26 << 2 = 104)
+        ("64496-10.0.1.10", "64497-10.0.1.1", 0),    # BE (TOS=0)
+        ("64496-10.0.1.20", "64497-10.0.1.1", 184),   # EF (DSCP 46 << 2 = 184)
+        ("64496-10.0.1.30", "64497-10.0.1.1", 72),    # AF31 (DSCP 26... wait no, 18<<2=72 → AF21)
+        ("64496-10.0.1.10", "64497-10.0.1.1", 104),   # AF31 (DSCP 26 << 2 = 104)
     ]
     for src, dst, tos in packets_pq:
         pkt = IPv8Packet(src=IPv8Address.parse(src), dst=IPv8Address.parse(dst), tos=tos, payload=b"pq")
@@ -274,12 +274,12 @@ def cmd_demo(
     shaper_wfq.configure_class(TrafficClass.EF, weight=3)
     shaper_wfq.configure_class(TrafficClass.BE, weight=1)
     for _ in range(6):
-        pkt_ef = IPv8Packet(src=IPv8Address.parse("64496.10.0.1.10"),
-                            dst=IPv8Address.parse("64497.10.0.1.1"), tos=184, payload=b"wfq")
+        pkt_ef = IPv8Packet(src=IPv8Address.parse("64496-10.0.1.10"),
+                            dst=IPv8Address.parse("64497-10.0.1.1"), tos=184, payload=b"wfq")
         shaper_wfq.enqueue(pkt_ef)
     for _ in range(6):
-        pkt_be = IPv8Packet(src=IPv8Address.parse("64496.10.0.1.20"),
-                            dst=IPv8Address.parse("64497.10.0.1.1"), tos=0, payload=b"wfq")
+        pkt_be = IPv8Packet(src=IPv8Address.parse("64496-10.0.1.20"),
+                            dst=IPv8Address.parse("64497-10.0.1.1"), tos=0, payload=b"wfq")
         shaper_wfq.enqueue(pkt_be)
 
     wfq_order: list[str] = []
@@ -300,8 +300,8 @@ def cmd_demo(
     shaper_rl.configure_class(TrafficClass.BE, rate_bps=8000, burst_bytes=100, max_queue=100)
     accepted = 0
     for _ in range(20):
-        pkt = IPv8Packet(src=IPv8Address.parse("64496.10.0.1.10"),
-                         dst=IPv8Address.parse("64497.10.0.1.1"), tos=0, payload=b"x" * 50)
+        pkt = IPv8Packet(src=IPv8Address.parse("64496-10.0.1.10"),
+                         dst=IPv8Address.parse("64497-10.0.1.1"), tos=0, payload=b"x" * 50)
         if shaper_rl.enqueue(pkt):
             accepted += 1
     results.append({

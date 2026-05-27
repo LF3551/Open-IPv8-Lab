@@ -97,7 +97,7 @@ class TestClassify:
     def test_classify_be(self) -> None:
         _reset()
         result = runner.invoke(app, [
-            "classify", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1", "--tos", "0",
+            "classify", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1", "--tos", "0",
         ])
         assert result.exit_code == 0
         assert "BE" in result.output
@@ -105,7 +105,7 @@ class TestClassify:
     def test_classify_ef(self) -> None:
         _reset()
         result = runner.invoke(app, [
-            "classify", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1", "--tos", "184",
+            "classify", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1", "--tos", "184",
         ])
         assert result.exit_code == 0
         assert "EF" in result.output
@@ -113,7 +113,7 @@ class TestClassify:
     def test_classify_json(self) -> None:
         _reset()
         result = runner.invoke(app, [
-            "classify", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "classify", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--tos", "184", "--json",
         ])
         assert result.exit_code == 0
@@ -132,7 +132,7 @@ class TestEnqueue:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         assert result.exit_code == 0
         assert "1/1" in result.output
@@ -141,7 +141,7 @@ class TestEnqueue:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--count", "5",
         ])
         assert result.exit_code == 0
@@ -151,7 +151,7 @@ class TestEnqueue:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--tos", "184", "--json",
         ])
         assert result.exit_code == 0
@@ -162,7 +162,7 @@ class TestEnqueue:
     def test_enqueue_no_init(self) -> None:
         _reset()
         result = runner.invoke(app, [
-            "enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         assert result.exit_code != 0
 
@@ -176,7 +176,7 @@ class TestDequeue:
     def test_dequeue(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1"])
+        runner.invoke(app, ["enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1"])
         result = runner.invoke(app, ["dequeue"])
         assert result.exit_code == 0
         assert "1" in result.output
@@ -185,7 +185,7 @@ class TestDequeue:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1", "--tos", "184",
+            "enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1", "--tos", "184",
         ])
         result = runner.invoke(app, ["dequeue", "--json"])
         assert result.exit_code == 0
@@ -217,7 +217,7 @@ class TestStatus:
     def test_status_json(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["enqueue", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1"])
+        runner.invoke(app, ["enqueue", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1"])
         result = runner.invoke(app, ["status", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)

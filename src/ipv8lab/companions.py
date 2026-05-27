@@ -56,7 +56,7 @@ class BGP8Advertisement:
     The 8TO4-ENDPOINT attribute carries the IPv4 tunnel endpoint.
     """
 
-    prefix: str          # e.g. "64496.0.0.0.0/8"
+    prefix: str          # e.g. "64496-0.0.0.0/8"
     origin_asn: int
     as_path: tuple[int, ...] = ()
     next_hop: str = ""

@@ -21,12 +21,12 @@ def table() -> RouteTable:
 
 class TestRouteTable:
     def test_find_exact_prefix(self, table: RouteTable):
-        route = table.find_route("64496.192.0.2.1")
+        route = table.find_route("64496-192.0.2.1")
         assert route.next_hop == "router-a"
         assert route.interface == "lab0"
 
     def test_find_exact_prefix_b(self, table: RouteTable):
-        route = table.find_route("64497.198.51.100.7")
+        route = table.find_route("64497-198.51.100.7")
         assert route.next_hop == "router-b"
 
     def test_fallback_default_route(self, table: RouteTable):
@@ -44,7 +44,7 @@ class TestRouteTable:
         assert not table.remove_route("nonexistent")
 
     def test_find_with_address_object(self, table: RouteTable):
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         route = table.find_route(addr)
         assert route.next_hop == "router-a"
 
@@ -64,11 +64,11 @@ class TestTwoTierRouteTable:
         return tt
 
     def test_tier1_asn_lookup(self, two_tier: TwoTierRouteTable):
-        route = two_tier.find_route("64496.192.0.2.1")
+        route = two_tier.find_route("64496-192.0.2.1")
         assert route.next_hop == "border-a"
 
     def test_tier1_asn_b(self, two_tier: TwoTierRouteTable):
-        route = two_tier.find_route("64497.198.51.100.7")
+        route = two_tier.find_route("64497-198.51.100.7")
         assert route.next_hop == "border-b"
 
     def test_ipv4_compatible_bypasses_tier1(self, two_tier: TwoTierRouteTable):
@@ -88,10 +88,10 @@ class TestTwoTierRouteTable:
     def test_no_route_at_all(self):
         tt = TwoTierRouteTable()
         with pytest.raises(NoRouteFoundError):
-            tt.find_route("64496.192.0.2.1")
+            tt.find_route("64496-192.0.2.1")
 
     def test_tier1_has_priority(self, two_tier: TwoTierRouteTable):
         """When Tier 1 matches, Tier 2 is not used."""
-        route = two_tier.find_route("64496.10.0.0.1")
+        route = two_tier.find_route("64496-10.0.0.1")
         # Tier 1 matches ASN prefix → border-a, not switch-a
         assert route.next_hop == "border-a"

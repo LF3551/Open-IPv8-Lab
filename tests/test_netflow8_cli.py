@@ -60,7 +60,7 @@ class TestObserve:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         assert result.exit_code == 0
         assert "1 packet" in result.output
@@ -69,7 +69,7 @@ class TestObserve:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--count", "5",
         ])
         assert result.exit_code == 0
@@ -79,7 +79,7 @@ class TestObserve:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--sport", "80", "--dport", "443", "--json",
         ])
         assert result.exit_code == 0
@@ -90,7 +90,7 @@ class TestObserve:
     def test_observe_no_init(self) -> None:
         _reset()
         result = runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         assert result.exit_code != 0
 
@@ -105,7 +105,7 @@ class TestExport:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         result = runner.invoke(app, ["export", "--all", "--json"])
         assert result.exit_code == 0
@@ -124,7 +124,7 @@ class TestExport:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         with tempfile.NamedTemporaryFile(suffix=".nf8", delete=False) as f:
             path = f.name
@@ -139,7 +139,7 @@ class TestExport:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         with tempfile.NamedTemporaryFile(suffix=".nf8", delete=False) as f:
             path = f.name
@@ -162,7 +162,7 @@ class TestReadNf8:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         with tempfile.NamedTemporaryFile(suffix=".nf8", delete=False) as f:
             path = f.name
@@ -197,11 +197,11 @@ class TestTop:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--count", "10",
         ])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.20", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.20", "--dst", "64497-10.0.1.1",
             "--count", "5",
         ])
         result = runner.invoke(app, ["top", "--count", "2", "--json"])
@@ -214,7 +214,7 @@ class TestTop:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
             "--count", "5",
         ])
         result = runner.invoke(app, ["top", "--by", "octets", "--json"])
@@ -240,7 +240,7 @@ class TestProtocols:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         result = runner.invoke(app, ["protocols", "--json"])
         assert result.exit_code == 0
@@ -265,7 +265,7 @@ class TestStatus:
         _reset()
         runner.invoke(app, ["init"])
         runner.invoke(app, [
-            "observe", "--src", "64496.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "observe", "--src", "64496-10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         result = runner.invoke(app, ["status", "--json"])
         assert result.exit_code == 0

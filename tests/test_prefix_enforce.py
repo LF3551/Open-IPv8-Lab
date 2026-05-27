@@ -26,23 +26,23 @@ runner = CliRunner()
 
 class TestBGP8PrefixAd:
     def test_cidr(self) -> None:
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=16)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=16)
         assert ad.cidr == "0.0.251.240.10.0.0.0/16"
 
     def test_is_too_specific_true(self) -> None:
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.0.0"), prefix_length=24)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24)
         assert ad.is_too_specific()
 
     def test_is_too_specific_false_16(self) -> None:
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=16)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=16)
         assert not ad.is_too_specific()
 
     def test_is_too_specific_false_8(self) -> None:
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=8)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=8)
         assert not ad.is_too_specific()
 
     def test_is_too_specific_17(self) -> None:
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=17)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=17)
         assert ad.is_too_specific()
 
 
@@ -53,20 +53,20 @@ class TestBGP8PrefixAd:
 class TestPrefixEnforcer:
     def test_accept_slash_16(self) -> None:
         e = PrefixEnforcer()
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=16)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=16)
         result = e.filter_advertisement(ad)
         assert result.action == FilterAction.ACCEPT
         assert result.alert is None
 
     def test_accept_slash_8(self) -> None:
         e = PrefixEnforcer()
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=8)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=8)
         result = e.filter_advertisement(ad)
         assert result.action == FilterAction.ACCEPT
 
     def test_reject_slash_24(self) -> None:
         e = PrefixEnforcer()
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.0.0"), prefix_length=24, peer_asn=64497)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24, peer_asn=64497)
         result = e.filter_advertisement(ad)
         assert result.action == FilterAction.REJECT
         assert result.alert is not None
@@ -75,13 +75,13 @@ class TestPrefixEnforcer:
 
     def test_reject_slash_32(self) -> None:
         e = PrefixEnforcer()
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.2.3"), prefix_length=32)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.2.3"), prefix_length=32)
         result = e.filter_advertisement(ad)
         assert result.action == FilterAction.REJECT
 
     def test_alert_recorded(self) -> None:
         e = PrefixEnforcer(router_id="br1")
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.0.0"), prefix_length=24, peer_asn=64497)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24, peer_asn=64497)
         e.filter_advertisement(ad, "wan0")
         assert len(e.alerts) == 1
         assert e.alerts[0].source == "br1"
@@ -97,7 +97,7 @@ class TestPrefixEnforcer:
 
     def test_clear_alerts(self) -> None:
         e = PrefixEnforcer()
-        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.0.0"), prefix_length=24)
+        ad = BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24)
         e.filter_advertisement(ad)
         n = e.clear_alerts()
         assert n == 1
@@ -112,9 +112,9 @@ class TestBatch:
     def test_filter_batch(self) -> None:
         e = PrefixEnforcer()
         items = [
-            (BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=16), "eth0"),
-            (BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.0.0"), prefix_length=24), "eth0"),
-            (BGP8PrefixAd(prefix=IPv8Address.parse("64496.172.16.0.0"), prefix_length=12), "eth1"),
+            (BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=16), "eth0"),
+            (BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24), "eth0"),
+            (BGP8PrefixAd(prefix=IPv8Address.parse("64496-172.16.0.0"), prefix_length=12), "eth1"),
         ]
         results = e.filter_batch(items)
         assert results[0].action == FilterAction.ACCEPT
@@ -129,8 +129,8 @@ class TestBatch:
 class TestSummary:
     def test_summary_counters(self) -> None:
         e = PrefixEnforcer(router_id="r1")
-        e.filter_advertisement(BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.0.0.0"), prefix_length=16))
-        e.filter_advertisement(BGP8PrefixAd(prefix=IPv8Address.parse("64496.10.1.0.0"), prefix_length=24))
+        e.filter_advertisement(BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.0.0.0"), prefix_length=16))
+        e.filter_advertisement(BGP8PrefixAd(prefix=IPv8Address.parse("64496-10.1.0.0"), prefix_length=24))
         d = e.summary()
         assert d["router_id"] == "r1"
         assert d["min_prefix_length"] == 16
@@ -153,14 +153,14 @@ class TestPrefixEnforceCLI:
 
     def test_check_accept_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["check", "64496.10.0.0.0", "16", "--json"])
+        result = runner.invoke(app, ["check", "64496-10.0.0.0", "16", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "accept"
 
     def test_check_reject_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["check", "64496.10.1.0.0", "24", "--peer-asn", "64497", "--json"])
+        result = runner.invoke(app, ["check", "64496-10.1.0.0", "24", "--peer-asn", "64497", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "reject"
@@ -170,14 +170,14 @@ class TestPrefixEnforceCLI:
 
     def test_check_accept_slash_8_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["check", "64496.10.0.0.0", "8", "--json"])
+        result = runner.invoke(app, ["check", "64496-10.0.0.0", "8", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "accept"
 
     def test_alerts_json(self) -> None:
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["check", "64496.10.1.0.0", "24"])
+        runner.invoke(app, ["check", "64496-10.1.0.0", "24"])
         result = runner.invoke(app, ["alerts", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)

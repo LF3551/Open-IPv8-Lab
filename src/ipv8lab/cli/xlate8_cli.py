@@ -61,7 +61,7 @@ def init_flow(
 @app.command("dns-add")
 def dns_add(
     hostname: str = typer.Argument(help="DNS hostname."),
-    address: str = typer.Argument(help="IPv8 address (e.g. 64496.10.0.1.100)."),
+    address: str = typer.Argument(help="IPv8 address (e.g. 64496-10.0.1.100)."),
     ttl: int = typer.Option(3600, "--ttl", help="TTL in seconds."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
 ) -> None:
@@ -351,8 +351,8 @@ def run_demo(
     flow = _flow
 
     # Add DNS records
-    flow.dns.add_record(A8Record(name="web.example.iv8", address=IPv8Address.parse("64497.10.0.1.100")))
-    flow.dns.add_record(A8Record(name="api.example.iv8", address=IPv8Address.parse("64498.10.0.2.50")))
+    flow.dns.add_record(A8Record(name="web.example.iv8", address=IPv8Address.parse("64497-10.0.1.100")))
+    flow.dns.add_record(A8Record(name="api.example.iv8", address=IPv8Address.parse("64498-10.0.2.50")))
 
     internal = IPv8Address.parse("127.1.0.0.10.0.1.10")
 

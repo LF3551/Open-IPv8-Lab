@@ -31,8 +31,8 @@ class TestHexdump:
 
 class TestPacketSummary:
     def test_summary_fields(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, payload=b"test")
         pkt.to_bytes()  # compute checksum
         s = packet_summary(pkt)

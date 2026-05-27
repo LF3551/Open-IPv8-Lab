@@ -47,7 +47,7 @@ class TestInit:
         assert data["external_asn"] == 64496
 
     def test_init_resets(self) -> None:
-        runner.invoke(app, ["dns-add", "x.iv8", "64497.10.0.1.1"])
+        runner.invoke(app, ["dns-add", "x.iv8", "64497-10.0.1.1"])
         runner.invoke(app, ["init", "--json"])
         result = runner.invoke(app, ["status", "--json"])
         data = json.loads(result.output)
@@ -63,19 +63,19 @@ class TestDnsAdd:
         _reset()
 
     def test_dns_add(self) -> None:
-        result = runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        result = runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         assert result.exit_code == 0
         assert "web.iv8" in result.output
 
     def test_dns_add_json(self) -> None:
-        result = runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100", "--json"])
+        result = runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["hostname"] == "web.iv8"
         assert data["dns_size"] == 1
 
     def test_dns_add_with_ttl(self) -> None:
-        result = runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100", "--ttl", "7200", "--json"])
+        result = runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100", "--ttl", "7200", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["ttl"] == 7200
@@ -94,7 +94,7 @@ class TestDnsLookup:
         _reset()
 
     def test_lookup_found(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         result = runner.invoke(app, ["dns-lookup", "web.iv8", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -108,7 +108,7 @@ class TestDnsLookup:
         assert data["found"] is False
 
     def test_lookup_rich_found(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         result = runner.invoke(app, ["dns-lookup", "web.iv8"])
         assert result.exit_code == 0
         assert "web.iv8" in result.output
@@ -126,7 +126,7 @@ class TestDnsLookup:
 class TestEgress:
     def setup_method(self) -> None:
         _reset()
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
 
     def test_egress_success(self) -> None:
         result = runner.invoke(app, ["egress", "web.iv8", "127.1.0.0.10.0.1.10", "--json"])
@@ -158,7 +158,7 @@ class TestEgress:
 class TestIngress:
     def setup_method(self) -> None:
         _reset()
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         runner.invoke(app, ["egress", "web.iv8", "127.1.0.0.10.0.1.10"])
 
     def test_ingress_success(self) -> None:
@@ -167,19 +167,19 @@ class TestIngress:
         entries = json.loads(status.output)
         ext_addr = entries[0]["external"]
 
-        result = runner.invoke(app, ["ingress", "64497.10.0.1.100", ext_addr, "--json"])
+        result = runner.invoke(app, ["ingress", "64497-10.0.1.100", ext_addr, "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is True
 
     def test_ingress_blocked(self) -> None:
-        result = runner.invoke(app, ["ingress", "64497.10.0.1.100", "64499.10.0.1.1", "--json"])
+        result = runner.invoke(app, ["ingress", "64497-10.0.1.100", "64499-10.0.1.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is False
 
     def test_ingress_bad_address(self) -> None:
-        result = runner.invoke(app, ["ingress", "invalid", "64497.10.0.1.100"])
+        result = runner.invoke(app, ["ingress", "invalid", "64497-10.0.1.100"])
         assert result.exit_code == 1
 
 
@@ -190,7 +190,7 @@ class TestIngress:
 class TestRoundTrip:
     def setup_method(self) -> None:
         _reset()
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
 
     def test_round_trip_success(self) -> None:
         result = runner.invoke(app, ["round-trip", "web.iv8", "127.1.0.0.10.0.1.10", "--json"])
@@ -236,7 +236,7 @@ class TestTable:
         assert data == []
 
     def test_table_after_egress(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         runner.invoke(app, ["egress", "web.iv8", "127.1.0.0.10.0.1.10"])
         result = runner.invoke(app, ["table", "--json"])
         assert result.exit_code == 0
@@ -265,7 +265,7 @@ class TestEvents:
         assert data == []
 
     def test_events_after_egress(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         runner.invoke(app, ["egress", "web.iv8", "127.1.0.0.10.0.1.10"])
         result = runner.invoke(app, ["events", "--json"])
         assert result.exit_code == 0
@@ -273,7 +273,7 @@ class TestEvents:
         assert len(data) >= 2
 
     def test_events_filter_direction(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         runner.invoke(app, ["round-trip", "web.iv8", "127.1.0.0.10.0.1.10"])
         result = runner.invoke(app, ["events", "--direction", "ingress", "--json"])
         assert result.exit_code == 0
@@ -281,7 +281,7 @@ class TestEvents:
         assert all(e["direction"] == "ingress" for e in data)
 
     def test_events_rich(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         runner.invoke(app, ["egress", "web.iv8", "127.1.0.0.10.0.1.10"])
         result = runner.invoke(app, ["events"])
         assert result.exit_code == 0
@@ -304,7 +304,7 @@ class TestStatus:
         assert data["xlate_entries"] == 0
 
     def test_status_after_ops(self) -> None:
-        runner.invoke(app, ["dns-add", "web.iv8", "64497.10.0.1.100"])
+        runner.invoke(app, ["dns-add", "web.iv8", "64497-10.0.1.100"])
         runner.invoke(app, ["egress", "web.iv8", "127.1.0.0.10.0.1.10"])
         result = runner.invoke(app, ["status", "--json"])
         data = json.loads(result.output)
@@ -341,7 +341,7 @@ class TestDemo:
         assert data["trips"][2]["success"] is False  # unknown.iv8
 
     def test_demo_resets_state(self) -> None:
-        runner.invoke(app, ["dns-add", "old.iv8", "64500.10.0.1.1"])
+        runner.invoke(app, ["dns-add", "old.iv8", "64500-10.0.1.1"])
         runner.invoke(app, ["demo", "--json"])
         result = runner.invoke(app, ["status", "--json"])
         data = json.loads(result.output)

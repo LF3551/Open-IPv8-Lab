@@ -26,15 +26,15 @@ runner = CliRunner()
 
 class TestIsInteriorLinkHost:
     def test_222_x(self) -> None:
-        addr = IPv8Address.parse("64496.222.0.0.1")
+        addr = IPv8Address.parse("64496-222.0.0.1")
         assert is_interior_link_host(addr)
 
     def test_non_222(self) -> None:
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         assert not is_interior_link_host(addr)
 
     def test_222_255(self) -> None:
-        addr = IPv8Address.parse("64496.222.255.255.255")
+        addr = IPv8Address.parse("64496-222.255.255.255")
         assert is_interior_link_host(addr)
 
 
@@ -45,13 +45,13 @@ class TestIsInteriorLinkHost:
 class TestBGP8Filtering:
     def test_non_222_accepted(self) -> None:
         f = InteriorLinkFilter()
-        addr = IPv8Address.parse("64496.10.0.0.0")
+        addr = IPv8Address.parse("64496-10.0.0.0")
         result = f.filter_bgp8_advertisement(addr)
         assert result.action == FilterAction.ACCEPT
 
     def test_222_dropped(self) -> None:
         f = InteriorLinkFilter()
-        addr = IPv8Address.parse("64496.222.0.0.1")
+        addr = IPv8Address.parse("64496-222.0.0.1")
         result = f.filter_bgp8_advertisement(addr)
         assert result.action == FilterAction.DROP
         assert result.trap is not None
@@ -59,7 +59,7 @@ class TestBGP8Filtering:
 
     def test_trap_recorded(self) -> None:
         f = InteriorLinkFilter(router_id="r1")
-        addr = IPv8Address.parse("64496.222.1.0.0")
+        addr = IPv8Address.parse("64496-222.1.0.0")
         f.filter_bgp8_advertisement(addr, "eth0")
         assert len(f.traps) == 1
         assert f.traps[0].source == "r1"
@@ -79,20 +79,20 @@ class TestBGP8Filtering:
 class TestPacketFiltering:
     def test_non_222_accepted(self) -> None:
         f = InteriorLinkFilter()
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         result = f.filter_packet(addr)
         assert result.action == FilterAction.ACCEPT
 
     def test_222_dropped(self) -> None:
         f = InteriorLinkFilter()
-        addr = IPv8Address.parse("64496.222.0.0.1")
+        addr = IPv8Address.parse("64496-222.0.0.1")
         result = f.filter_packet(addr, "wan0")
         assert result.action == FilterAction.DROP
         assert result.trap is not None
 
     def test_egress_trap_content(self) -> None:
         f = InteriorLinkFilter(router_id="br2")
-        addr = IPv8Address.parse("64496.222.5.0.1")
+        addr = IPv8Address.parse("64496-222.5.0.1")
         f.filter_packet(addr, "wan0")
         assert f.traps[0].violation == "Interior link address in egress packet"
 
@@ -105,9 +105,9 @@ class TestBatchAndClear:
     def test_filter_batch(self) -> None:
         f = InteriorLinkFilter()
         items = [
-            (IPv8Address.parse("64496.10.0.0.1"), "eth0"),
-            (IPv8Address.parse("64496.222.0.0.1"), "eth0"),
-            (IPv8Address.parse("64496.222.1.0.0"), "eth1"),
+            (IPv8Address.parse("64496-10.0.0.1"), "eth0"),
+            (IPv8Address.parse("64496-222.0.0.1"), "eth0"),
+            (IPv8Address.parse("64496-222.1.0.0"), "eth1"),
         ]
         results = f.filter_batch(items)
         assert results[0].action == FilterAction.ACCEPT
@@ -116,7 +116,7 @@ class TestBatchAndClear:
 
     def test_clear_traps(self) -> None:
         f = InteriorLinkFilter()
-        f.filter_bgp8_advertisement(IPv8Address.parse("64496.222.0.0.1"))
+        f.filter_bgp8_advertisement(IPv8Address.parse("64496-222.0.0.1"))
         n = f.clear_traps()
         assert n == 1
         assert len(f.traps) == 0
@@ -141,14 +141,14 @@ class TestILinkProtectionCLI:
 
     def test_bgp8_accept_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["bgp8", "64496.10.0.0.0", "--json"])
+        result = runner.invoke(app, ["bgp8", "64496-10.0.0.0", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "accept"
 
     def test_bgp8_drop_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["bgp8", "64496.222.0.0.1", "--json"])
+        result = runner.invoke(app, ["bgp8", "64496-222.0.0.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "drop"
@@ -157,21 +157,21 @@ class TestILinkProtectionCLI:
 
     def test_packet_accept_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["packet", "64496.10.0.0.1", "--json"])
+        result = runner.invoke(app, ["packet", "64496-10.0.0.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "accept"
 
     def test_packet_drop_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["packet", "64496.222.0.0.1", "--json"])
+        result = runner.invoke(app, ["packet", "64496-222.0.0.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "drop"
 
     def test_traps_json(self) -> None:
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["bgp8", "64496.222.0.0.1"])
+        runner.invoke(app, ["bgp8", "64496-222.0.0.1"])
         result = runner.invoke(app, ["traps", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)

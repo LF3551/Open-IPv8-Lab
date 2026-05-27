@@ -15,8 +15,8 @@ from ipv8lab.tunnel import (
     is_8to4_frame,
 )
 
-SRC = IPv8Address.parse("64496.192.0.2.1")
-DST = IPv8Address.parse("64497.198.51.100.7")
+SRC = IPv8Address.parse("64496-192.0.2.1")
+DST = IPv8Address.parse("64497-198.51.100.7")
 
 
 @pytest.fixture()

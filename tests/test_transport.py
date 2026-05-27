@@ -48,8 +48,8 @@ class TestUDPTransport:
         await receiver.start()
 
         try:
-            src = IPv8Address.parse("64496.10.0.0.1")
-            dst = IPv8Address.parse("64497.10.0.0.2")
+            src = IPv8Address.parse("64496-10.0.0.1")
+            dst = IPv8Address.parse("64497-10.0.0.2")
             pkt = IPv8Packet(src=src, dst=dst, payload=b"udp-test")
 
             sender.send(pkt, receiver.local)

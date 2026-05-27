@@ -196,27 +196,27 @@ def _format_rate(bps: int) -> str:
 def build_demo_data() -> DashboardData:
     """Build demonstration data for the TUI dashboard."""
     nodes = [
-        NodeInfo(name="r1-as64496", address="64496.10.0.1.1", role="router", route_count=5, link_count=3),
-        NodeInfo(name="r2-as64497", address="64497.10.0.1.1", role="router", route_count=4, link_count=2),
-        NodeInfo(name="h1-as64496", address="64496.10.0.1.11", role="host", gateway="r1-as64496", link_count=1),
-        NodeInfo(name="h2-as64496", address="64496.10.0.1.12", role="host", gateway="r1-as64496", link_count=1),
-        NodeInfo(name="h1-as64497", address="64497.10.0.1.11", role="host", gateway="r2-as64497", link_count=1),
-        NodeInfo(name="nat-gw", address="64496.10.0.2.1", role="nat_gateway", route_count=3, link_count=2),
+        NodeInfo(name="r1-as64496", address="64496-10.0.1.1", role="router", route_count=5, link_count=3),
+        NodeInfo(name="r2-as64497", address="64497-10.0.1.1", role="router", route_count=4, link_count=2),
+        NodeInfo(name="h1-as64496", address="64496-10.0.1.11", role="host", gateway="r1-as64496", link_count=1),
+        NodeInfo(name="h2-as64496", address="64496-10.0.1.12", role="host", gateway="r1-as64496", link_count=1),
+        NodeInfo(name="h1-as64497", address="64497-10.0.1.11", role="host", gateway="r2-as64497", link_count=1),
+        NodeInfo(name="nat-gw", address="64496-10.0.2.1", role="nat_gateway", route_count=3, link_count=2),
     ]
 
     routes = [
-        RouteInfo(destination="64497.0.0.0.0/8", next_hop="r2-as64497", interface="eth0", metric=10, tier="global"),
-        RouteInfo(destination="64496.10.0.1.0/24", next_hop="direct", interface="eth1", metric=0, tier="local"),
-        RouteInfo(destination="64496.10.0.2.0/24", next_hop="nat-gw", interface="eth2", metric=5, tier="local"),
+        RouteInfo(destination="64497-0.0.0.0/8", next_hop="r2-as64497", interface="eth0", metric=10, tier="global"),
+        RouteInfo(destination="64496-10.0.1.0/24", next_hop="direct", interface="eth1", metric=0, tier="local"),
+        RouteInfo(destination="64496-10.0.2.0/24", next_hop="nat-gw", interface="eth2", metric=5, tier="local"),
         RouteInfo(destination="0.0.0.0.0/0", next_hop="r1-as64496", interface="eth0", metric=100, tier="global"),
-        RouteInfo(destination="64497.10.0.1.0/24", next_hop="r2-as64497", interface="eth0", metric=15, tier="global"),
+        RouteInfo(destination="64497-10.0.1.0/24", next_hop="r2-as64497", interface="eth0", metric=15, tier="global"),
     ]
 
     flows = [
-        FlowInfo(src_addr="64496.10.0.1.11", dst_addr="64497.10.0.1.11", protocol=6, src_port=45200, dst_port=80, packets=152, octets=98304),
-        FlowInfo(src_addr="64496.10.0.1.12", dst_addr="64497.10.0.1.11", protocol=17, src_port=53000, dst_port=53, packets=24, octets=2048),
-        FlowInfo(src_addr="64497.10.0.1.11", dst_addr="64496.10.0.1.11", protocol=6, src_port=80, dst_port=45200, packets=148, octets=524288),
-        FlowInfo(src_addr="64496.10.0.1.11", dst_addr="64496.10.0.2.1", protocol=1, src_port=0, dst_port=0, packets=5, octets=320),
+        FlowInfo(src_addr="64496-10.0.1.11", dst_addr="64497-10.0.1.11", protocol=6, src_port=45200, dst_port=80, packets=152, octets=98304),
+        FlowInfo(src_addr="64496-10.0.1.12", dst_addr="64497-10.0.1.11", protocol=17, src_port=53000, dst_port=53, packets=24, octets=2048),
+        FlowInfo(src_addr="64497-10.0.1.11", dst_addr="64496-10.0.1.11", protocol=6, src_port=80, dst_port=45200, packets=148, octets=524288),
+        FlowInfo(src_addr="64496-10.0.1.11", dst_addr="64496-10.0.2.1", protocol=1, src_port=0, dst_port=0, packets=5, octets=320),
     ]
 
     qos_classes = [
@@ -227,16 +227,16 @@ def build_demo_data() -> DashboardData:
     ]
 
     nat_mappings = [
-        NATInfo(internal_addr="64496.10.0.1.11", external_addr="64496.10.0.2.100", mode="dynamic", internal_port=45200, external_port=45200, packets_out=152, packets_in=148),
-        NATInfo(internal_addr="64496.10.0.1.12", external_addr="64496.10.0.2.100", mode="pat", internal_port=53000, external_port=60001, packets_out=24, packets_in=24),
-        NATInfo(internal_addr="64496.10.0.1.99", external_addr="64496.10.0.2.50", mode="static", internal_port=0, external_port=0, packets_out=1000, packets_in=950),
+        NATInfo(internal_addr="64496-10.0.1.11", external_addr="64496-10.0.2.100", mode="dynamic", internal_port=45200, external_port=45200, packets_out=152, packets_in=148),
+        NATInfo(internal_addr="64496-10.0.1.12", external_addr="64496-10.0.2.100", mode="pat", internal_port=53000, external_port=60001, packets_out=24, packets_in=24),
+        NATInfo(internal_addr="64496-10.0.1.99", external_addr="64496-10.0.2.50", mode="static", internal_port=0, external_port=0, packets_out=1000, packets_in=950),
     ]
 
     docker_nodes = [
-        DockerNodeInfo(name="r1-as64496", address="64496.10.0.1.1", role="router", network_count=3, status="running"),
-        DockerNodeInfo(name="r2-as64497", address="64497.10.0.1.1", role="router", network_count=2, status="running"),
-        DockerNodeInfo(name="h1-as64496", address="64496.10.0.1.11", role="host", network_count=1, status="running"),
-        DockerNodeInfo(name="nat-gw", address="64496.10.0.2.1", role="nat_gateway", network_count=2, status="running"),
+        DockerNodeInfo(name="r1-as64496", address="64496-10.0.1.1", role="router", network_count=3, status="running"),
+        DockerNodeInfo(name="r2-as64497", address="64497-10.0.1.1", role="router", network_count=2, status="running"),
+        DockerNodeInfo(name="h1-as64496", address="64496-10.0.1.11", role="host", network_count=1, status="running"),
+        DockerNodeInfo(name="nat-gw", address="64496-10.0.2.1", role="nat_gateway", network_count=2, status="running"),
     ]
 
     return DashboardData(

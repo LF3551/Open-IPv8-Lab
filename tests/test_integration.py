@@ -186,7 +186,7 @@ class TestWHOIS8Validate:
     def test_valid_destination(self):
         s = EndToEndScenario(clock=_FakeClock())
         s.setup_zone()
-        dst = IPv8Address.parse("64496.192.0.2.100")
+        dst = IPv8Address.parse("64496-192.0.2.100")
         r = s.validate_egress(dst)
         assert r.success
 
@@ -217,8 +217,8 @@ class TestRouting:
     def test_route_found(self):
         s = EndToEndScenario(clock=_FakeClock())
         s.setup_zone()
-        src = IPv8Address.parse("64496.192.0.2.10")
-        dst = IPv8Address.parse("64496.192.0.2.100")
+        src = IPv8Address.parse("64496-192.0.2.10")
+        dst = IPv8Address.parse("64496-192.0.2.100")
         r = s.route_packet(src, dst)
         assert r.success
         assert "via" in r.detail
@@ -226,7 +226,7 @@ class TestRouting:
     def test_no_route(self):
         s = EndToEndScenario(clock=_FakeClock())
         s.setup_zone()
-        src = IPv8Address.parse("64496.192.0.2.10")
+        src = IPv8Address.parse("64496-192.0.2.10")
         dst = IPv8Address.parse("99999.10.0.0.1")
         r = s.route_packet(src, dst)
         assert not r.success
@@ -236,8 +236,8 @@ class TestIngressFilter:
     def test_clean_packet(self):
         s = EndToEndScenario(clock=_FakeClock())
         s.setup_zone()
-        src = IPv8Address.parse("64496.192.0.2.10")
-        dst = IPv8Address.parse("64496.192.0.2.100")
+        src = IPv8Address.parse("64496-192.0.2.10")
+        dst = IPv8Address.parse("64496-192.0.2.100")
         r = s.check_ingress(src, dst)
         assert r.success
 
@@ -245,7 +245,7 @@ class TestIngressFilter:
         s = EndToEndScenario(clock=_FakeClock())
         s.setup_zone()
         src = IPv8Address.parse("99999.10.0.0.1")  # wrong ASN
-        dst = IPv8Address.parse("64496.192.0.2.100")
+        dst = IPv8Address.parse("64496-192.0.2.100")
         r = s.check_ingress(src, dst)
         assert not r.success
 

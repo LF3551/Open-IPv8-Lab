@@ -84,7 +84,7 @@ class TestClassify:
         assert entry.external_routing == ExternalRouting.IPV4_ONLY
 
     def test_asn_unicast(self) -> None:
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         entry = classify_address(addr)
         assert entry.usage == "Explicit public services only"
         assert entry.external_routing == ExternalRouting.GLOBAL
@@ -108,7 +108,7 @@ class TestClassify:
 
 class TestUsageSummary:
     def test_returns_dict(self) -> None:
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         d = usage_summary(addr)
         assert d["address"] == "0.0.251.240.10.0.0.1"
         assert d["external_routing"] == "global"
@@ -144,7 +144,7 @@ class TestAddrUsageCLI:
         assert data["external_routing"] == "never"
 
     def test_classify_text(self) -> None:
-        result = runner.invoke(app, ["classify", "64496.192.0.2.1"])
+        result = runner.invoke(app, ["classify", "64496-192.0.2.1"])
         assert result.exit_code == 0
         assert "public" in result.output.lower()
 
@@ -158,7 +158,7 @@ class TestAddrUsageCLI:
         result = runner.invoke(app, [
             "batch",
             "127.1.0.0.10.0.0.1",
-            "64496.192.0.2.1",
+            "64496-192.0.2.1",
             "0.0.0.0.8.8.8.8",
             "--json",
         ])
@@ -174,7 +174,7 @@ class TestAddrUsageCLI:
         result = runner.invoke(app, [
             "batch",
             "127.1.0.0.10.0.0.1",
-            "64496.192.0.2.1",
+            "64496-192.0.2.1",
         ])
         assert result.exit_code == 0
         assert "Internal" in result.output

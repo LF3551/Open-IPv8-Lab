@@ -238,16 +238,16 @@ def cmd_demo(
 
     # --- Static NAT ---
     gw_s = NATGateway(mode=NATMode.STATIC)
-    gw_s.add_static_mapping("127.1.0.0.10.0.1.10", "64496.10.0.1.100")
+    gw_s.add_static_mapping("127.1.0.0.10.0.1.10", "64496-10.0.1.100")
     pkt = IPv8Packet(
         src=IPv8Address.parse("127.1.0.0.10.0.1.10"),
-        dst=IPv8Address.parse("64497.10.0.1.1"),
+        dst=IPv8Address.parse("64497-10.0.1.1"),
         payload=b"static-test",
     )
     out = gw_s.translate_egress(pkt)
     back = gw_s.translate_ingress(
-        IPv8Packet(src=IPv8Address.parse("64497.10.0.1.1"),
-                   dst=IPv8Address.parse("64496.10.0.1.100"), payload=b"reply")
+        IPv8Packet(src=IPv8Address.parse("64497-10.0.1.1"),
+                   dst=IPv8Address.parse("64496-10.0.1.100"), payload=b"reply")
     ) if out else None
     results.append({
         "mode": "static",
@@ -259,11 +259,11 @@ def cmd_demo(
 
     # --- Dynamic NAT ---
     gw_d = NATGateway(mode=NATMode.DYNAMIC)
-    gw_d.add_pool_address("64496.10.0.1.200")
-    gw_d.add_pool_address("64496.10.0.1.201")
+    gw_d.add_pool_address("64496-10.0.1.200")
+    gw_d.add_pool_address("64496-10.0.1.201")
     hosts = ["127.1.0.0.10.0.1.20", "127.1.0.0.10.0.1.21"]
     for h in hosts:
-        p = IPv8Packet(src=IPv8Address.parse(h), dst=IPv8Address.parse("64497.10.0.1.1"), payload=b"dyn")
+        p = IPv8Packet(src=IPv8Address.parse(h), dst=IPv8Address.parse("64497-10.0.1.1"), payload=b"dyn")
         gw_d.translate_egress(p)
     results.append({
         "mode": "dynamic",
@@ -273,9 +273,9 @@ def cmd_demo(
     })
 
     # --- PAT ---
-    gw_p = NATGateway(mode=NATMode.PAT, pat_address="64496.10.0.1.50")
+    gw_p = NATGateway(mode=NATMode.PAT, pat_address="64496-10.0.1.50")
     for port in range(8080, 8085):
-        p = IPv8Packet(src=IPv8Address.parse("127.1.0.0.10.0.1.30"), dst=IPv8Address.parse("64497.10.0.1.1"), payload=b"pat")
+        p = IPv8Packet(src=IPv8Address.parse("127.1.0.0.10.0.1.30"), dst=IPv8Address.parse("64497-10.0.1.1"), payload=b"pat")
         gw_p.translate_egress(p, src_port=port)
     results.append({
         "mode": "pat",

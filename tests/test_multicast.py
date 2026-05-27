@@ -51,7 +51,7 @@ class TestClassifyMulticast:
         assert classify_multicast(addr) == MulticastType.UNKNOWN_PROTOCOL
 
     def test_not_multicast(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         assert classify_multicast(addr) == MulticastType.NOT_MULTICAST
 
 
@@ -115,7 +115,7 @@ class TestAnalyzeMulticast:
         assert info.deprecated is True
 
     def test_unicast_not_multicast(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         info = analyze_multicast(addr)
         assert info.multicast_type == MulticastType.NOT_MULTICAST
         assert info.routable_beyond_as is False

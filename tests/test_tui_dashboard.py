@@ -27,17 +27,17 @@ from ipv8lab.tui_dashboard import (
 
 class TestNodeInfo:
     def test_create(self) -> None:
-        n = NodeInfo(name="r1", address="64496.10.0.1.1", role="router")
+        n = NodeInfo(name="r1", address="64496-10.0.1.1", role="router")
         assert n.name == "r1"
         assert n.role == "router"
 
     def test_to_row(self) -> None:
-        n = NodeInfo(name="h1", address="64496.10.0.1.10", role="host", gateway="r1", route_count=3, link_count=1)
+        n = NodeInfo(name="h1", address="64496-10.0.1.10", role="host", gateway="r1", route_count=3, link_count=1)
         row = n.to_row()
-        assert row == ("h1", "64496.10.0.1.10", "host", "r1", "3", "1")
+        assert row == ("h1", "64496-10.0.1.10", "host", "r1", "3", "1")
 
     def test_default_values(self) -> None:
-        n = NodeInfo(name="x", address="64496.10.0.1.1")
+        n = NodeInfo(name="x", address="64496-10.0.1.1")
         assert n.role == "host"
         assert n.gateway == ""
         assert n.route_count == 0
@@ -45,8 +45,8 @@ class TestNodeInfo:
 
 class TestRouteInfo:
     def test_create(self) -> None:
-        r = RouteInfo(destination="64497.0.0.0.0/8", next_hop="r2", metric=10)
-        assert r.destination == "64497.0.0.0.0/8"
+        r = RouteInfo(destination="64497-0.0.0.0/8", next_hop="r2", metric=10)
+        assert r.destination == "64497-0.0.0.0/8"
 
     def test_to_row(self) -> None:
         r = RouteInfo(destination="10.0.0.0/8", next_hop="gw", interface="eth0", metric=5, tier="local")
@@ -61,7 +61,7 @@ class TestRouteInfo:
 
 class TestFlowInfo:
     def test_create(self) -> None:
-        f = FlowInfo(src_addr="64496.10.0.1.11", dst_addr="64497.10.0.1.11", protocol=6)
+        f = FlowInfo(src_addr="64496-10.0.1.11", dst_addr="64497-10.0.1.11", protocol=6)
         assert f.protocol == 6
 
     def test_to_row_tcp(self) -> None:
@@ -97,7 +97,7 @@ class TestQoSInfo:
 
 class TestNATInfo:
     def test_create(self) -> None:
-        m = NATInfo(internal_addr="64496.10.0.1.11", external_addr="64496.10.0.2.100", mode="pat")
+        m = NATInfo(internal_addr="64496-10.0.1.11", external_addr="64496-10.0.2.100", mode="pat")
         assert m.mode == "pat"
 
     def test_to_row(self) -> None:
@@ -108,13 +108,13 @@ class TestNATInfo:
 
 class TestDockerNodeInfo:
     def test_create(self) -> None:
-        d = DockerNodeInfo(name="r1", address="64496.10.0.1.1", role="router", network_count=3)
+        d = DockerNodeInfo(name="r1", address="64496-10.0.1.1", role="router", network_count=3)
         assert d.network_count == 3
 
     def test_to_row(self) -> None:
-        d = DockerNodeInfo(name="r1", address="64496.10.0.1.1", role="router", network_count=2, status="running")
+        d = DockerNodeInfo(name="r1", address="64496-10.0.1.1", role="router", network_count=2, status="running")
         row = d.to_row()
-        assert row == ("r1", "64496.10.0.1.1", "router", "2", "running")
+        assert row == ("r1", "64496-10.0.1.1", "router", "2", "running")
 
 
 # ---------------------------------------------------------------------------

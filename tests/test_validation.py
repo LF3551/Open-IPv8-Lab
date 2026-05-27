@@ -20,7 +20,7 @@ class TestValidatePrefix:
         assert result.routable_externally is True
 
     def test_asn_unicast_is_global(self):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         result = validate_prefix(addr)
         assert result.scope == RoutingScope.GLOBAL
         assert result.routable_externally is True
@@ -55,7 +55,7 @@ class TestValidatePrefix:
         assert result.routable_externally is False
 
     def test_interior_link_not_external(self):
-        addr = IPv8Address.parse("64496.222.0.0.1")
+        addr = IPv8Address.parse("64496-222.0.0.1")
         result = validate_prefix(addr)
         assert result.scope == RoutingScope.INTERNAL
         assert result.routable_externally is False
@@ -79,45 +79,45 @@ class TestValidatePrefix:
 
 class TestCheckEgress:
     def test_normal_unicast_no_violations(self):
-        src = IPv8Address.parse("64496.192.0.2.1")
-        dst = IPv8Address.parse("64497.198.51.100.7")
+        src = IPv8Address.parse("64496-192.0.2.1")
+        dst = IPv8Address.parse("64497-198.51.100.7")
         assert check_egress(src, dst) == []
 
     def test_internal_zone_src_violation(self):
         src = IPv8Address.parse("127.1.0.0.10.0.0.1")
-        dst = IPv8Address.parse("64497.198.51.100.7")
+        dst = IPv8Address.parse("64497-198.51.100.7")
         violations = check_egress(src, dst)
         assert len(violations) == 1
         assert "127.x.x.x" in violations[0]
 
     def test_internal_zone_dst_violation(self):
-        src = IPv8Address.parse("64496.192.0.2.1")
+        src = IPv8Address.parse("64496-192.0.2.1")
         dst = IPv8Address.parse("127.2.0.0.10.0.0.1")
         violations = check_egress(src, dst)
         assert len(violations) == 1
 
     def test_rine_src_violation(self):
         src = IPv8Address.parse("100.0.0.1.10.0.0.1")
-        dst = IPv8Address.parse("64497.198.51.100.7")
+        dst = IPv8Address.parse("64497-198.51.100.7")
         violations = check_egress(src, dst)
         assert len(violations) == 1
         assert "RINE" in violations[0]
 
     def test_rine_dst_violation(self):
-        src = IPv8Address.parse("64496.192.0.2.1")
+        src = IPv8Address.parse("64496-192.0.2.1")
         dst = IPv8Address.parse("100.0.0.2.10.0.0.1")
         violations = check_egress(src, dst)
         assert len(violations) == 1
 
     def test_interior_link_violation(self):
-        src = IPv8Address.parse("64496.222.0.0.1")
-        dst = IPv8Address.parse("64497.198.51.100.7")
+        src = IPv8Address.parse("64496-222.0.0.1")
+        dst = IPv8Address.parse("64497-198.51.100.7")
         violations = check_egress(src, dst)
         assert len(violations) == 1
         assert "interior link" in violations[0]
 
     def test_broadcast_dst_violation(self):
-        src = IPv8Address.parse("64496.192.0.2.1")
+        src = IPv8Address.parse("64496-192.0.2.1")
         dst = IPv8Address.parse("255.255.255.255.255.255.255.255")
         violations = check_egress(src, dst)
         assert len(violations) == 1

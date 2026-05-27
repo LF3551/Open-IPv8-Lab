@@ -20,12 +20,12 @@ runner = CliRunner()
 
 class TestRunCmd:
     def test_run(self) -> None:
-        result = runner.invoke(app, ["run", "64496.10.0.0.1", "64500.10.0.0.1"])
+        result = runner.invoke(app, ["run", "64496-10.0.0.1", "64500-10.0.0.1"])
         assert result.exit_code == 0
         assert "traceroute8" in result.output.lower() or "✓" in result.output
 
     def test_run_json(self) -> None:
-        result = runner.invoke(app, ["run", "64496.10.0.0.1", "64500.10.0.0.1", "--json"])
+        result = runner.invoke(app, ["run", "64496-10.0.0.1", "64500-10.0.0.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["completed"] is True
@@ -33,14 +33,14 @@ class TestRunCmd:
 
     def test_run_custom_hops(self) -> None:
         result = runner.invoke(app, [
-            "run", "64496.10.0.0.1", "64500.10.0.0.1", "-n", "3", "--json",
+            "run", "64496-10.0.0.1", "64500-10.0.0.1", "-n", "3", "--json",
         ])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["completed"] is True
 
     def test_run_bad_addr(self) -> None:
-        result = runner.invoke(app, ["run", "bad", "64500.10.0.0.1"])
+        result = runner.invoke(app, ["run", "bad", "64500-10.0.0.1"])
         assert result.exit_code != 0
 
 

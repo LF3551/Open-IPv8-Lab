@@ -323,10 +323,10 @@ def build_diamond_topology() -> tuple[Topology, IPv8Address, IPv8Address]:
     R0 default route goes via R1 (shorter path).
     """
     topo = Topology()
-    topo.add_router("R0", "64496.10.0.0.1", {"*": "R1"})
-    topo.add_router("R1", "64497.10.0.0.1", {"*": "R3"})
-    topo.add_router("R2", "64498.10.0.0.1", {"*": "R3"})
-    topo.add_router("R3", "64499.10.0.0.1")
+    topo.add_router("R0", "64496-10.0.0.1", {"*": "R1"})
+    topo.add_router("R1", "64497-10.0.0.1", {"*": "R3"})
+    topo.add_router("R2", "64498-10.0.0.1", {"*": "R3"})
+    topo.add_router("R3", "64499-10.0.0.1")
 
     src = topo.routers["R0"].address
     dst = topo.routers["R3"].address
@@ -339,12 +339,12 @@ def build_loop_topology() -> tuple[Topology, IPv8Address, IPv8Address]:
     R0 → R1 → R2 → R1 (loop)
     """
     topo = Topology()
-    topo.add_router("R0", "64496.10.0.0.1", {"*": "R1"})
-    topo.add_router("R1", "64497.10.0.0.1", {"*": "R2"})
-    topo.add_router("R2", "64498.10.0.0.1", {"*": "R1"})  # loop back
+    topo.add_router("R0", "64496-10.0.0.1", {"*": "R1"})
+    topo.add_router("R1", "64497-10.0.0.1", {"*": "R2"})
+    topo.add_router("R2", "64498-10.0.0.1", {"*": "R1"})  # loop back
 
     src = topo.routers["R0"].address
-    dst = IPv8Address.parse("64500.10.0.0.1")  # unreachable
+    dst = IPv8Address.parse("64500-10.0.0.1")  # unreachable
     return topo, src, dst
 
 
@@ -353,12 +353,12 @@ def build_multi_path_topology() -> tuple[Topology, IPv8Address, IPv8Address]:
 
     R0 routes 64499 prefix via R2 (direct), everything else via R1.
     """
-    dst_prefix = IPv8Address.parse("64499.10.0.0.1").prefix_str
+    dst_prefix = IPv8Address.parse("64499-10.0.0.1").prefix_str
     topo = Topology()
-    topo.add_router("R0", "64496.10.0.0.1", {dst_prefix: "R2", "*": "R1"})
-    topo.add_router("R1", "64497.10.0.0.1", {"*": "R3"})
-    topo.add_router("R2", "64498.10.0.0.1", {"*": "R3"})
-    topo.add_router("R3", "64499.10.0.0.1")
+    topo.add_router("R0", "64496-10.0.0.1", {dst_prefix: "R2", "*": "R1"})
+    topo.add_router("R1", "64497-10.0.0.1", {"*": "R3"})
+    topo.add_router("R2", "64498-10.0.0.1", {"*": "R3"})
+    topo.add_router("R3", "64499-10.0.0.1")
 
     src = topo.routers["R0"].address
     dst = topo.routers["R3"].address

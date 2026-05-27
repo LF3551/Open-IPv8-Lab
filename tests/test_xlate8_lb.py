@@ -28,15 +28,15 @@ runner = CliRunner()
 
 class TestParity:
     def test_even(self) -> None:
-        addr = IPv8Address.parse("64496.10.0.0.2")
+        addr = IPv8Address.parse("64496-10.0.0.2")
         assert address_parity(addr) == Parity.EVEN
 
     def test_odd(self) -> None:
-        addr = IPv8Address.parse("64496.10.0.0.3")
+        addr = IPv8Address.parse("64496-10.0.0.3")
         assert address_parity(addr) == Parity.ODD
 
     def test_zero_is_even(self) -> None:
-        addr = IPv8Address.parse("64496.10.0.0.0")
+        addr = IPv8Address.parse("64496-10.0.0.0")
         assert address_parity(addr) == Parity.EVEN
 
 

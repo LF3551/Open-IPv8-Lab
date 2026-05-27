@@ -20,8 +20,8 @@ runner = CliRunner()
 
 
 def _make_pkt(
-    src: str = "64496.10.0.1.1",
-    dst: str = "64497.10.0.1.100",
+    src: str = "64496-10.0.1.1",
+    dst: str = "64497-10.0.1.100",
     payload: bytes = b"test",
 ) -> IPv8Packet:
     return IPv8Packet(
@@ -137,7 +137,7 @@ class TestWrite:
         out = tmp_path / "w.pcap"
         result = runner.invoke(app, [
             "write", str(out),
-            "--src", "64500.10.0.0.1", "--dst", "64501.10.0.0.2",
+            "--src", "64500-10.0.0.1", "--dst", "64501-10.0.0.2",
             "--payload", "custom", "--json",
         ])
         assert result.exit_code == 0

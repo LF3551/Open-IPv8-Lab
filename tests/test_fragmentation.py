@@ -28,8 +28,8 @@ from ipv8lab.packet import IPv8Packet
 
 def _pkt(payload_size: int = 100, flags: int = 0, identification: int = 1) -> IPv8Packet:
     return IPv8Packet(
-        src=IPv8Address.parse("64496.10.0.1.1"),
-        dst=IPv8Address.parse("64497.10.0.1.100"),
+        src=IPv8Address.parse("64496-10.0.1.1"),
+        dst=IPv8Address.parse("64497-10.0.1.100"),
         payload=bytes(range(256)) * (payload_size // 256) + bytes(range(payload_size % 256)),
         identification=identification,
         flags=flags,
@@ -286,8 +286,8 @@ class TestRoundTrip:
 
     def test_empty_payload(self) -> None:
         pkt = IPv8Packet(
-            src=IPv8Address.parse("64496.10.0.1.1"),
-            dst=IPv8Address.parse("64497.10.0.1.100"),
+            src=IPv8Address.parse("64496-10.0.1.1"),
+            dst=IPv8Address.parse("64497-10.0.1.100"),
             payload=b"",
         )
         result = fragment_and_reassemble(pkt, mtu=1500)

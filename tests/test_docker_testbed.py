@@ -30,24 +30,24 @@ from ipv8lab.docker_testbed import (
 
 class TestNodeSpec:
     def test_create(self) -> None:
-        n = NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER)
+        n = NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER)
         assert n.name == "r1"
         assert n.role == NodeRole.ROUTER
 
     def test_to_dict(self) -> None:
-        n = NodeSpec(name="h1", address="64496.10.0.1.10", role=NodeRole.HOST, gateway="r1")
+        n = NodeSpec(name="h1", address="64496-10.0.1.10", role=NodeRole.HOST, gateway="r1")
         d = n.to_dict()
         assert d["name"] == "h1"
         assert d["role"] == "host"
         assert d["gateway"] == "r1"
 
     def test_default_role(self) -> None:
-        n = NodeSpec(name="x", address="64496.10.0.1.1")
+        n = NodeSpec(name="x", address="64496-10.0.1.1")
         assert n.role == NodeRole.HOST
 
     def test_services_and_env(self) -> None:
         n = NodeSpec(
-            name="collector", address="64496.10.0.1.99",
+            name="collector", address="64496-10.0.1.99",
             role=NodeRole.COLLECTOR,
             services=["netflow8"],
             environment={"LOG_LEVEL": "debug"},
@@ -148,13 +148,13 @@ class TestTestbed:
 
     def test_add_node(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
         assert tb.node_count == 1
 
     def test_add_link(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-        tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10"))
         lk = tb.add_link("r1", "h1", "10.0.1.0/24")
         assert tb.link_count == 1
         assert lk.network_name == "net-r1-h1"
@@ -168,7 +168,7 @@ class TestTestbed:
 
     def test_get_node(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1"))
         assert tb.get_node("r1") is not None
         assert tb.get_node("missing") is None
 
@@ -198,7 +198,7 @@ class TestTestbed:
 
     def test_to_dict(self) -> None:
         tb = Testbed(name="test")
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
         d = tb.to_dict()
         assert d["name"] == "test"
         assert "stats" in d
@@ -222,8 +222,8 @@ class TestCompose:
 
     def test_compose_service_fields(self) -> None:
         tb = Testbed(name="mytest")
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-        tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10", gateway="r1"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10", gateway="r1"))
         tb.add_link("r1", "h1", "10.0.1.0/24")
         compose = tb.generate_compose()
         svc_r1 = compose["services"]["r1"]  # type: ignore[index]
@@ -233,15 +233,15 @@ class TestCompose:
 
     def test_compose_yaml(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
         yml = tb.generate_compose_yaml()
         assert "services:" in yml
         assert "r1:" in yml
 
     def test_node_networks(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-        tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10"))
         tb.add_link("r1", "h1", "10.0.1.0/24", network_name="lan1")
         compose = tb.generate_compose()
         svc_r1 = compose["services"]["r1"]  # type: ignore[index]
@@ -249,8 +249,8 @@ class TestCompose:
 
     def test_gateway_env(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-        tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10", gateway="r1"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10", gateway="r1"))
         compose = tb.generate_compose()
         svc_h1 = compose["services"]["h1"]  # type: ignore[index]
         assert svc_h1["environment"]["IPV8_GATEWAY"] == "r1"
@@ -264,8 +264,8 @@ class TestCompose:
 class TestNodeConfig:
     def test_generate_config(self) -> None:
         tb = Testbed()
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-        tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10", gateway="r1"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10", gateway="r1"))
         tb.add_link("r1", "h1", "10.0.1.0/24")
         cfg = tb.generate_node_config("r1")
         assert cfg["name"] == "r1"
@@ -306,8 +306,8 @@ class TestWriteOutput:
 
     def test_configs_are_valid_yaml(self) -> None:
         tb = Testbed(name="yaml-test")
-        tb.add_node(NodeSpec(name="r1", address="64496.10.0.1.1", role=NodeRole.ROUTER))
-        tb.add_node(NodeSpec(name="h1", address="64496.10.0.1.10", gateway="r1"))
+        tb.add_node(NodeSpec(name="r1", address="64496-10.0.1.1", role=NodeRole.ROUTER))
+        tb.add_node(NodeSpec(name="h1", address="64496-10.0.1.10", gateway="r1"))
         tb.add_link("r1", "h1", "10.0.1.0/24")
 
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -12,8 +12,8 @@ from ipv8lab.packet import HEADER_SIZE, IPV8_VERSION, IPv8Packet, PROTO_EXPERIME
 
 class TestPacketBuildParse:
     def test_roundtrip(self):
-        src = IPv8Address.parse("64496.192.0.2.1")
-        dst = IPv8Address.parse("64497.198.51.100.7")
+        src = IPv8Address.parse("64496-192.0.2.1")
+        dst = IPv8Address.parse("64497-198.51.100.7")
         pkt = IPv8Packet(src=src, dst=dst, payload=b"hello")
         raw = pkt.to_bytes()
         restored = IPv8Packet.from_bytes(raw)
@@ -34,8 +34,8 @@ class TestPacketBuildParse:
         assert restored.payload == b""
 
     def test_checksum_mismatch(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, payload=b"data")
         raw = bytearray(pkt.to_bytes())
         # corrupt one byte
@@ -48,8 +48,8 @@ class TestPacketBuildParse:
             IPv8Packet.from_bytes(b"\x00" * 10)
 
     def test_truncated_payload(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, payload=b"long payload data here")
         raw = pkt.to_bytes()
         # cut off part of the payload
@@ -61,16 +61,16 @@ class TestPacketHeaderFields:
     """Test IPv8 header fields per Section 5.1."""
 
     def test_version_is_8(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst)
         raw = pkt.to_bytes()
         # First nibble of first byte is version
         assert (raw[0] >> 4) == 8
 
     def test_ihl_is_7(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst)
         raw = pkt.to_bytes()
         # Lower nibble of first byte is IHL
@@ -80,22 +80,22 @@ class TestPacketHeaderFields:
         assert HEADER_SIZE == 28
 
     def test_tos_roundtrip(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, tos=0x28)
         restored = IPv8Packet.from_bytes(pkt.to_bytes())
         assert restored.tos == 0x28
 
     def test_identification_roundtrip(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, identification=12345)
         restored = IPv8Packet.from_bytes(pkt.to_bytes())
         assert restored.identification == 12345
 
     def test_flags_and_fragment_offset(self):
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, flags=0x02, fragment_offset=100)
         restored = IPv8Packet.from_bytes(pkt.to_bytes())
         assert restored.flags == 0x02
@@ -103,8 +103,8 @@ class TestPacketHeaderFields:
 
     def test_total_length_in_wire(self):
         import struct
-        src = IPv8Address.parse("64496.10.0.0.1")
-        dst = IPv8Address.parse("64497.10.0.0.2")
+        src = IPv8Address.parse("64496-10.0.0.1")
+        dst = IPv8Address.parse("64497-10.0.0.2")
         pkt = IPv8Packet(src=src, dst=dst, payload=b"test")
         raw = pkt.to_bytes()
         total_length = struct.unpack("!H", raw[2:4])[0]
@@ -113,8 +113,8 @@ class TestPacketHeaderFields:
     def test_src_dst_split_in_wire(self):
         """Verify ASN prefix and host are separate 32-bit fields in wire format."""
         import struct
-        src = IPv8Address.parse("64496.192.0.2.1")
-        dst = IPv8Address.parse("64497.198.51.100.7")
+        src = IPv8Address.parse("64496-192.0.2.1")
+        dst = IPv8Address.parse("64497-198.51.100.7")
         pkt = IPv8Packet(src=src, dst=dst)
         raw = pkt.to_bytes()
         # Bytes 12-15: src ASN prefix, 16-19: src host, 20-23: dst ASN, 24-27: dst host

@@ -36,7 +36,7 @@ class TestInit:
 
     def test_init_pat(self) -> None:
         _reset()
-        result = runner.invoke(app, ["init", "--mode", "pat", "--pat-addr", "64496.10.0.1.50"])
+        result = runner.invoke(app, ["init", "--mode", "pat", "--pat-addr", "64496-10.0.1.50"])
         assert result.exit_code == 0
 
     def test_init_json(self) -> None:
@@ -60,20 +60,20 @@ class TestAddStatic:
     def test_add_static(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        result = runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         assert result.exit_code == 0
 
     def test_add_static_json(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100", "--json"])
+        result = runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["mode"] == "static"
 
     def test_add_static_no_init(self) -> None:
         _reset()
-        result = runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        result = runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         assert result.exit_code != 0
 
 
@@ -85,13 +85,13 @@ class TestAddPool:
     def test_add_pool(self) -> None:
         _reset()
         runner.invoke(app, ["init", "--mode", "dynamic"])
-        result = runner.invoke(app, ["add-pool", "64496.10.0.1.200"])
+        result = runner.invoke(app, ["add-pool", "64496-10.0.1.200"])
         assert result.exit_code == 0
 
     def test_add_pool_json(self) -> None:
         _reset()
         runner.invoke(app, ["init", "--mode", "dynamic"])
-        result = runner.invoke(app, ["add-pool", "64496.10.0.1.200", "--json"])
+        result = runner.invoke(app, ["add-pool", "64496-10.0.1.200", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["pool_size"] == 1
@@ -105,9 +105,9 @@ class TestTranslate:
     def test_egress(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         result = runner.invoke(app, [
-            "translate", "--src", "127.1.0.0.10.0.1.10", "--dst", "64497.10.0.1.1",
+            "translate", "--src", "127.1.0.0.10.0.1.10", "--dst", "64497-10.0.1.1",
         ])
         assert result.exit_code == 0
         assert "✓" in result.output
@@ -115,9 +115,9 @@ class TestTranslate:
     def test_egress_json(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         result = runner.invoke(app, [
-            "translate", "--src", "127.1.0.0.10.0.1.10", "--dst", "64497.10.0.1.1", "--json",
+            "translate", "--src", "127.1.0.0.10.0.1.10", "--dst", "64497-10.0.1.1", "--json",
         ])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -126,9 +126,9 @@ class TestTranslate:
     def test_ingress(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         result = runner.invoke(app, [
-            "translate", "--src", "64497.10.0.1.1", "--dst", "64496.10.0.1.100",
+            "translate", "--src", "64497-10.0.1.1", "--dst", "64496-10.0.1.100",
             "--dir", "ingress",
         ])
         assert result.exit_code == 0
@@ -137,7 +137,7 @@ class TestTranslate:
         _reset()
         runner.invoke(app, ["init"])
         result = runner.invoke(app, [
-            "translate", "--src", "127.1.0.0.10.0.1.10", "--dst", "64497.10.0.1.1", "--json",
+            "translate", "--src", "127.1.0.0.10.0.1.10", "--dst", "64497-10.0.1.1", "--json",
         ])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -180,7 +180,7 @@ class TestMappings:
     def test_mappings_json(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         result = runner.invoke(app, ["mappings", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -195,7 +195,7 @@ class TestRelease:
     def test_release(self) -> None:
         _reset()
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496.10.0.1.100"])
+        runner.invoke(app, ["add-static", "127.1.0.0.10.0.1.10", "64496-10.0.1.100"])
         result = runner.invoke(app, ["release", "127.1.0.0.10.0.1.10"])
         assert result.exit_code == 0
         assert "✓" in result.output

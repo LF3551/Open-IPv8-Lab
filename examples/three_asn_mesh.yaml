@@ -12,15 +12,15 @@ network:
 
 nodes:
   - name: node-a
-    address: 64496.10.0.1.1
+    address: 64496-10.0.1.1
     type: host
 
   - name: node-b
-    address: 64497.10.0.2.1
+    address: 64497-10.0.2.1
     type: host
 
   - name: node-c
-    address: 64498.10.0.3.1
+    address: 64498-10.0.3.1
     type: host
 
 routers:

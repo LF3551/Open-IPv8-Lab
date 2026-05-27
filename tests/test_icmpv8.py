@@ -20,8 +20,8 @@ from ipv8lab.icmpv8 import (
     time_exceeded,
 )
 
-SRC = IPv8Address.parse("64496.192.0.2.1")
-DST = IPv8Address.parse("64497.198.51.100.7")
+SRC = IPv8Address.parse("64496-192.0.2.1")
+DST = IPv8Address.parse("64497-198.51.100.7")
 
 
 class TestEchoRequestReply:

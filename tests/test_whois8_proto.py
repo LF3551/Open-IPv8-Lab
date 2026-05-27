@@ -257,7 +257,7 @@ class TestClient:
 
     def test_validate_destination_valid(self) -> None:
         c = self._setup()
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         r = c.validate_destination(addr)
         assert r.code == ResponseCode.OK
 

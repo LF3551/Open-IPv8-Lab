@@ -119,8 +119,8 @@ class NATGateway:
     Usage::
 
         gw = NATGateway(mode=NATMode.DYNAMIC)
-        gw.add_pool_address("64496.10.0.0.100")
-        gw.add_pool_address("64496.10.0.0.101")
+        gw.add_pool_address("64496-10.0.0.100")
+        gw.add_pool_address("64496-10.0.0.101")
 
         translated = gw.translate_egress(packet)
         original   = gw.translate_ingress(response)

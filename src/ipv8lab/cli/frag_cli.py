@@ -31,8 +31,8 @@ console = Console()
 
 @app.command("fragment")
 def cmd_fragment(
-    src: str = typer.Option("64496.10.0.1.1", "--src", help="Source IPv8 address."),
-    dst: str = typer.Option("64497.10.0.1.100", "--dst", help="Destination IPv8 address."),
+    src: str = typer.Option("64496-10.0.1.1", "--src", help="Source IPv8 address."),
+    dst: str = typer.Option("64497-10.0.1.100", "--dst", help="Destination IPv8 address."),
     payload_size: int = typer.Option(3000, "--size", "-s", help="Payload size in bytes."),
     mtu: int = typer.Option(DEFAULT_MTU, "--mtu", "-m", help="MTU in bytes."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
@@ -99,8 +99,8 @@ def cmd_fragment(
 
 @app.command("reassemble")
 def cmd_reassemble(
-    src: str = typer.Option("64496.10.0.1.1", "--src", help="Source IPv8 address."),
-    dst: str = typer.Option("64497.10.0.1.100", "--dst", help="Destination IPv8 address."),
+    src: str = typer.Option("64496-10.0.1.1", "--src", help="Source IPv8 address."),
+    dst: str = typer.Option("64497-10.0.1.100", "--dst", help="Destination IPv8 address."),
     payload_size: int = typer.Option(3000, "--size", "-s", help="Payload size in bytes."),
     mtu: int = typer.Option(DEFAULT_MTU, "--mtu", "-m", help="MTU in bytes."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
@@ -152,8 +152,8 @@ def cmd_info(
 ) -> None:
     """Show fragmentation info for a given packet size and MTU."""
     pkt = IPv8Packet(
-        src=IPv8Address.parse("64496.10.0.1.1"),
-        dst=IPv8Address.parse("64497.10.0.1.1"),
+        src=IPv8Address.parse("64496-10.0.1.1"),
+        dst=IPv8Address.parse("64497-10.0.1.1"),
         payload=bytes(payload_size),
         flags=FLAG_DF if df else 0,
     )
@@ -204,8 +204,8 @@ def cmd_demo(
     results: list[dict[str, object]] = []
     for label, size, mtu in scenarios:
         pkt = IPv8Packet(
-            src=IPv8Address.parse("64496.10.0.1.1"),
-            dst=IPv8Address.parse("64497.10.0.1.100"),
+            src=IPv8Address.parse("64496-10.0.1.1"),
+            dst=IPv8Address.parse("64497-10.0.1.100"),
             payload=bytes(range(256)) * (size // 256) + bytes(range(size % 256)),
             identification=len(results) + 1,
         )

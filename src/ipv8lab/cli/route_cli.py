@@ -48,7 +48,7 @@ def simulate(
         if len(host_nodes) < 2:
             console.print("[red]Need at least 2 host nodes for auto-detect.[/red]")
             raise typer.Exit(1)
-        dst = host_nodes[1].address.asn_notation
+        dst = host_nodes[1].address.canonical
 
     console.print(f"[bold]Network:[/bold] {sim.name}")
     console.print(f"[bold]From:[/bold] {src} → [bold]To:[/bold] {dst}")

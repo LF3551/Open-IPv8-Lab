@@ -118,7 +118,7 @@ class TestValidateRoute:
 
 class TestValidateDestination:
     def test_valid_destination(self, resolver: WHOIS8Resolver):
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         result = resolver.validate_destination(addr)
         assert result.is_valid
 
@@ -146,6 +146,6 @@ class TestValidateDestination:
     def test_expired_destination(self):
         r = WHOIS8Resolver()
         r._registry[64496] = WHOIS8Record(asn=64496, holder="X", active=False)
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         result = r.validate_destination(addr)
         assert result.status == ValidationStatus.EXPIRED

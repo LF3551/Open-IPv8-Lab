@@ -26,7 +26,7 @@ class _FakeClock:
 class TestDNS8Resolver:
     def test_add_and_resolve(self) -> None:
         r = DNS8Resolver()
-        addr = IPv8Address.parse("64496.10.0.1.100")
+        addr = IPv8Address.parse("64496-10.0.1.100")
         r.add_record(A8Record(name="example.ipv8", address=addr))
         rec = r.resolve("example.ipv8")
         assert rec is not None
@@ -39,7 +39,7 @@ class TestDNS8Resolver:
     def test_size(self) -> None:
         r = DNS8Resolver()
         assert r.size == 0
-        addr = IPv8Address.parse("64496.10.0.1.100")
+        addr = IPv8Address.parse("64496-10.0.1.100")
         r.add_record(A8Record(name="a.ipv8", address=addr))
         assert r.size == 1
 
@@ -68,7 +68,7 @@ class TestDNSLookup:
     def setup_method(self) -> None:
         self.clock = _FakeClock()
         self.flow = NorthSouthFlow(clock=self.clock)
-        addr = IPv8Address.parse("64496.10.0.1.100")
+        addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.dns.add_record(A8Record(name="service.ipv8", address=addr))
 
     def test_successful_lookup(self) -> None:
@@ -105,14 +105,14 @@ class TestXLATECreate:
 
     def test_create_entry(self) -> None:
         int_addr = IPv8Address.parse("127.1.0.0.10.0.1.10")
-        ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        ext_addr = IPv8Address.parse("64496-10.0.1.100")
         ok = self.flow.create_xlate_entry(int_addr, ext_addr, internal_port=8080, external_port=443)
         assert ok is True
         assert self.flow.xlate_table.size == 1
 
     def test_create_event(self) -> None:
         int_addr = IPv8Address.parse("127.1.0.0.10.0.1.10")
-        ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        ext_addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.create_xlate_entry(int_addr, ext_addr)
         evts = [e for e in self.flow.events if e.step == "xlate_create"]
         assert len(evts) == 1
@@ -128,7 +128,7 @@ class TestEgressTranslation:
         self.clock = _FakeClock()
         self.flow = NorthSouthFlow(clock=self.clock)
         self.int_addr = IPv8Address.parse("127.1.0.0.10.0.1.10")
-        self.ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        self.ext_addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.create_xlate_entry(self.int_addr, self.ext_addr, internal_port=8080)
 
     def test_translate_rewrites_src(self) -> None:
@@ -168,7 +168,7 @@ class TestEgressFlow:
     def setup_method(self) -> None:
         self.clock = _FakeClock()
         self.flow = NorthSouthFlow(clock=self.clock)
-        ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        ext_addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.dns.add_record(A8Record(name="api.ipv8", address=ext_addr))
 
     def test_full_egress(self) -> None:
@@ -201,28 +201,28 @@ class TestIngressTranslation:
         self.clock = _FakeClock()
         self.flow = NorthSouthFlow(clock=self.clock)
         self.int_addr = IPv8Address.parse("127.1.0.0.10.0.1.10")
-        self.ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        self.ext_addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.create_xlate_entry(
             self.int_addr, self.ext_addr,
             internal_port=8080, external_port=443,
         )
 
     def test_reverse_translate(self) -> None:
-        remote = IPv8Address.parse("64497.10.0.1.50")
+        remote = IPv8Address.parse("64497-10.0.1.50")
         pkt = IPv8Packet(src=remote, dst=self.ext_addr, payload=b"response")
         result = self.flow.translate_ingress(pkt, external_port=443)
         assert result is not None
         assert str(result.dst) == str(self.int_addr)
 
     def test_no_reverse_entry(self) -> None:
-        remote = IPv8Address.parse("64497.10.0.1.50")
-        other_dst = IPv8Address.parse("64498.10.0.1.200")
+        remote = IPv8Address.parse("64497-10.0.1.50")
+        other_dst = IPv8Address.parse("64498-10.0.1.200")
         pkt = IPv8Packet(src=remote, dst=other_dst, payload=b"response")
         result = self.flow.translate_ingress(pkt, external_port=443)
         assert result is None
 
     def test_ingress_event(self) -> None:
-        remote = IPv8Address.parse("64497.10.0.1.50")
+        remote = IPv8Address.parse("64497-10.0.1.50")
         pkt = IPv8Packet(src=remote, dst=self.ext_addr, payload=b"response")
         self.flow.translate_ingress(pkt, external_port=443)
         evts = [e for e in self.flow.events if e.step == "translate_ingress"]
@@ -239,18 +239,18 @@ class TestIngressFlow:
         self.clock = _FakeClock()
         self.flow = NorthSouthFlow(clock=self.clock)
         self.int_addr = IPv8Address.parse("127.1.0.0.10.0.1.10")
-        self.ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        self.ext_addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.create_xlate_entry(self.int_addr, self.ext_addr, external_port=443)
 
     def test_full_ingress(self) -> None:
-        remote = IPv8Address.parse("64497.10.0.1.50")
+        remote = IPv8Address.parse("64497-10.0.1.50")
         pkt = self.flow.ingress_flow(remote, self.ext_addr, external_port=443)
         assert pkt is not None
         assert str(pkt.dst) == str(self.int_addr)
 
     def test_ingress_no_entry(self) -> None:
-        remote = IPv8Address.parse("64497.10.0.1.50")
-        other = IPv8Address.parse("64498.10.0.1.200")
+        remote = IPv8Address.parse("64497-10.0.1.50")
+        other = IPv8Address.parse("64498-10.0.1.200")
         pkt = self.flow.ingress_flow(remote, other, external_port=443)
         assert pkt is None
 
@@ -263,7 +263,7 @@ class TestRoundTrip:
     def setup_method(self) -> None:
         self.clock = _FakeClock()
         self.flow = NorthSouthFlow(clock=self.clock)
-        ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        ext_addr = IPv8Address.parse("64496-10.0.1.100")
         self.flow.dns.add_record(A8Record(name="web.ipv8", address=ext_addr))
 
     def test_full_round_trip(self) -> None:
@@ -318,7 +318,7 @@ class TestNoDNSBlocked:
         clock = _FakeClock()
         flow = NorthSouthFlow(clock=clock)
         int_addr = IPv8Address.parse("127.1.0.0.10.0.1.10")
-        ext_addr = IPv8Address.parse("64496.10.0.1.100")
+        ext_addr = IPv8Address.parse("64496-10.0.1.100")
         pkt = IPv8Packet(src=int_addr, dst=ext_addr, payload=b"data")
         result = flow.translate_egress(pkt)
         assert result is None

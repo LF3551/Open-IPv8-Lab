@@ -30,7 +30,7 @@ from ipv8lab.cost_factor import CFComponents, compute_cf
 # ---------------------------------------------------------------------------
 
 def _adv(
-    prefix: str = "64496.0.0.0.0/8",
+    prefix: str = "64496-0.0.0.0/8",
     origin: int = 64496,
     as_path: tuple[int, ...] = (64496,),
     next_hop: str = "peer-1",
@@ -168,12 +168,12 @@ class TestReceiveAdvertisement:
             _adv(origin=64497, as_path=(64497, 64496), next_hop="peer-b"),
             hop_cfs=(500, 500),
         )
-        assert s.candidate_count("64496.0.0.0.0/8") == 2
+        assert s.candidate_count("64496-0.0.0.0/8") == 2
 
     def test_withdraw(self) -> None:
         s = BGP8PathSelector(local_asn=64500)
         s.receive_advertisement(_adv(origin=64496, as_path=(64496,)))
-        ok = s.withdraw("64496.0.0.0.0/8", 64496)
+        ok = s.withdraw("64496-0.0.0.0/8", 64496)
         assert ok is True
         assert s.rib_size() == 0
 
@@ -200,7 +200,7 @@ class TestPathSelection:
             _adv(origin=64497, as_path=(64497, 64496), next_hop="peer-b"),
             hop_cfs=(100, 100),
         )
-        result = s.select("64496.0.0.0.0/8")
+        result = s.select("64496-0.0.0.0/8")
         assert result.best is not None
         assert result.best.advertisement.next_hop == "peer-b"
         assert result.best.accumulated_cf == 200
@@ -222,7 +222,7 @@ class TestPathSelection:
             _adv(origin=64497, as_path=(64497, 64496), next_hop="indirect"),
             hop_cfs=(500, 500),
         )
-        result = s.select("64496.0.0.0.0/8")
+        result = s.select("64496-0.0.0.0/8")
         assert result.best is not None
         # Both have CF=1000; direct has shorter AS-path
         assert result.best.advertisement.next_hop == "direct"
@@ -239,7 +239,7 @@ class TestPathSelection:
             _adv(origin=64496, as_path=(64496,), next_hop="peer-a"),
             hop_cfs=(1000,),
         )
-        result = s.select("64496.0.0.0.0/8")
+        result = s.select("64496-0.0.0.0/8")
         assert result.best is not None
         assert result.best.advertisement.origin_asn == 64496
 
@@ -256,21 +256,21 @@ class TestPathSelection:
             hop_cfs=(200,),
         )
         # Without intrazone, A wins
-        assert s.select("64496.0.0.0.0/8").best is not None
-        assert s.select("64496.0.0.0.0/8").best.advertisement.next_hop == "peer-a"  # type: ignore[union-attr]
+        assert s.select("64496-0.0.0.0/8").best is not None
+        assert s.select("64496-0.0.0.0/8").best.advertisement.next_hop == "peer-a"  # type: ignore[union-attr]
 
         # Intrazone CF doesn't change relative order (adds equally)
         s.intrazone_cf = 50
-        assert s.select("64496.0.0.0.0/8").best.advertisement.next_hop == "peer-a"  # type: ignore[union-attr]
+        assert s.select("64496-0.0.0.0/8").best.advertisement.next_hop == "peer-a"  # type: ignore[union-attr]
 
     def test_select_all(self) -> None:
         s = BGP8PathSelector(local_asn=64500)
         s.receive_advertisement(
-            _adv(prefix="64496.0.0.0.0/8", origin=64496, as_path=(64496,)),
+            _adv(prefix="64496-0.0.0.0/8", origin=64496, as_path=(64496,)),
             hop_cfs=(100,),
         )
         s.receive_advertisement(
-            _adv(prefix="64497.0.0.0.0/8", origin=64497, as_path=(64497,)),
+            _adv(prefix="64497-0.0.0.0/8", origin=64497, as_path=(64497,)),
             hop_cfs=(200,),
         )
         results = s.select_all()
@@ -280,7 +280,7 @@ class TestPathSelection:
     def test_best_path_shortcut(self) -> None:
         s = BGP8PathSelector(local_asn=64500)
         s.receive_advertisement(_adv(as_path=(64496,)), hop_cfs=(100,))
-        assert s.best_path("64496.0.0.0.0/8") is not None
+        assert s.best_path("64496-0.0.0.0/8") is not None
 
     def test_best_path_none(self) -> None:
         s = BGP8PathSelector(local_asn=64500)
@@ -310,7 +310,7 @@ class TestCFIntegration:
             hop_cfs=(cf_b,),
         )
 
-        best = s.best_path("64496.0.0.0.0/8")
+        best = s.best_path("64496-0.0.0.0/8")
         assert best is not None
         assert best.advertisement.next_hop == "good-link"
         assert best.accumulated_cf < cf_b
@@ -328,7 +328,7 @@ class TestCFIntegration:
             _adv(origin=64496, as_path=(64498, 64497, 64496), next_hop="transit"),
             hop_cfs=(hop1, hop2, hop3),
         )
-        best = s.best_path("64496.0.0.0.0/8")
+        best = s.best_path("64496-0.0.0.0/8")
         assert best is not None
         assert best.accumulated_cf == hop1 + hop2 + hop3
 
@@ -339,7 +339,7 @@ class TestCFIntegration:
             _adv(origin=64496, as_path=(64496,)),
             hop_cfs=(0xFFFFFFFF, 1),
         )
-        best = s.best_path("64496.0.0.0.0/8")
+        best = s.best_path("64496-0.0.0.0/8")
         assert best is not None
         assert best.accumulated_cf == 0xFFFFFFFF
 
@@ -352,7 +352,7 @@ class TestCFIntegration:
             distance_km=10000.0,
             measured_rtt_ms=5.0,  # impossibly fast
         )
-        result = s.select("64496.0.0.0.0/8")
+        result = s.select("64496-0.0.0.0/8")
         assert result.has_anomalies is True
         assert result.best is not None
         assert result.best.anomaly is True
@@ -360,18 +360,18 @@ class TestCFIntegration:
     def test_build_advertisement_helper(self) -> None:
         components = CFComponents(rtt=0.2, packet_loss=0.1)
         adv, cf_val = build_advertisement(
-            prefix="64496.0.0.0.0/8",
+            prefix="64496-0.0.0.0/8",
             origin_asn=64496,
             as_path=(64496,),
             cf_components=components,
         )
-        assert adv.prefix == "64496.0.0.0.0/8"
+        assert adv.prefix == "64496-0.0.0.0/8"
         assert cf_val == compute_cf(components)
         assert cf_val > 0
 
     def test_build_advertisement_no_cf(self) -> None:
         adv, cf_val = build_advertisement(
-            prefix="64496.0.0.0.0/8",
+            prefix="64496-0.0.0.0/8",
             origin_asn=64496,
             as_path=(64496,),
         )
@@ -446,7 +446,7 @@ class TestRealisticScenario:
             ),
         )
 
-        result = sel.select("64496.0.0.0.0/8")
+        result = sel.select("64496-0.0.0.0/8")
         assert result.best is not None
         assert result.best.advertisement.next_hop == "peer-a"
         assert result.reason == "lowest CF"
@@ -467,13 +467,13 @@ class TestRealisticScenario:
         )
 
         # Primary wins
-        assert sel.best_path("64496.0.0.0.0/8").advertisement.next_hop == "primary"  # type: ignore[union-attr]
+        assert sel.best_path("64496-0.0.0.0/8").advertisement.next_hop == "primary"  # type: ignore[union-attr]
 
         # Withdraw primary
-        sel.withdraw("64496.0.0.0.0/8", 64496)
+        sel.withdraw("64496-0.0.0.0/8", 64496)
 
         # Backup takes over
-        best = sel.best_path("64496.0.0.0.0/8")
+        best = sel.best_path("64496-0.0.0.0/8")
         assert best is not None
         assert best.advertisement.next_hop == "backup"
 

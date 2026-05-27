@@ -3,11 +3,11 @@ network:
 
 nodes:
   - name: node-a
-    address: 64496.192.0.2.1
+    address: 64496-192.0.2.1
     type: host
 
   - name: node-b
-    address: 64497.198.51.100.7
+    address: 64497-198.51.100.7
     type: host
 
 routers:

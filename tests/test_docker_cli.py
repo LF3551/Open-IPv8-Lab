@@ -73,13 +73,13 @@ class TestInit:
 class TestAddNode:
     def test_add_node(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["add-node", "r1", "--addr", "64496.10.0.1.1", "--role", "router"])
+        result = runner.invoke(app, ["add-node", "r1", "--addr", "64496-10.0.1.1", "--role", "router"])
         assert result.exit_code == 0
         assert "r1" in result.output
 
     def test_add_node_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["add-node", "h1", "--addr", "64496.10.0.1.10", "--json"])
+        result = runner.invoke(app, ["add-node", "h1", "--addr", "64496-10.0.1.10", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["name"] == "h1"
@@ -87,11 +87,11 @@ class TestAddNode:
 
     def test_add_node_bad_role(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["add-node", "x", "--addr", "64496.10.0.1.1", "--role", "INVALID"])
+        result = runner.invoke(app, ["add-node", "x", "--addr", "64496-10.0.1.1", "--role", "INVALID"])
         assert result.exit_code != 0
 
     def test_add_node_no_init(self) -> None:
-        result = runner.invoke(app, ["add-node", "r1", "--addr", "64496.10.0.1.1"])
+        result = runner.invoke(app, ["add-node", "r1", "--addr", "64496-10.0.1.1"])
         assert result.exit_code != 0 or "not initialized" in result.output
 
 
@@ -103,16 +103,16 @@ class TestAddNode:
 class TestAddLink:
     def test_add_link(self) -> None:
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-node", "r1", "--addr", "64496.10.0.1.1", "--role", "router"])
-        runner.invoke(app, ["add-node", "h1", "--addr", "64496.10.0.1.10"])
+        runner.invoke(app, ["add-node", "r1", "--addr", "64496-10.0.1.1", "--role", "router"])
+        runner.invoke(app, ["add-node", "h1", "--addr", "64496-10.0.1.10"])
         result = runner.invoke(app, ["add-link", "r1", "h1", "--net", "10.0.1.0/24"])
         assert result.exit_code == 0
         assert "r1" in result.output
 
     def test_add_link_json(self) -> None:
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-node", "r1", "--addr", "64496.10.0.1.1"])
-        runner.invoke(app, ["add-node", "h1", "--addr", "64496.10.0.1.10"])
+        runner.invoke(app, ["add-node", "r1", "--addr", "64496-10.0.1.1"])
+        runner.invoke(app, ["add-node", "h1", "--addr", "64496-10.0.1.10"])
         result = runner.invoke(app, ["add-link", "r1", "h1", "--net", "10.0.1.0/24", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -120,8 +120,8 @@ class TestAddLink:
 
     def test_add_link_custom_name(self) -> None:
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-node", "r1", "--addr", "64496.10.0.1.1"])
-        runner.invoke(app, ["add-node", "h1", "--addr", "64496.10.0.1.10"])
+        runner.invoke(app, ["add-node", "r1", "--addr", "64496-10.0.1.1"])
+        runner.invoke(app, ["add-node", "h1", "--addr", "64496-10.0.1.10"])
         result = runner.invoke(app, ["add-link", "r1", "h1", "--net", "10.0.1.0/24", "--name", "mynet", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -153,7 +153,7 @@ class TestTopology:
 
     def test_topology_with_nodes(self) -> None:
         runner.invoke(app, ["init"])
-        runner.invoke(app, ["add-node", "r1", "--addr", "64496.10.0.1.1", "--role", "router"])
+        runner.invoke(app, ["add-node", "r1", "--addr", "64496-10.0.1.1", "--role", "router"])
         result = runner.invoke(app, ["topology"])
         assert result.exit_code == 0
         assert "r1" in result.output

@@ -19,7 +19,7 @@ from ipv8lab.qos import (
 )
 
 
-def _pkt(tos: int = 0, src: str = "64496.10.0.1.10", dst: str = "64497.10.0.1.1") -> IPv8Packet:
+def _pkt(tos: int = 0, src: str = "64496-10.0.1.10", dst: str = "64497-10.0.1.1") -> IPv8Packet:
     return IPv8Packet(
         src=IPv8Address.parse(src),
         dst=IPv8Address.parse(dst),
@@ -157,10 +157,10 @@ class TestPriorityQueuing:
 
     def test_same_class_fifo(self) -> None:
         shaper = TrafficShaper(policy=QoSPolicy.PRIORITY)
-        pkt1 = IPv8Packet(src=IPv8Address.parse("64496.10.0.1.10"),
-                          dst=IPv8Address.parse("64497.10.0.1.1"), tos=0, payload=b"first")
-        pkt2 = IPv8Packet(src=IPv8Address.parse("64496.10.0.1.10"),
-                          dst=IPv8Address.parse("64497.10.0.1.1"), tos=0, payload=b"second")
+        pkt1 = IPv8Packet(src=IPv8Address.parse("64496-10.0.1.10"),
+                          dst=IPv8Address.parse("64497-10.0.1.1"), tos=0, payload=b"first")
+        pkt2 = IPv8Packet(src=IPv8Address.parse("64496-10.0.1.10"),
+                          dst=IPv8Address.parse("64497-10.0.1.1"), tos=0, payload=b"second")
         shaper.enqueue(pkt1)
         shaper.enqueue(pkt2)
         assert shaper.dequeue() is pkt1

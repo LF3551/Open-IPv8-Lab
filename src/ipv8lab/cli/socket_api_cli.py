@@ -52,7 +52,7 @@ def info(
 
 @app.command()
 def create(
-    address: str = typer.Argument(..., help="IPv8 address (e.g. 64496.10.0.0.1)"),
+    address: str = typer.Argument(..., help="IPv8 address (e.g. 64496-10.0.0.1)"),
     port: int = typer.Option(0, help="Port number"),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:

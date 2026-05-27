@@ -25,7 +25,7 @@ class TestCGNATEngine:
     def test_prefix_preserved(self) -> None:
         """r.r.r.r MUST NOT be modified during translation."""
         engine = CGNATEngine(operator_asn=64496)
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         result = engine.translate(addr)
         assert result.violation == CGNATViolation.NONE
         assert result.translated.routing_prefix == addr.routing_prefix
@@ -33,7 +33,7 @@ class TestCGNATEngine:
 
     def test_only_host_part_translated(self) -> None:
         engine = CGNATEngine(operator_asn=64496, pool_start="198.51.100.1", pool_end="198.51.100.254")
-        addr = IPv8Address.parse("64496.192.168.1.1")
+        addr = IPv8Address.parse("64496-192.168.1.1")
         result = engine.translate(addr)
         assert result.translated.prefix_str == addr.prefix_str
         assert result.translated.host_str.startswith("198.51.100.")
@@ -49,25 +49,25 @@ class TestCGNATEngine:
     def test_no_asn_nonzero_prefix_violation(self) -> None:
         """Operator without ASN receiving non-zero r.r.r.r → violation."""
         engine = CGNATEngine(operator_asn=0)
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         result = engine.translate(addr)
         assert result.violation == CGNATViolation.NO_ASN_NONZERO_PREFIX
 
     def test_validate_ok(self) -> None:
         engine = CGNATEngine(operator_asn=64496)
-        orig = IPv8Address.parse("64496.10.0.0.1")
-        trans = IPv8Address.parse("64496.198.51.100.1")
+        orig = IPv8Address.parse("64496-10.0.0.1")
+        trans = IPv8Address.parse("64496-198.51.100.1")
         assert engine.validate_translation(orig, trans) == CGNATViolation.NONE
 
     def test_validate_prefix_modified(self) -> None:
         engine = CGNATEngine(operator_asn=64496)
-        orig = IPv8Address.parse("64496.10.0.0.1")
-        trans = IPv8Address.parse("64497.198.51.100.1")
+        orig = IPv8Address.parse("64496-10.0.0.1")
+        trans = IPv8Address.parse("64497-198.51.100.1")
         assert engine.validate_translation(orig, trans) == CGNATViolation.PREFIX_MODIFIED
 
     def test_bindings_recorded(self) -> None:
         engine = CGNATEngine(operator_asn=64496)
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         engine.translate(addr, src_port=12345)
         assert len(engine.bindings) == 1
         b = engine.bindings[0]
@@ -76,20 +76,20 @@ class TestCGNATEngine:
 
     def test_reverse_translate(self) -> None:
         engine = CGNATEngine(operator_asn=64496)
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         result = engine.translate(addr)
         found = engine.reverse_translate(result.translated)
         assert found == addr
 
     def test_reverse_translate_miss(self) -> None:
         engine = CGNATEngine(operator_asn=64496)
-        addr = IPv8Address.parse("64496.1.2.3.4")
+        addr = IPv8Address.parse("64496-1.2.3.4")
         assert engine.reverse_translate(addr) is None
 
     def test_flush(self) -> None:
         engine = CGNATEngine(operator_asn=64496)
-        engine.translate(IPv8Address.parse("64496.10.0.0.1"))
-        engine.translate(IPv8Address.parse("64496.10.0.0.2"))
+        engine.translate(IPv8Address.parse("64496-10.0.0.1"))
+        engine.translate(IPv8Address.parse("64496-10.0.0.2"))
         n = engine.flush()
         assert n == 2
         assert len(engine.bindings) == 0
@@ -144,7 +144,7 @@ class TestCGNATCLI:
 
     def test_translate_json(self) -> None:
         runner.invoke(app, ["init", "--asn", "64496"])
-        result = runner.invoke(app, ["translate", "64496.10.0.0.1", "--json"])
+        result = runner.invoke(app, ["translate", "64496-10.0.0.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["prefix_preserved"] is True
@@ -152,7 +152,7 @@ class TestCGNATCLI:
 
     def test_translate_text(self) -> None:
         runner.invoke(app, ["init", "--asn", "64496"])
-        result = runner.invoke(app, ["translate", "64496.10.0.0.1"])
+        result = runner.invoke(app, ["translate", "64496-10.0.0.1"])
         assert result.exit_code == 0
         assert "preserved" in result.output.lower()
 
@@ -176,7 +176,7 @@ class TestCGNATCLI:
 
     def test_bindings_json(self) -> None:
         runner.invoke(app, ["init", "--asn", "64496"])
-        runner.invoke(app, ["translate", "64496.10.0.0.1"])
+        runner.invoke(app, ["translate", "64496-10.0.0.1"])
         result = runner.invoke(app, ["bindings", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -184,7 +184,7 @@ class TestCGNATCLI:
 
     def test_flush_json(self) -> None:
         runner.invoke(app, ["init", "--asn", "64496"])
-        runner.invoke(app, ["translate", "64496.10.0.0.1"])
+        runner.invoke(app, ["translate", "64496-10.0.0.1"])
         result = runner.invoke(app, ["flush", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)

@@ -30,7 +30,7 @@ class TestIsRinePrefix:
         assert is_rine_prefix(IPv8Address.parse("100.0.0.1.10.0.0.1"))
 
     def test_non_rine(self) -> None:
-        assert not is_rine_prefix(IPv8Address.parse("64496.10.0.0.1"))
+        assert not is_rine_prefix(IPv8Address.parse("64496-10.0.0.1"))
 
     def test_100_255(self) -> None:
         assert is_rine_prefix(IPv8Address.parse("100.255.255.255.1.2.3.4"))
@@ -43,7 +43,7 @@ class TestIsRinePrefix:
 class TestPacketFiltering:
     def test_non_rine_always_accepted(self) -> None:
         f = RINEPrefixFilter()
-        addr = IPv8Address.parse("64496.10.0.0.1")
+        addr = IPv8Address.parse("64496-10.0.0.1")
         result = f.filter_packet(addr, "eth0", InterfaceType.EXTERNAL)
         assert result.action == FilterAction.ACCEPT
 
@@ -92,7 +92,7 @@ class TestPacketFiltering:
 class TestBGP8Filtering:
     def test_non_rine_advertisement_accepted(self) -> None:
         f = RINEPrefixFilter()
-        addr = IPv8Address.parse("64496.0.0.0.0")
+        addr = IPv8Address.parse("64496-0.0.0.0")
         result = f.filter_bgp8_advertisement(addr, "eth0")
         assert result.action == FilterAction.ACCEPT
 
@@ -119,7 +119,7 @@ class TestBatchAndClear:
     def test_filter_batch(self) -> None:
         f = RINEPrefixFilter()
         items = [
-            (IPv8Address.parse("64496.10.0.0.1"), "eth0", InterfaceType.EXTERNAL),
+            (IPv8Address.parse("64496-10.0.0.1"), "eth0", InterfaceType.EXTERNAL),
             (IPv8Address.parse("100.0.0.1.10.0.0.1"), "eth0", InterfaceType.EXTERNAL),
             (IPv8Address.parse("100.0.0.2.10.0.0.1"), "ixp0", InterfaceType.PEERING),
         ]
@@ -155,7 +155,7 @@ class TestRINEProtectionCLI:
 
     def test_check_accept_json(self) -> None:
         runner.invoke(app, ["init"])
-        result = runner.invoke(app, ["check", "64496.10.0.0.1", "--json"])
+        result = runner.invoke(app, ["check", "64496-10.0.0.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["action"] == "accept"

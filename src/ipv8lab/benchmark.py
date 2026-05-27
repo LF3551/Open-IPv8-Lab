@@ -49,29 +49,29 @@ def bench_address_parse(iterations: int = 10_000) -> BenchmarkResult:
     """Benchmark IPv8Address.parse()."""
     return _bench(
         "address_parse",
-        lambda: IPv8Address.parse("64496.192.0.2.1"),
+        lambda: IPv8Address.parse("64496-192.0.2.1"),
         iterations,
     )
 
 
 def bench_address_to_int(iterations: int = 10_000) -> BenchmarkResult:
     """Benchmark IPv8Address.to_int()."""
-    addr = IPv8Address.parse("64496.192.0.2.1")
+    addr = IPv8Address.parse("64496-192.0.2.1")
     return _bench("address_to_int", addr.to_int, iterations)
 
 
 def bench_packet_serialize(iterations: int = 10_000) -> BenchmarkResult:
     """Benchmark IPv8Packet serialization."""
-    src = IPv8Address.parse("64496.192.0.2.1")
-    dst = IPv8Address.parse("64497.198.51.100.7")
+    src = IPv8Address.parse("64496-192.0.2.1")
+    dst = IPv8Address.parse("64497-198.51.100.7")
     pkt = IPv8Packet(src=src, dst=dst, payload=b"benchmark-payload")
     return _bench("packet_serialize", pkt.to_bytes, iterations)
 
 
 def bench_packet_deserialize(iterations: int = 10_000) -> BenchmarkResult:
     """Benchmark IPv8Packet deserialization."""
-    src = IPv8Address.parse("64496.192.0.2.1")
-    dst = IPv8Address.parse("64497.198.51.100.7")
+    src = IPv8Address.parse("64496-192.0.2.1")
+    dst = IPv8Address.parse("64497-198.51.100.7")
     pkt = IPv8Packet(src=src, dst=dst, payload=b"benchmark-payload")
     raw = pkt.to_bytes()
     return _bench("packet_deserialize", lambda: IPv8Packet.from_bytes(raw), iterations)

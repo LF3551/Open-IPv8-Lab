@@ -36,27 +36,27 @@ from ipv8lab.companions import (
 
 class TestBGP8:
     def test_peer_defaults(self):
-        p = BGP8Peer(asn=64496, address="64496.192.0.2.1")
+        p = BGP8Peer(asn=64496, address="64496-192.0.2.1")
         assert p.state == BGP8State.IDLE
         assert p.is_ebgp is True
 
     def test_advertisement_valid_prefix(self):
         adv = BGP8Advertisement(
-            prefix="64496.0.0.0.0/8", origin_asn=64496,
+            prefix="64496-0.0.0.0/8", origin_asn=64496,
             prefix_length=8,
         )
         assert adv.is_valid_ebgp_prefix()
 
     def test_advertisement_invalid_prefix(self):
         adv = BGP8Advertisement(
-            prefix="64496.192.168.0.0/24", origin_asn=64496,
+            prefix="64496-192.168.0.0/24", origin_asn=64496,
             prefix_length=24,
         )
         assert not adv.is_valid_ebgp_prefix()
 
     def test_advertisement_boundary_16(self):
         adv = BGP8Advertisement(
-            prefix="64496.192.0.0.0/16", origin_asn=64496,
+            prefix="64496-192.0.0.0/16", origin_asn=64496,
             prefix_length=16,
         )
         assert adv.is_valid_ebgp_prefix()
@@ -197,15 +197,15 @@ class TestRINE:
 
 class TestARP8:
     def test_entry_expiry(self):
-        e = ARP8Entry("64496.10.0.0.1", "aa:bb:cc:dd:ee:ff", timestamp=100.0)
+        e = ARP8Entry("64496-10.0.0.1", "aa:bb:cc:dd:ee:ff", timestamp=100.0)
         assert not e.is_expired(100.0)
         assert e.is_expired(100.0 + 14400.0)
 
     def test_table_learn_lookup(self):
         t = ARP8Table()
-        e = ARP8Entry("64496.10.0.0.1", "aa:bb:cc:dd:ee:ff")
+        e = ARP8Entry("64496-10.0.0.1", "aa:bb:cc:dd:ee:ff")
         t.learn(e)
-        assert t.lookup("64496.10.0.0.1") is e
+        assert t.lookup("64496-10.0.0.1") is e
         assert t.lookup("nope") is None
         assert t.size == 1
 
@@ -226,7 +226,7 @@ class TestARP8:
 
     def test_gratuitous_announce(self):
         t = ARP8Table()
-        e = t.gratuitous_announce("64496.10.0.0.1", "aa:bb:cc:dd:ee:ff")
+        e = t.gratuitous_announce("64496-10.0.0.1", "aa:bb:cc:dd:ee:ff")
         assert e.is_gratuitous is True
         assert t.size == 1
 
@@ -238,14 +238,14 @@ class TestARP8:
 class TestXLATE8:
     def test_create_entry(self):
         t = XLATE8Table()
-        e = XLATE8Entry("127.1.0.0.10.0.0.1", "64496.203.0.113.1",
+        e = XLATE8Entry("127.1.0.0.10.0.0.1", "64496-203.0.113.1",
                         internal_port=443, external_port=443)
         assert t.create_entry(e) is True
         assert t.size == 1
 
     def test_reject_no_dns(self):
         t = XLATE8Table()
-        e = XLATE8Entry("127.1.0.0.10.0.0.1", "64496.203.0.113.1",
+        e = XLATE8Entry("127.1.0.0.10.0.0.1", "64496-203.0.113.1",
                         dns_validated=False, internal_port=80)
         assert t.create_entry(e) is False
         assert t.size == 0

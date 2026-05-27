@@ -57,7 +57,7 @@ class TestSockaddrIn8:
         assert sa.sin8_asn == 64496  # backwards-compat alias
 
     def test_from_ipv8_address(self) -> None:
-        addr = IPv8Address.parse("64496.192.0.2.1")
+        addr = IPv8Address.parse("64496-192.0.2.1")
         sa = SockaddrIn8.from_ipv8_address(addr, port=443)
         assert sa.sin8_family == AF_INET8
         assert sa.sin8_port == 443
@@ -228,7 +228,7 @@ class TestSocketAPICLI:
         assert "sockaddr_in8" in result.output
 
     def test_create_json(self) -> None:
-        result = runner.invoke(app, ["create", "64496.10.0.0.1", "--port", "443", "--json"])
+        result = runner.invoke(app, ["create", "64496-10.0.0.1", "--port", "443", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["sin8_rn"] == 64496
@@ -236,7 +236,7 @@ class TestSocketAPICLI:
         assert data["sin8_port"] == 443
 
     def test_create_text(self) -> None:
-        result = runner.invoke(app, ["create", "64496.10.0.0.1"])
+        result = runner.invoke(app, ["create", "64496-10.0.0.1"])
         assert result.exit_code == 0
         assert "sin8_rn" in result.output
 
@@ -254,7 +254,7 @@ class TestSocketAPICLI:
 
     def test_simulate_json(self) -> None:
         result = runner.invoke(app, [
-            "simulate", "64496.10.0.0.1", "64497.10.0.0.2",
+            "simulate", "64496-10.0.0.1", "64497-10.0.0.2",
             "--port", "443", "--json",
         ])
         assert result.exit_code == 0
@@ -266,7 +266,7 @@ class TestSocketAPICLI:
         assert "close" in actions
 
     def test_simulate_text(self) -> None:
-        result = runner.invoke(app, ["simulate", "64496.10.0.0.1", "64497.10.0.0.2"])
+        result = runner.invoke(app, ["simulate", "64496-10.0.0.1", "64497-10.0.0.2"])
         assert result.exit_code == 0
         assert "connect" in result.output
 

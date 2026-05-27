@@ -52,7 +52,7 @@ class TestInit:
 
     def test_init_resets_state(self) -> None:
         runner.invoke(app, ["init", "--asn", "64497"])
-        runner.invoke(app, ["add-peer", "64498", "64498.10.0.1.1"])
+        runner.invoke(app, ["add-peer", "64498", "64498-10.0.1.1"])
         runner.invoke(app, ["init", "--asn", "64496", "--json"])
         result = runner.invoke(app, ["status", "--json"])
         data = json.loads(result.output)
@@ -68,12 +68,12 @@ class TestAddPeer:
         _reset()
 
     def test_add_peer(self) -> None:
-        result = runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1"])
+        result = runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1"])
         assert result.exit_code == 0
         assert "64497" in result.output
 
     def test_add_peer_json(self) -> None:
-        result = runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1", "--json"])
+        result = runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["asn"] == 64497
@@ -81,13 +81,13 @@ class TestAddPeer:
         assert data["total_peers"] == 1
 
     def test_add_ibgp_peer(self) -> None:
-        result = runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1", "--ibgp", "--json"])
+        result = runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1", "--ibgp", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["is_ebgp"] is False
 
     def test_add_peer_with_desc(self) -> None:
-        result = runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1", "--desc", "upstream", "--json"])
+        result = runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1", "--desc", "upstream", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["description"] == "upstream"
@@ -102,21 +102,21 @@ class TestAdvertise:
         _reset()
 
     def test_advertise_simple(self) -> None:
-        result = runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497"])
+        result = runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497"])
         assert result.exit_code == 0
         assert "accepted" in result.output.lower()
 
     def test_advertise_json(self) -> None:
-        result = runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497", "--json"])
+        result = runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["accepted"] is True
-        assert data["prefix"] == "64497.0.0.0.0/8"
+        assert data["prefix"] == "64497-0.0.0.0/8"
         assert data["rib_size"] == 1
 
     def test_advertise_with_as_path(self) -> None:
         result = runner.invoke(app, [
-            "advertise", "64497.0.0.0.0/8", "64497",
+            "advertise", "64497-0.0.0.0/8", "64497",
             "--as-path", "64498,64497", "--json",
         ])
         assert result.exit_code == 0
@@ -125,7 +125,7 @@ class TestAdvertise:
 
     def test_advertise_with_cf_components(self) -> None:
         result = runner.invoke(app, [
-            "advertise", "64497.0.0.0.0/8", "64497",
+            "advertise", "64497-0.0.0.0/8", "64497",
             "--rtt", "0.2", "--packet-loss", "0.1", "--json",
         ])
         assert result.exit_code == 0
@@ -134,7 +134,7 @@ class TestAdvertise:
 
     def test_advertise_with_hop_cfs(self) -> None:
         result = runner.invoke(app, [
-            "advertise", "64497.0.0.0.0/8", "64497",
+            "advertise", "64497-0.0.0.0/8", "64497",
             "--hop-cfs", "100,200", "--json",
         ])
         assert result.exit_code == 0
@@ -144,7 +144,7 @@ class TestAdvertise:
     def test_advertise_loop_rejected(self) -> None:
         runner.invoke(app, ["init", "--asn", "64496"])
         result = runner.invoke(app, [
-            "advertise", "64497.0.0.0.0/8", "64497",
+            "advertise", "64497-0.0.0.0/8", "64497",
             "--as-path", "64496,64497", "--json",
         ])
         assert result.exit_code == 0
@@ -153,7 +153,7 @@ class TestAdvertise:
 
     def test_advertise_invalid_prefix_length(self) -> None:
         result = runner.invoke(app, [
-            "advertise", "64497.0.0.0.0/32", "64497",
+            "advertise", "64497-0.0.0.0/32", "64497",
             "--prefix-len", "32", "--json",
         ])
         assert result.exit_code == 0
@@ -162,7 +162,7 @@ class TestAdvertise:
 
     def test_advertise_bad_cf_component(self) -> None:
         result = runner.invoke(app, [
-            "advertise", "64497.0.0.0.0/8", "64497",
+            "advertise", "64497-0.0.0.0/8", "64497",
             "--rtt", "1.5",
         ])
         assert result.exit_code == 1
@@ -177,20 +177,20 @@ class TestWithdraw:
         _reset()
 
     def test_withdraw(self) -> None:
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497"])
-        result = runner.invoke(app, ["withdraw", "64497.0.0.0.0/8", "64497", "--json"])
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497"])
+        result = runner.invoke(app, ["withdraw", "64497-0.0.0.0/8", "64497", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["withdrawn"] is True
 
     def test_withdraw_nonexistent(self) -> None:
-        result = runner.invoke(app, ["withdraw", "64497.0.0.0.0/8", "64497", "--json"])
+        result = runner.invoke(app, ["withdraw", "64497-0.0.0.0/8", "64497", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["withdrawn"] is False
 
     def test_withdraw_rich(self) -> None:
-        result = runner.invoke(app, ["withdraw", "64497.0.0.0.0/8", "64497"])
+        result = runner.invoke(app, ["withdraw", "64497-0.0.0.0/8", "64497"])
         assert result.exit_code == 0
 
 
@@ -203,37 +203,37 @@ class TestSelect:
         _reset()
 
     def test_select_no_paths(self) -> None:
-        result = runner.invoke(app, ["select", "64497.0.0.0.0/8", "--json"])
+        result = runner.invoke(app, ["select", "64497-0.0.0.0/8", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["best"] is None
         assert data["reason"] == "no paths"
 
     def test_select_one_path(self) -> None:
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497", "--hop-cfs", "100"])
-        result = runner.invoke(app, ["select", "64497.0.0.0.0/8", "--json"])
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497", "--hop-cfs", "100"])
+        result = runner.invoke(app, ["select", "64497-0.0.0.0/8", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["best"]["origin_asn"] == 64497
         assert data["best"]["accumulated_cf"] == 100
 
     def test_select_best_cf_wins(self) -> None:
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497",
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497",
                             "--as-path", "64497", "--hop-cfs", "500"])
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497",
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497",
                             "--as-path", "64498,64497", "--hop-cfs", "100"])
-        result = runner.invoke(app, ["select", "64497.0.0.0.0/8", "--json"])
+        result = runner.invoke(app, ["select", "64497-0.0.0.0/8", "--json"])
         data = json.loads(result.output)
         assert data["best"]["accumulated_cf"] == 100
 
     def test_select_rich(self) -> None:
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497", "--hop-cfs", "50"])
-        result = runner.invoke(app, ["select", "64497.0.0.0.0/8"])
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497", "--hop-cfs", "50"])
+        result = runner.invoke(app, ["select", "64497-0.0.0.0/8"])
         assert result.exit_code == 0
         assert "64497" in result.output
 
     def test_select_no_path_rich(self) -> None:
-        result = runner.invoke(app, ["select", "64497.0.0.0.0/8"])
+        result = runner.invoke(app, ["select", "64497-0.0.0.0/8"])
         assert result.exit_code == 0
         assert "No path" in result.output
 
@@ -258,15 +258,15 @@ class TestRib:
         assert data == []
 
     def test_rib_after_advertise(self) -> None:
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497"])
-        runner.invoke(app, ["advertise", "64499.0.0.0.0/8", "64499"])
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497"])
+        runner.invoke(app, ["advertise", "64499-0.0.0.0/8", "64499"])
         result = runner.invoke(app, ["rib", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert len(data) == 2
 
     def test_rib_rich(self) -> None:
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497"])
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497"])
         result = runner.invoke(app, ["rib"])
         assert result.exit_code == 0
         assert "64497" in result.output
@@ -292,8 +292,8 @@ class TestPeers:
         assert data == []
 
     def test_peers_after_add(self) -> None:
-        runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1"])
-        runner.invoke(app, ["add-peer", "64498", "64498.10.0.1.1", "--ibgp"])
+        runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1"])
+        runner.invoke(app, ["add-peer", "64498", "64498-10.0.1.1", "--ibgp"])
         result = runner.invoke(app, ["peers", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -302,7 +302,7 @@ class TestPeers:
         assert data[1]["is_ebgp"] is False
 
     def test_peers_rich(self) -> None:
-        runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1"])
+        runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1"])
         result = runner.invoke(app, ["peers"])
         assert result.exit_code == 0
         assert "64497" in result.output
@@ -325,8 +325,8 @@ class TestStatus:
         assert data["rib_size"] == 0
 
     def test_status_after_ops(self) -> None:
-        runner.invoke(app, ["add-peer", "64497", "64497.10.0.1.1"])
-        runner.invoke(app, ["advertise", "64497.0.0.0.0/8", "64497"])
+        runner.invoke(app, ["add-peer", "64497", "64497-10.0.1.1"])
+        runner.invoke(app, ["advertise", "64497-0.0.0.0/8", "64497"])
         result = runner.invoke(app, ["status", "--json"])
         data = json.loads(result.output)
         assert data["peers"] == 1

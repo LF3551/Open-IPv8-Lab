@@ -120,8 +120,8 @@ def inspect_pcap(
 @app.command("write")
 def write_pcap(
     output_path: str = typer.Argument(help="Output .pcap file path."),
-    src: str = typer.Option("64496.10.0.1.1", "--src", help="Source IPv8 address."),
-    dst: str = typer.Option("64497.10.0.1.1", "--dst", help="Destination IPv8 address."),
+    src: str = typer.Option("64496-10.0.1.1", "--src", help="Source IPv8 address."),
+    dst: str = typer.Option("64497-10.0.1.1", "--dst", help="Destination IPv8 address."),
     payload: str = typer.Option("hello", "--payload", help="Packet payload."),
     count: int = typer.Option(1, "--count", "-n", help="Number of packets."),
     as_json: bool = typer.Option(False, "--json", help="Output as JSON."),
@@ -188,12 +188,12 @@ def run_demo(
     writer = PcapWriter()
 
     packets_data = [
-        ("64496.10.0.1.1", "64497.10.0.1.100", b"GET /index.html"),
-        ("64497.10.0.1.100", "64496.10.0.1.1", b"HTTP/1.1 200 OK"),
-        ("64496.10.0.1.1", "64498.10.0.2.50", b"DNS QUERY web.iv8"),
-        ("64498.10.0.2.50", "64496.10.0.1.1", b"DNS REPLY 64499.10.0.1.42"),
-        ("64496.10.0.1.1", "64499.10.0.1.42", b"CONNECT"),
-        ("64499.10.0.1.42", "64496.10.0.1.1", b"ACK"),
+        ("64496-10.0.1.1", "64497-10.0.1.100", b"GET /index.html"),
+        ("64497-10.0.1.100", "64496-10.0.1.1", b"HTTP/1.1 200 OK"),
+        ("64496-10.0.1.1", "64498-10.0.2.50", b"DNS QUERY web.iv8"),
+        ("64498-10.0.2.50", "64496-10.0.1.1", b"DNS REPLY 64499-10.0.1.42"),
+        ("64496-10.0.1.1", "64499-10.0.1.42", b"CONNECT"),
+        ("64499-10.0.1.42", "64496-10.0.1.1", b"ACK"),
     ]
 
     for i, (s, d, payload) in enumerate(packets_data):
