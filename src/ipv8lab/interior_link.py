@@ -91,20 +91,20 @@ def validate_interior_link(addr: IPv8Address) -> list[str]:
 
     if not is_interior_link_address(addr):
         violations.append(
-            f"{addr.full_notation}: host part does not start with "
+            f"{addr.canonical}: host part does not start with "
             f"{INTERIOR_LINK_PREFIX} (222.x.x.x)"
         )
         return violations
 
     if addr.is_ipv4_compatible():
         violations.append(
-            f"{addr.full_notation}: interior link with r.r.r.r=0.0.0.0 "
+            f"{addr.canonical}: interior link with r.r.r.r=0.0.0.0 "
             "has no owning ASN — use <own-asn>.222.x.x.x"
         )
 
     if addr.is_internal_zone():
         violations.append(
-            f"{addr.full_notation}: interior link MUST NOT use "
+            f"{addr.canonical}: interior link MUST NOT use "
             "internal zone prefix (127.x.x.x)"
         )
 
@@ -115,7 +115,7 @@ def check_interior_link_egress(addr: IPv8Address) -> str | None:
     """Return a violation string if an interior link address appears at egress."""
     if is_interior_link_address(addr):
         return (
-            f"{addr.full_notation}: interior link (222.x.x.x) "
+            f"{addr.canonical}: interior link (222.x.x.x) "
             "MUST NOT be routed externally (Section 4.10)"
         )
     return None

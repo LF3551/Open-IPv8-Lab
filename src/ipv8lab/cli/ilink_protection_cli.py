@@ -54,7 +54,7 @@ def check_bgp8(
     addr = IPv8Address.parse(addr_str)
     result = f.filter_bgp8_advertisement(addr, interface)
     d = {
-        "prefix": addr.full_notation,
+        "prefix": addr.canonical,
         "is_interior_link": is_interior_link_host(addr),
         "action": result.action.value,
         "reason": result.reason,
@@ -63,7 +63,7 @@ def check_bgp8(
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"{result.action.value.upper()}: {addr.full_notation}")
+        typer.echo(f"{result.action.value.upper()}: {addr.canonical}")
         if result.reason:
             typer.echo(f"  {result.reason}")
 
@@ -79,7 +79,7 @@ def check_packet(
     addr = IPv8Address.parse(address)
     result = f.filter_packet(addr, interface)
     d = {
-        "address": addr.full_notation,
+        "address": addr.canonical,
         "action": result.action.value,
         "reason": result.reason,
         "trap": result.trap.to_dict() if result.trap else None,
@@ -87,7 +87,7 @@ def check_packet(
     if as_json:
         typer.echo(json.dumps(d))
     else:
-        typer.echo(f"{result.action.value.upper()}: {addr.full_notation}")
+        typer.echo(f"{result.action.value.upper()}: {addr.canonical}")
         if result.reason:
             typer.echo(f"  {result.reason}")
 

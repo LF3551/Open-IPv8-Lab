@@ -50,17 +50,22 @@ $ ipv8lab addr encode-asn 64496
 $ ipv8lab addr decode-prefix 0.0.251.240
 64496
 
-# Classify address type
-$ ipv8lab addr classify 64496-192.0.2.1
-Type: unicast
+# Classify address per Section 4.11 usage model
+$ ipv8lab usage classify 64496-192.0.2.1
+Address:  0.0.251.240.192.0.2.1
+Pattern:  <own-asn>.n.n.n.n
+Usage:    Explicit public services only
+Routing:  global
 
 # Classify multicast
-$ ipv8lab addr classify 64496-224.0.0.1
-Type: multicast
+$ ipv8lab usage classify 255.255.0.0.224.0.0.1
+Pattern:  ff.ff.x.x.n.n.n.n
+Usage:    Cross-ASN multicast
 
-# Classify RINE
-$ ipv8lab addr classify 64496-100.0.0.1
-Type: rine_prefix
+# Classify RINE peering link
+$ ipv8lab usage classify 100.0.0.1-10.0.0.1
+Pattern:  100.x.x.x.n.n.n.n
+Usage:    RINE peering links only
 
 # JSON output (all commands)
 $ ipv8lab addr parse 64496-192.0.2.1 --json

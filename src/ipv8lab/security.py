@@ -74,7 +74,7 @@ class IngressFilter:
                     section="18.2",
                     severity=Severity.SEC_ALERT,
                     message=(
-                        f"Internal zone source {src.full_notation} "
+                        f"Internal zone source {src.canonical} "
                         "on external interface"
                     ),
                 ))
@@ -83,7 +83,7 @@ class IngressFilter:
                     section="18.2",
                     severity=Severity.SEC_ALERT,
                     message=(
-                        f"Internal zone destination {dst.full_notation} "
+                        f"Internal zone destination {dst.canonical} "
                         "on external interface"
                     ),
                 ))
@@ -95,7 +95,7 @@ class IngressFilter:
                     section="18.3",
                     severity=Severity.SEC_ALERT,
                     message=(
-                        f"RINE source {src.full_notation} "
+                        f"RINE source {src.canonical} "
                         "on non-peering interface"
                     ),
                 ))
@@ -104,7 +104,7 @@ class IngressFilter:
                     section="18.3",
                     severity=Severity.SEC_ALERT,
                     message=(
-                        f"RINE destination {dst.full_notation} "
+                        f"RINE destination {dst.canonical} "
                         "on non-peering interface"
                     ),
                 ))
@@ -116,7 +116,7 @@ class IngressFilter:
                     section="18.4",
                     severity=Severity.SEC_ALERT,
                     message=(
-                        f"Interior link source {src.full_notation} "
+                        f"Interior link source {src.canonical} "
                         "on external interface"
                     ),
                 ))
@@ -125,7 +125,7 @@ class IngressFilter:
                     section="18.4",
                     severity=Severity.SEC_ALERT,
                     message=(
-                        f"Interior link destination {dst.full_notation} "
+                        f"Interior link destination {dst.canonical} "
                         "on external interface"
                     ),
                 ))
@@ -144,7 +144,7 @@ class IngressFilter:
                 severity=Severity.SEC_ALERT,
                 message=(
                     f"Cross-ASN multicast protocol prefix "
-                    f"{dst.full_notation} must be filtered at border"
+                    f"{dst.canonical} must be filtered at border"
                 ),
             ))
 

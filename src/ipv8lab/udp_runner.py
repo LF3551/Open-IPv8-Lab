@@ -43,7 +43,7 @@ class UDPNode:
         if pkt.dst.to_int() == self.node.address.to_int():
             self.node.receive_packet(pkt)
             msg = (
-                f"[{self.node.name}] Received packet from {pkt.src.full_notation}: "
+                f"[{self.node.name}] Received packet from {pkt.src.canonical}: "
                 f"{pkt.payload.decode(errors='replace')}"
             )
             log.info(msg)
@@ -75,7 +75,7 @@ class UDPNode:
                         break
 
             if next_hop is None:
-                msg = f"[{self.node.name}] No route to {pkt.dst.full_notation}"
+                msg = f"[{self.node.name}] No route to {pkt.dst.canonical}"
                 log.warning(msg)
                 self.trace.append(msg)
                 return
@@ -169,7 +169,7 @@ class UDPNetwork:
                     break
 
         if first_hop is None:
-            return [f"[{src_name}] No route to {dst_addr.full_notation}"]
+            return [f"[{src_name}] No route to {dst_addr.canonical}"]
 
         src_unode.send_to(pkt, first_hop)
         await asyncio.sleep(wait)

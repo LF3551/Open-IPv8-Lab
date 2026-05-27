@@ -138,6 +138,6 @@ class TwoTierRouteTable:
                 return route
 
         raise NoRouteFoundError(
-            f"No route found for {address.full_notation} "
+            f"No route found for {address.canonical} "
             f"(prefix={address.prefix_str}, host={host_str})"
         )

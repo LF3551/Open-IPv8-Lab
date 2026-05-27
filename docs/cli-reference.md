@@ -64,10 +64,10 @@ ipv8lab addr encode-asn 64496
 ipv8lab addr decode-prefix 0.0.251.240
 
 # Classify address type
-ipv8lab addr classify 64496-192.0.2.1
+ipv8lab usage classify 64496-192.0.2.1
 
-# Validate address
-ipv8lab addr validate 64496-192.0.2.1
+# Show full Section 4.11 usage table
+ipv8lab usage table
 
 # JSON output
 ipv8lab addr parse 64496-192.0.2.1 --json

@@ -97,7 +97,7 @@ class NetworkSimulator:
                         return
                     self._forward(to, pkt)
                     return
-            self.trace.append(f"{current_name} -> *  no route to {pkt.dst.full_notation}")
+            self.trace.append(f"{current_name} -> *  no route to {pkt.dst.canonical}")
             return
 
         next_hop = route.next_hop

@@ -156,43 +156,43 @@ def check_egress(src: IPv8Address, dst: IPv8Address) -> list[str]:
     # Internal zone MUST NOT appear on WAN (Section 18.2)
     if src.is_internal_zone():
         violations.append(
-            f"Source {src.full_notation}: internal zone prefix (127.x.x.x) "
+            f"Source {src.canonical}: internal zone prefix (127.x.x.x) "
             "MUST NOT appear on external interfaces"
         )
     if dst.is_internal_zone():
         violations.append(
-            f"Destination {dst.full_notation}: internal zone prefix (127.x.x.x) "
+            f"Destination {dst.canonical}: internal zone prefix (127.x.x.x) "
             "MUST NOT be routed externally"
         )
 
     # RINE MUST NOT appear in eBGP8 (Section 18.3)
     if src.is_rine_prefix():
         violations.append(
-            f"Source {src.full_notation}: RINE prefix (100.x.x.x) "
+            f"Source {src.canonical}: RINE prefix (100.x.x.x) "
             "MUST NOT appear on non-peering interfaces"
         )
     if dst.is_rine_prefix():
         violations.append(
-            f"Destination {dst.full_notation}: RINE prefix (100.x.x.x) "
+            f"Destination {dst.canonical}: RINE prefix (100.x.x.x) "
             "MUST NOT be globally routed"
         )
 
     # Interior link MUST NOT be routed externally (Section 18.4)
     if src.is_interior_link():
         violations.append(
-            f"Source {src.full_notation}: interior link (222.x.x.x host) "
+            f"Source {src.canonical}: interior link (222.x.x.x host) "
             "MUST NOT be routed externally"
         )
     if dst.is_interior_link():
         violations.append(
-            f"Destination {dst.full_notation}: interior link (222.x.x.x host) "
+            f"Destination {dst.canonical}: interior link (222.x.x.x host) "
             "MUST NOT be routed externally"
         )
 
     # Broadcast MUST NOT be routed (Section 12)
     if dst.is_broadcast():
         violations.append(
-            f"Destination {dst.full_notation}: broadcast "
+            f"Destination {dst.canonical}: broadcast "
             "MUST NOT be routed beyond local segment"
         )
 
